@@ -1,0 +1,146 @@
+﻿#
+# Revit Batch Processor
+#
+# Copyright (c) 2017  Dan Rumery, BVN
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+
+import clr
+import System
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+
+from System.IO import File
+
+import server_util
+import stream_io_util
+import revit_process_host
+import monitor_revit_process
+import snapshot_data_util
+import revit_dialog_detection
+import exception_util
+import time_util
+import batch_rvt_util
+from batch_rvt_util import ScriptDataUtil
+
+SECONDS_PER_MINUTE = 60
+REVIT_PROCESS_EXIT_TIMEOUT_IN_SECONDS = 10 * SECONDS_PER_MINUTE
+
+def ShowSupportedRevitFileInfo(supportedRevitFileInfo, output):
+  output()
+  revitFileInfo = supportedRevitFileInfo.GetRevitFileInfo()
+  revitFilePath = revitFileInfo.GetFullPath()
+  fileExists = revitFileInfo.Exists()
+  fileSize = revitFileInfo.GetFileSize()
+  fileSizeText = str.Format("{0:0.00}MB", fileSize / (1024.0 * 1024.0)) if fileSize is not None else "<UNKNOWN>"
+  output("\t" + revitFilePath)
+  output("\t" + "File exists: " + ("YES" if fileExists else "NO"))
+  output("\t" + "File size: " + fileSizeText)
+  if fileExists:
+    revitVersionText = revitFileInfo.TryGetRevitVersionText()
+    revitVersionText = revitVersionText if revitVersionText is not None else "NOT DETECTED!"
+    output("\t" + "Revit version: " + revitVersionText)
+  return
+
+def UsingClientHandle(serverStream, action):
+  result = None
+  try:
+    result = action()
+  finally:
+    serverStream.DisposeLocalCopyOfClientHandle()
+  return result
+
+def ShowRevitScriptOutput(scriptOutputStream, output, pendingReadLineTask=None):
+  outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(scriptOutputStream, pendingReadLineTask)
+  if outputLines.Any():
+    for line in outputLines:
+      output("\t" + "- " + line)
+  return pendingReadLineTask
+
+def RunScriptedRevitSession(revitVersion, batchRvtScriptsFolderPath, scriptFilePath, scriptDatas, output):
+  scriptDataFilePath = ScriptDataUtil.GetUniqueScriptDataFilePath()
+  ScriptDataUtil.SaveManyToFile(scriptDataFilePath, scriptDatas)
+
+  serverStream = server_util.CreateAnonymousPipeServer(
+      server_util.IN,
+      server_util.HandleInheritability.Inheritable
+    )
+  
+  def serverStreamAction():
+    scriptOutputStreamReader = stream_io_util.GetStreamReader(serverStream)
+    
+    def streamReaderAction():
+      scriptOutputPipeHandleString = serverStream.GetClientHandleAsString()
+
+      def clientHandleAction():
+        hostRevitProcess = revit_process_host.StartHostRevitProcess(
+            revitVersion,
+            batchRvtScriptsFolderPath,
+            scriptFilePath,
+            scriptDataFilePath,
+            scriptOutputPipeHandleString
+          )
+        return hostRevitProcess
+
+      hostRevitProcess = UsingClientHandle(serverStream, clientHandleAction)
+
+      hostRevitProcessId = hostRevitProcess.Id
+
+      snapshotDataFilePaths = [
+          snapshot_data_util.GetSnapshotDataFilePath(scriptData.DataExportFolderPath.GetValue())
+          for scriptData in scriptDatas
+        ]
+
+      pendingReadLineTask = [None] # Needs to be a list so it can be captured by reference in closures.
+      
+      snapshotDataFilesExistTimestamp = [None] # Needs to be a list so it can be captured by reference in closures.
+
+      def monitoringAction():
+        pendingReadLineTask[0] = ShowRevitScriptOutput(scriptOutputStreamReader, output, pendingReadLineTask[0])
+        
+        if snapshotDataFilesExistTimestamp[0] is not None:
+          if time_util.GetSecondsElapsedSinceUtc(snapshotDataFilesExistTimestamp[0]) > REVIT_PROCESS_EXIT_TIMEOUT_IN_SECONDS:
+            output()
+            output("WARNING: Timed-out waiting for the Revit process to exit. Forcibly terminating the Revit process...")
+            try:
+              hostRevitProcess.Kill()
+            except Exception, e:
+              output()
+              output("ERROR: an error occurred while attempting to kill the Revit process!")
+              exception_util.LogOutputErrorDetails(e, output)
+        elif snapshotDataFilePaths.All(lambda snapshotDataFilePath: File.Exists(snapshotDataFilePath)):
+          output()
+          output("Detected snapshot data files. Waiting for Revit process to exit...")
+          snapshotDataFilesExistTimestamp[0] = time_util.GetDateTimeUtcNow()
+
+        try:
+          revit_dialog_detection.DismissCheekyRevitDialogBoxes(hostRevitProcessId, output)
+        except Exception, e:
+          output()
+          output("WARNING: an error occurred in the cheeky Revit dialog box dismisser!")
+          exception_util.LogOutputErrorDetails(e, output)
+        
+        return
+
+      monitor_revit_process.MonitorHostRevitProcess(hostRevitProcess, monitoringAction, output)
+      return
+    
+    stream_io_util.UsingStream(scriptOutputStreamReader, streamReaderAction)
+    return
+  
+  stream_io_util.UsingStream(serverStream, serverStreamAction)
+  return
+
