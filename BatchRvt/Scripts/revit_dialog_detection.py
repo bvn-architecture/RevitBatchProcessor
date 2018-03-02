@@ -26,22 +26,34 @@ import ui_automation_util
 import script_host_error
 
 MODEL_UPGRADE_WINDOW_TITLE = "Model Upgrade"
+CHANGES_NOT_SAVED_TITLE = "Changes Not Saved"
+CLOSE_PROJECT_WITHOUT_SAVING_TITLE = "Close Project Without Saving"
 SAVE_FILE_WINDOW_TITLE = "Save File"
+EDITABLE_ELEMENTS_TITLE = "Editable Elements"
 
 DIRECTUI_CLASS_NAME = "DirectUIHWND"
 CTRLNOTIFYSINK_CLASS_NAME = "CtrlNotifySink"
 BUTTON_CLASS_NAME = "Button"
+STATIC_CONTROL_CLASS_NAME = "Static"
+
 CLOSE_BUTTON_TEXT = "Close"
 OK_BUTTON_TEXT = "OK"
 NO_BUTTON_TEXT = "No"
 YES_BUTTON_TEXT = "Yes"
 ALWAYS_LOAD_BUTTON_TEXT = "Always Load"
+DO_NOT_SAVE_THE_PROJECT_TEXT = "Do not save the project"
+RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish all elements and worksets"
+RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish elements and worksets"
 
 
 class RevitDialogInfo:
   def __init__(self, dialogHwnd):
     self.Window = ui_automation_util.WindowInfo(dialogHwnd)
+    self.Win32Buttons = []
     self.Buttons = []
+    for win32Button in win32_user32.FindWindows(dialogHwnd, BUTTON_CLASS_NAME, None):
+      buttonInfo = ui_automation_util.WindowInfo(win32Button)
+      self.Win32Buttons.append(buttonInfo)
     for directUI in win32_user32.FindWindows(dialogHwnd, DIRECTUI_CLASS_NAME, None):
       for ctrlNotifySink in win32_user32.FindWindows(directUI, CTRLNOTIFYSINK_CLASS_NAME, None):
         for button in win32_user32.FindWindows(ctrlNotifySink, BUTTON_CLASS_NAME, None):
@@ -77,40 +89,66 @@ def SendButtonClick(buttons, output):
     output("...sent.")
   return
 
+def DismissRevitDialogBox(title, buttons, targetButtonText, output):
+  targetButtons = ui_automation_util.FilterControlsByText(buttons, targetButtonText)
+  if len(targetButtons) == 1:
+    targetButton = targetButtons[0]
+  else:
+    output()
+    output("WARNING: Could not find suitable button to click for '" + title + "' dialog box!")
+    targetButton = None
+    for button in buttons:
+      buttonText = ui_automation_util.GetButtonText(button)
+      output()
+      output("\tButton: '" + buttonText +"'")
+
+  if targetButton is not None:
+    targetButtonText = ui_automation_util.GetButtonText(targetButton)
+    output()
+    output("Sending button click to '" + targetButtonText + "' button...")
+    win32_user32.SendButtonClickMessage(targetButton.Hwnd)
+    output()
+    output("...sent.")
+  return
+
 def DismissCheekyRevitDialogBoxes(revitProcessId, output):
   enabledDialogs = ui_automation_util.GetEnabledDialogsInfo(revitProcessId)
   if len(enabledDialogs) > 0:
     for enabledDialog in enabledDialogs:
       revitDialog = RevitDialogInfo(enabledDialog.Hwnd)
       buttons = revitDialog.Buttons
+      win32Buttons = revitDialog.Win32Buttons
       if enabledDialog.WindowText == MODEL_UPGRADE_WINDOW_TITLE and len(buttons) == 0:
         pass # Do nothing for model upgrade dialog box. It has no buttons and will go away on its own.
       elif enabledDialog.WindowText == script_host_error.BATCH_RVT_ERROR_WINDOW_TITLE:
         pass # Do nothing for BatchRvt error message windows.
+      elif enabledDialog.WindowText == CHANGES_NOT_SAVED_TITLE and len(buttons) == 4:
+        output()
+        output("'" + CHANGES_NOT_SAVED_TITLE + "' dialog box detected.")
+        DismissRevitDialogBox(CHANGES_NOT_SAVED_TITLE, buttons, DO_NOT_SAVE_THE_PROJECT_TEXT, output)
+      elif enabledDialog.WindowText == CLOSE_PROJECT_WITHOUT_SAVING_TITLE and len(buttons) == 3:
+        output()
+        output("'" + CLOSE_PROJECT_WITHOUT_SAVING_TITLE + "' dialog box detected.")
+        DismissRevitDialogBox(CLOSE_PROJECT_WITHOUT_SAVING_TITLE, buttons, RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT, output)
       elif enabledDialog.WindowText == SAVE_FILE_WINDOW_TITLE and len(buttons) == 3:
         output()
         output("'" + SAVE_FILE_WINDOW_TITLE + "' dialog box detected.")
-
-        noButtons = ui_automation_util.FilterControlsByText(buttons, NO_BUTTON_TEXT)
-        if len(noButtons) == 1:
-          targetButton = noButtons[0]
-        else:
+        DismissRevitDialogBox(SAVE_FILE_WINDOW_TITLE, buttons, NO_BUTTON_TEXT, output)
+      elif enabledDialog.WindowText == EDITABLE_ELEMENTS_TITLE and len(buttons) == 3:
+        output()
+        output("'" + EDITABLE_ELEMENTS_TITLE + "' dialog box detected.")
+        DismissRevitDialogBox(EDITABLE_ELEMENTS_TITLE, buttons, RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT, output)
+      elif enabledDialog.WindowText == str.Empty and len(buttons) == 0 and len(win32Buttons) == 1:
+        output()
+        output("Dialog box detected. Has no title.")
+        staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
+        if len(staticControls) > 0:
           output()
-          output("WARNING: Could not find suitable button to click for '" + SAVE_FILE_WINDOW_TITLE + "' dialog box!")
-          targetButton = None
-          for button in buttons:
-            buttonText = ui_automation_util.GetButtonText(button)
+          output("Dialog has the following static control text:")
+          for staticControl in staticControls:
             output()
-            output("\tButton: '" + buttonText +"'")
-
-        if targetButton is not None:
-          targetButtonText = ui_automation_util.GetButtonText(targetButton)
-          output()
-          output("Sending button click to '" + targetButtonText + "' button...")
-          win32_user32.SendButtonClickMessage(targetButton.Hwnd)
-          output()
-          output("...sent.")
-      
+            output(staticControl.WindowText)
+          DismissRevitDialogBox(str.Empty, win32Buttons, OK_BUTTON_TEXT, output)
       else:
         output()
         output("WARNING: unhandled Revit dialog box detected!")

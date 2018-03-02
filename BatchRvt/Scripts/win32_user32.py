@@ -61,7 +61,7 @@ def FindWindows(parentHwnd, className, windowTitle):
       yield hwnd
   return
 
-STRING_BUFFER_SIZE = 1025
+STRING_BUFFER_SIZE = (8 * 1024) + 1 # Large enough for static controls with long Window text values.
 
 def GetWindowText(hwnd):
   s = StringBuilder()
