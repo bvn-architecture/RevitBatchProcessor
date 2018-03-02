@@ -94,6 +94,22 @@ def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False)
   WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
   return application.OpenDocumentFile(localModelPath, openOptions)
 
+def OpenAndActivateNewLocal(uiApplication, modelPath, localModelPath, closeAllWorksets=False):
+  if isinstance(modelPath, str):
+    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+  if isinstance(localModelPath, str):
+    localModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(localModelPath)
+  openOptions = OpenOptions()
+  openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
+  worksetConfig = (
+      WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
+      if closeAllWorksets else
+      WorksetConfiguration()
+    )
+  openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+  WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
+  return uiApplication.OpenAndActivateDocument(localModelPath, openOptions, False)
+
 def OpenDetachAndPreserveWorksets(application, modelPath, closeAllWorksets=False):
   if isinstance(modelPath, str):
     modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
@@ -107,10 +123,28 @@ def OpenDetachAndPreserveWorksets(application, modelPath, closeAllWorksets=False
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   return application.OpenDocumentFile(modelPath, openOptions)
 
+def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllWorksets=False):
+  if isinstance(modelPath, str):
+    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+  openOptions = OpenOptions()
+  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
+  worksetConfig = (
+      WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
+      if closeAllWorksets else
+      WorksetConfiguration()
+    )
+  openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+  return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
+
 def OpenDocumentFile(application, modelPath):
   if isinstance(modelPath, ModelPath):
     modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
   return application.OpenDocumentFile(modelPath)
+
+def OpenAndActivateDocumentFile(uiApplication, modelPath):
+  if isinstance(modelPath, ModelPath):
+    modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+  return uiApplication.OpenAndActivateDocument(modelPath)
 
 def RelinquishAll(doc, shouldWaitForLockAvailabilityCallback=None):
   relinquishOptions = RelinquishOptions(True)
