@@ -13,7 +13,7 @@ def ExecuteDynamoScript(uiapp, dynamoScriptFilePath, showUI=False):
   if revitVersionNumber == "2015":
     raise Exception("Automation of Dynamo scripts is not supported in Revit 2015!")
   elif revitVersionNumber == "2016":
-    JOURNAL_KEY__AUTOMATION_MODE = "dynAutomation" # NOTE: the typo is intended here because there's a typo in the original source code!
+    JOURNAL_KEY__AUTOMATION_MODE = "dynAutomation"
     JOURNAL_KEY__SHOW_UI = "dynShowUI"
     JOURNAL_KEY__DYN_PATH = "dynPath"
   else:
