@@ -78,6 +78,9 @@
     <Content Include="Scripts\excel_util.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\revit_dynamo_util.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\template_post_processing_script.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
