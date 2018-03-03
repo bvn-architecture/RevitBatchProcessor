@@ -1,7 +1,7 @@
 
 # Revit Batch Processor
 
-Fully automated batch processing of Revit files with custom python scripts.
+Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
 ![alt text](BatchRvt_Screenshot.png)
 
