@@ -170,7 +170,7 @@ def WithOpenedDetachedDocument(app, centralFilePath, documentAction, output):
       except Exception, e:
         output()
         output("WARNING: Couldn't close the document!")
-        exception_util.LogOutputErrorDetails(e, output)
+        exception_util.LogOutputErrorDetails(e, output, False)
       app.PurgeReleasedAPIObjects()
 
   except OperationCanceledException, e:
@@ -203,7 +203,7 @@ def WithOpenedNewLocalDocument(app, centralFilePath, localFilePath, documentActi
       except Exception, e:
         output()
         output("WARNING: Couldn't close the local file!")
-        exception_util.LogOutputErrorDetails(e, output)
+        exception_util.LogOutputErrorDetails(e, output, False)
       app.PurgeReleasedAPIObjects()
 
   except OperationCanceledException, e:
@@ -234,7 +234,7 @@ def WithOpenedDocument(app, revitFilePath, documentAction, output):
       except Exception, e:
         output()
         output("WARNING: Couldn't close the document!")
-        exception_util.LogOutputErrorDetails(e, output)
+        exception_util.LogOutputErrorDetails(e, output, False)
       app.PurgeReleasedAPIObjects()
 
   except OperationCanceledException, e:

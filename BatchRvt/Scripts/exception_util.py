@@ -37,7 +37,7 @@ def GetInterpretedFrameInfo(clsExceptionData):
       break
   return interpretedFrameInfo
 
-def LogOutputErrorDetails(exception, output):
+def LogOutputErrorDetails(exception, output, verbose=True):
   exceptionMessage = (
       str(exception.message) if isinstance(exception, exceptions.Exception)
       else
@@ -58,14 +58,15 @@ def LogOutputErrorDetails(exception, output):
     if clsException is not None:
       clsExceptionType = clr.GetClrType(type(clsException))
       output(".NET exception: [" + str(clsExceptionType.Name) + "] " + str(clsException.Message))
-      interpretedFrameInfo = GetInterpretedFrameInfo(clsException.Data)
-      if interpretedFrameInfo is not None:
-        output()
-        output("Further exception information:")
-        output()
-        for i in interpretedFrameInfo:
-          if str(i) != "CallSite.Target":
-            output("\t" + str(i))
+      if verbose:
+        interpretedFrameInfo = GetInterpretedFrameInfo(clsException.Data)
+        if interpretedFrameInfo is not None:
+          output()
+          output("Further exception information:")
+          output()
+          for i in interpretedFrameInfo:
+            if str(i) != "CallSite.Target":
+              output("\t" + str(i))
   except:
     output("Could not obtain further exception information.")
   return
