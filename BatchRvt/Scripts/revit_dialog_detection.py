@@ -124,31 +124,33 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
         pass # Do nothing for BatchRvt error message windows.
       elif enabledDialog.WindowText == CHANGES_NOT_SAVED_TITLE and len(buttons) == 4:
         output()
-        output("'" + CHANGES_NOT_SAVED_TITLE + "' dialog box detected.")
-        DismissRevitDialogBox(CHANGES_NOT_SAVED_TITLE, buttons, DO_NOT_SAVE_THE_PROJECT_TEXT, output)
+        output("'" + enabledDialog.WindowText + "' dialog box detected.")
+        DismissRevitDialogBox(enabledDialog.WindowText, buttons, DO_NOT_SAVE_THE_PROJECT_TEXT, output)
       elif enabledDialog.WindowText == CLOSE_PROJECT_WITHOUT_SAVING_TITLE and len(buttons) == 3:
         output()
-        output("'" + CLOSE_PROJECT_WITHOUT_SAVING_TITLE + "' dialog box detected.")
-        DismissRevitDialogBox(CLOSE_PROJECT_WITHOUT_SAVING_TITLE, buttons, RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT, output)
+        output("'" + enabledDialog.WindowText + "' dialog box detected.")
+        DismissRevitDialogBox(enabledDialog.WindowText, buttons, RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT, output)
       elif enabledDialog.WindowText == SAVE_FILE_WINDOW_TITLE and len(buttons) == 3:
         output()
-        output("'" + SAVE_FILE_WINDOW_TITLE + "' dialog box detected.")
-        DismissRevitDialogBox(SAVE_FILE_WINDOW_TITLE, buttons, NO_BUTTON_TEXT, output)
+        output("'" + enabledDialog.WindowText + "' dialog box detected.")
+        DismissRevitDialogBox(enabledDialog.WindowText, buttons, NO_BUTTON_TEXT, output)
       elif enabledDialog.WindowText == EDITABLE_ELEMENTS_TITLE and len(buttons) == 3:
         output()
-        output("'" + EDITABLE_ELEMENTS_TITLE + "' dialog box detected.")
-        DismissRevitDialogBox(EDITABLE_ELEMENTS_TITLE, buttons, RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT, output)
-      elif enabledDialog.WindowText == str.Empty and len(buttons) == 0 and len(win32Buttons) == 1:
+        output("'" + enabledDialog.WindowText + "' dialog box detected.")
+        DismissRevitDialogBox(enabledDialog.WindowText, buttons, RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT, output)
+      elif enabledDialog.WindowText in ["Revit", str.Empty] and len(buttons) == 0 and len(win32Buttons) == 1:
         output()
-        output("Dialog box detected. Has no title.")
+        output("'" + enabledDialog.WindowText + "' dialog box detected.")
         staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
         if len(staticControls) > 0:
           output()
           output("Dialog has the following static control text:")
           for staticControl in staticControls:
-            output()
-            output(staticControl.WindowText)
-          DismissRevitDialogBox(str.Empty, win32Buttons, OK_BUTTON_TEXT, output)
+            staticControlText = staticControl.WindowText
+            if not str.IsNullOrWhiteSpace(staticControlText):
+              output()
+              output(staticControlText)
+          DismissRevitDialogBox(enabledDialog.WindowText, win32Buttons, OK_BUTTON_TEXT, output)
       else:
         output()
         output("WARNING: unhandled Revit dialog box detected!")
