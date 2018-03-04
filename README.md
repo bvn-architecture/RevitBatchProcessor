@@ -7,15 +7,29 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 # Overview
 
+The Revit Batch Processor
+
 [ TO DO ]
 
 # Build & Installation Instructions
 
-[ TO DO ]
+Open the solution file RevitBatchProcessor.sln in Visual Studio 2013 or later and run Build Solution (F6).
+
+Revit addins will be automatically deployed to the Addins folder for each available Revit version [2015-2018]. e.g. %APPDATA%\Autodesk\Revit\Addins\2018
+
+The BatchRvtGUI project is the GUI that drives the underlying engine (the BatchRvt project). Once built, run BatchRvtGUI.exe to start the Revit Batch Processor GUI.
 
 # Features
 
-[ TO DO ]
+- Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2018. (Of course the required version of Revit must be installed!)
+- Custom task scripts written in Python (specifically IronPython). These scripts of course have full access to the Revit API in addition to some batch processing-related information. They can even execute Dynamo scripts with just a small amount of python code! (Stay tuned for HOW-TO)
+- Central file processing options (Create a new local file, Detach from central).
+- Option to process files (of the same Revit version) in the same Revit session, or to process each file in its own Revit session. The latter is useful if Revit happens to crash during processing, since this won't block further processing.
+- Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!
+- Ability to import and export settings. This feature combined with a simple command line interface allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI!
+- Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work.
+
+[TODO: include some useful sample task scripts]
 
 # Requirements
 
