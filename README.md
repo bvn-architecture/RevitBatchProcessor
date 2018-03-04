@@ -33,7 +33,9 @@ The BatchRvtGUI project is the GUI that drives the underlying engine (the BatchR
 
 # Requirements
 
-[ TO DO ]
+- At least one version of Revit installed. Currently supports Revit versions 2015 through 2018.
+- To build from source code, Visual Studio version 2013 or later.
+- If executing Dynamo scripts from the task script, Dynamo 1.3+ installed (currently supports Revit versions 2016 through 2018)
 
 # License
 
