@@ -131,7 +131,7 @@ Output("Finished Dynamo script.")
 # Known Limitations / Issues
 
 - Dynamo scripts executed from a task script MUST have been saved with the 'Automatic' Run mode. (Revit Batch Processor cannot execute Dynamo scripts saved in 'Manual' Run mode.)
-- Executing Dynamo scripts from a task script requires that the Revit document is opened and active in the UI (See [Sample Scripts](#sample-scripts)). Due to the context in which Revit Batch Processor operates within Revit, such active UI documents cannot be closed during the Revit session. Because of this, if many files are to be processed with a Dynamo script it is recommended to process them using the one-Revit-session-per-file option.
+- Executing Dynamo scripts from a task script requires that the Revit document is opened and active in the UI (See [Sample Scripts](#sample-scripts) for how to do this). Due to the context in which Revit Batch Processor operates within Revit, such active UI documents cannot be closed during the Revit session. Because of this, if many files are to be processed with a Dynamo script it is recommended to process them using the one-Revit-session-per-file option.
 
 # Release Notes
 
