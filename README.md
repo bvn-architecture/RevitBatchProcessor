@@ -59,9 +59,9 @@ Daniel Rumery
 
 # Contribute
 
-<https://github.com/bvn-architecture/RevitBatchProcessor>
-
 Feedback and suggestions for improvement are more than welcome! Please track and submit bugs via the Github Issues page. If you're feeling particularly adventurous you may even submit your own code via a Github pull request.
+
+<https://github.com/bvn-architecture/RevitBatchProcessor>
 
 # Sample Scripts
 
