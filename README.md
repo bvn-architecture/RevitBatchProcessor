@@ -59,6 +59,8 @@ Daniel Rumery
 
 # Contribute
 
+<https://github.com/bvn-architecture/RevitBatchProcessor>
+
 Feedback and suggestions for improvement are more than welcome! Please track and submit bugs via the Github Issues page. If you're feeling particularly adventurous you may even submit your own code via a Github pull request.
 
 # Sample Scripts
@@ -126,14 +128,18 @@ Output("Finished Dynamo script.")
 
 # Manual
 
-[ TO DO ]
+Detailed instructions to come!
 
 # Known Limitations / Issues
 
 - Dynamo scripts executed from a task script MUST have been saved with the 'Automatic' Run mode. (Revit Batch Processor cannot execute Dynamo scripts saved in 'Manual' Run mode.)
 - Executing Dynamo scripts from a task script requires that the Revit document is opened and active in the UI (See [Sample Scripts](#sample-scripts) for how to do this). Due to the context in which Revit Batch Processor operates within Revit, such active UI documents cannot be closed during the Revit session. Because of this, if many files are to be processed with a Dynamo script it is recommended to process them using the one-Revit-session-per-file option.
 
+<!---
+
 # Release Notes
 
 [ TO DO ]
+
+--->
 
