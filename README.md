@@ -57,17 +57,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Daniel Rumery
 
-# Known Limitations / Issues
-
-[ TO DO ]
-
 # Contribute
 
 Feedback and suggestions for improvement are more than welcome! Please track and submit bugs via the Github Issues page. If you're feeling particularly adventurous you may even submit your own code via a Github pull request.
-
-# Manual
-
-[ TO DO ]
 
 # Sample Scripts
 
@@ -131,6 +123,14 @@ revit_dynamo_util.ExecuteDynamoScript(uiapp, DYNAMO_SCRIPT_FILE_PATH)
 Output()
 Output("Finished Dynamo script.")
 ```
+
+# Manual
+
+[ TO DO ]
+
+# Known Limitations / Issues
+
+[ TO DO ]
 
 # Release Notes
 
