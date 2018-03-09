@@ -104,7 +104,7 @@ from revit_script_util import Output
 
 import revit_dynamo_util
 
-DYNAMO_SCRIPT_FILE_PATH = r"C:\DynamoScripts\MyDynamoWorkspace.dyn")
+DYNAMO_SCRIPT_FILE_PATH = r"C:\DynamoScripts\MyDynamoWorkspace.dyn"
 
 sessionId = revit_script_util.GetSessionId()
 uiapp = revit_script_util.GetUIApplication()
