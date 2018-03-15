@@ -11,6 +11,14 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 # Build & Installation Instructions
 
+## Installer
+
+[Installer for Revit Batch Processor v1.0](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/2018.03.15/RevitBatchProcessorSetup.exe)
+
+The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
+
+## Build from Source code
+
 Open the solution file RevitBatchProcessor.sln in Visual Studio 2013 or later and run Build Solution (F6).
 
 Revit addins will be automatically deployed to the Addins folder for each available Revit version [2015-2018]. e.g. %APPDATA%\Autodesk\Revit\Addins\2018
