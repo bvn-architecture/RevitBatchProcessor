@@ -28,6 +28,13 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 
 ![alt text](BatchRvt_Screenshot.png)
 
+## Who's it for?
+
+> "With great power come great responsibility"
+[Spiderman](https://quoteinvestigator.com/2015/07/23/great-power/)
+
+This tool alows you to _do_ things on a very large scale. It should be used by people who are confident in their ability to write python in a way that won't ruin everyone's files
+
 
 # Build & Installation Instructions
 
