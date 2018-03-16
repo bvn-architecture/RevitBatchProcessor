@@ -1,0 +1,83 @@
+# Sample Scripts
+
+The RevitBatchProcessor takes three types of scripts, task, pre and post. They can either be pure ironPython, or can be a mix of iron python and Dynamo. TODO: write more here
+
+## Task scripts
+
+Task scripts are for...
+
+
+'Hello World' task script:
+
+```python
+'''Output "Hello Revit world!" to the log.'''
+
+# This section is common to all of these scripts. 
+import clr
+import System
+
+clr.AddReference("RevitAPI")
+clr.AddReference("RevitAPIUI")
+from Autodesk.Revit.DB import *
+
+import revit_script_util
+from revit_script_util import Output
+
+sessionId = revit_script_util.GetSessionId()
+uiapp = revit_script_util.GetUIApplication()
+
+# NOTE: these only make sense for batch Revit file processing mode.
+doc = revit_script_util.GetScriptDocument()
+revitFilePath = revit_script_util.GetRevitFilePath()
+
+# The code above is boilerplate, everything below is yours!
+
+Output()
+Output("Hello Revit world!")
+```
+
+## Dynamo Scripts
+
+Task script to execute a Dynamo script:
+
+```python
+import clr
+import System
+
+clr.AddReference("RevitAPI")
+clr.AddReference("RevitAPIUI")
+from Autodesk.Revit.DB import *
+
+import revit_script_util
+from revit_script_util import Output
+
+import revit_dynamo_util
+
+DYNAMO_SCRIPT_FILE_PATH = r"C:\DynamoScripts\MyDynamoWorkspace.dyn"
+
+sessionId = revit_script_util.GetSessionId()
+uiapp = revit_script_util.GetUIApplication()
+
+# NOTE: these only make sense for batch Revit file processing mode.
+doc = revit_script_util.GetScriptDocument()
+revitFilePath = revit_script_util.GetRevitFilePath()
+
+# Dynamo requires an active UIDocument, not just a loaded Document!
+Output()
+Output("Activating the document for Dynamo script automation.")
+uidoc = uiapp.OpenAndActivateDocument(doc.PathName)
+
+Output()
+Output("Executing Dynamo script.")
+revit_dynamo_util.ExecuteDynamoScript(uiapp, DYNAMO_SCRIPT_FILE_PATH)
+
+Output()
+Output("Finished Dynamo script.")
+```
+
+## Pre processing scripts
+TODO: write something here
+
+## Post processing scripts
+TODO: write something here
+
