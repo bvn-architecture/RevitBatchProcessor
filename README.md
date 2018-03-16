@@ -3,11 +3,10 @@
 
 Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
+* example use case 1
+* example use case 2
+
 ![alt text](BatchRvt_Screenshot.png)
-
-# Overview
-
-Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
 # Build & Installation Instructions
 
