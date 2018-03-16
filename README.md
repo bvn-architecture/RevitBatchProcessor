@@ -3,8 +3,15 @@
 
 Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
-* example use case 1
-* example use case 2
+This tool doesn't _do_ any of these things, but it _allows_ you to do them:
+
+* Open all the Revit files that your company is currently using and run a healthcheck script against them.
+
+    Keeping an eye on the health of many Revit files is time consuming. You can use this to check in on all your files, every day, and react to problems before they get to gnarly.
+* Do family audits across the whole company
+* Run large scale queries against many revit files
+* Find and replace families based on complicated criteria
+* more example use cases
 
 ![alt text](BatchRvt_Screenshot.png)
 
@@ -163,4 +170,3 @@ Feedback and suggestions for improvement are more than welcome! Please track and
 [ TO DO ]
 
 --->
-
