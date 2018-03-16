@@ -145,7 +145,7 @@ Revit Batch Processor can be run from the command-line (bypassing the GUI). Firs
 Optionally you can also specify the location for the log file:
 
 ```
-%LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --settings_file "C:\MyBatchTasks\BatchRvt.Settings.json" --log_folder "C:\MyBatchTasks\Logs"
+%LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --log_folder "C:\MyBatchTasks\Logs" --settings_file "C:\MyBatchTasks\BatchRvt.Settings.json"
 ```
 
 # Manual
