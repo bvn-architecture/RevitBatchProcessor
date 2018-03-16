@@ -134,6 +134,20 @@ Output()
 Output("Finished Dynamo script.")
 ```
 
+# Command-line Interface
+
+Revit Batch Processor can be run from the command-line (bypassing the GUI). First configure and export the required processing settings from the GUI application. Once this is done you can simply run the command line utility **BatchRvt.exe** passing the exported settings file path as an argument:
+
+```
+%LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --settings_file "BatchRvt.Settings.json"
+```
+
+Optionally you can also specify the location for the log file:
+
+```
+%LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --settings_file "C:\MyBatchTasks\BatchRvt.Settings.json" --log_folder "C:\MyBatchTasks\Logs"
+```
+
 # Manual
 
 Detailed instructions to come!
