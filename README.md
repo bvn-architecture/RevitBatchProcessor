@@ -76,6 +76,9 @@ Daniel Rumery
 'Hello World' task script:
 
 ```python
+'''Output "Hello Revit world!" to the log.'''
+
+# This section is common to all of these scripts. 
 import clr
 import System
 
@@ -92,6 +95,8 @@ uiapp = revit_script_util.GetUIApplication()
 # NOTE: these only make sense for batch Revit file processing mode.
 doc = revit_script_util.GetScriptDocument()
 revitFilePath = revit_script_util.GetRevitFilePath()
+
+# The code above is boilerplate, everything below is yours!
 
 Output()
 Output("Hello Revit world!")
