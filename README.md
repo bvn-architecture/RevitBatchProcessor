@@ -65,12 +65,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Daniel Rumery
 
-# Contribute
-
-Feedback and suggestions for improvement are more than welcome! Please track and submit bugs via the Github Issues page. If you're feeling particularly adventurous you may even submit your own code via a Github pull request.
-
-<https://github.com/bvn-architecture/RevitBatchProcessor>
-
 # Sample Scripts
 
 'Hello World' task script:
@@ -151,6 +145,12 @@ Optionally you can also specify the location for the log file:
 # Manual
 
 Detailed instructions to come!
+
+# Contribute
+
+Feedback and suggestions for improvement are more than welcome! Please track and submit bugs via the Github Issues page. If you're feeling particularly adventurous you may even submit your own code via a Github pull request.
+
+<https://github.com/bvn-architecture/RevitBatchProcessor>
 
 # Known Limitations / Issues
 
