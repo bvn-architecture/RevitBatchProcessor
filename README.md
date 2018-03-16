@@ -3,7 +3,7 @@
 
 Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
-# Use cases
+## Use cases
 
 This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 
@@ -15,7 +15,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 * Find and replace families based on complicated criteria
 * more example use cases
 
-# Features
+## Features
 
 - Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2018. (Of course the required version of Revit must be installed!)
 - Custom task scripts written in Python (specifically IronPython). These scripts of course have full access to the Revit API in addition to some batch processing-related information. They can even execute Dynamo scripts with just a small amount of python code! (See [Sample Scripts](#sample-scripts))
@@ -27,6 +27,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Ability to import and export settings. This feature combined with the simple [command-line interface](#command-line-interface) allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.
 
 ![alt text](BatchRvt_Screenshot.png)
+
 
 # Build & Installation Instructions
 
