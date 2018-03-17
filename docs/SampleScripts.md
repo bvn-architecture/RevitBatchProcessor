@@ -1,6 +1,6 @@
 # Sample Scripts
 
-The RevitBatchProcessor takes three types of scripts, task, pre and post. They can either be pure ironPython, or can be a mix of iron python and Dynamo. TODO: write more here
+The RevitBatchProcessor takes three types of scripts: a task script and (optionally) a pre-processing and post-processing script. These scripts are written in Iron-Python (a .NET variant of Python). With a small amount of additional code the task script can also execute your Dynamo script!
 
 ## Task scripts
 
@@ -53,6 +53,8 @@ from revit_script_util import Output
 
 import revit_dynamo_util
 
+# Change this variable to the path of your Dynamo workspace file.
+# (Note that the Dynamo script must have been saved in 'Automatic' mode.)
 DYNAMO_SCRIPT_FILE_PATH = r"C:\DynamoScripts\MyDynamoWorkspace.dyn"
 
 sessionId = revit_script_util.GetSessionId()
@@ -63,12 +65,14 @@ doc = revit_script_util.GetScriptDocument()
 revitFilePath = revit_script_util.GetRevitFilePath()
 
 # Dynamo requires an active UIDocument, not just a loaded Document!
+# So we use UIApplication.OpenAndActivateDocument() here.
 Output()
 Output("Activating the document for Dynamo script automation.")
 uidoc = uiapp.OpenAndActivateDocument(doc.PathName)
 
 Output()
 Output("Executing Dynamo script.")
+# One line to execute the Dynamo script!
 revit_dynamo_util.ExecuteDynamoScript(uiapp, DYNAMO_SCRIPT_FILE_PATH)
 
 Output()
