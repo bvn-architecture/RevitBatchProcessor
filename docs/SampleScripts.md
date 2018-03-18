@@ -4,8 +4,7 @@ The RevitBatchProcessor takes three types of scripts: a task script and (optiona
 
 ## Task scripts
 
-Task scripts are for...
-
+Some simple Task scripts to demonstrate how they work:
 
 'Hello World' task script:
 
@@ -79,9 +78,11 @@ Output()
 Output("Finished Dynamo script.")
 ```
 
-## Pre processing scripts
-TODO: write something here
+## Pre-processing scripts
 
-## Post processing scripts
-TODO: write something here
+TODO: list some examples
+
+## Post-processing scripts
+
+TODO: list some examples
 

@@ -7,13 +7,13 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 
-* Open all the Revit files that your company is currently using and run a healthcheck script against them.
-
-    Keeping an eye on the health of many Revit files is time consuming. You can use this to check in on all your files, every day, and react to problems before they get to gnarly.
-* Do family audits across the whole company
-* Run large scale queries against many revit files
-* Find and replace families based on complicated criteria
-* more example use cases
+- Open all the Revit files across your Revit projects and run a health-check script against them. Keeping an eye on the health and performance of many Revit files is time-consuming. You could use this to check in on all your files daily and react to problems before they get too gnarly.
+- Perform project and family audits across your Revit projects.
+- Run large scale queries against many Revit files.
+- Mine data from your Revit projects for analytics or machine learning projects.
+- Automated milestoning of Revit projects.
+- Automated housekeeping tasks (e.g. place elements on appropriate worksets)
+- Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!
 
 ## Features
 
@@ -26,15 +26,14 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!
 - Ability to import and export settings. This feature combined with the simple [command-line interface](#command-line-interface) allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.
 
-![alt text](BatchRvt_Screenshot.png)
+![Screenshot of the UI](BatchRvt_Screenshot.png)
 
-## Who's it for?
+## Who's this for?
 
 > "With great power come great responsibility"
 [Spiderman](https://quoteinvestigator.com/2015/07/23/great-power/)
 
-This tool alows you to _do_ things on a very large scale. It should be used by people who are confident in their ability to write python in a way that won't ruin everyone's files
-
+This tool alows you to _do_ things with Revit on a very large scale. Because of this power, Python or Dynamo scripts that make modifications to Revit files (esp. workshared files) should be developed with the utmost care! You will need to be confident in your ability to write Python or Dynamo scripts that won't ruin your files en-masse. The Revit Batch Processor's 'Detach from Central' option should be used both while testing and for scripts that do not explicitly depend on working with a live workshared Central file (the 'Create New local' option).
 
 # Build & Installation Instructions
 
@@ -83,6 +82,8 @@ Daniel Rumery
 
 # Sample Scripts
 
+Some simple Task scripts to demonstrate how they work:
+
 'Hello World' task script:
 
 ```python
@@ -115,6 +116,8 @@ Output("Hello Revit world!")
 Task script to execute a Dynamo script:
 
 ```python
+'''Run a Dynamo workspace script on each Revit file.'''
+
 import clr
 import System
 
@@ -127,6 +130,8 @@ from revit_script_util import Output
 
 import revit_dynamo_util
 
+# Change this variable to the path of your Dynamo workspace file.
+# (Note that the Dynamo script must have been saved in 'Automatic' mode.)
 DYNAMO_SCRIPT_FILE_PATH = r"C:\DynamoScripts\MyDynamoWorkspace.dyn"
 
 sessionId = revit_script_util.GetSessionId()
@@ -137,12 +142,14 @@ doc = revit_script_util.GetScriptDocument()
 revitFilePath = revit_script_util.GetRevitFilePath()
 
 # Dynamo requires an active UIDocument, not just a loaded Document!
+# So we use UIApplication.OpenAndActivateDocument() here.
 Output()
 Output("Activating the document for Dynamo script automation.")
 uidoc = uiapp.OpenAndActivateDocument(doc.PathName)
 
 Output()
 Output("Executing Dynamo script.")
+# One line to execute the Dynamo script!
 revit_dynamo_util.ExecuteDynamoScript(uiapp, DYNAMO_SCRIPT_FILE_PATH)
 
 Output()
