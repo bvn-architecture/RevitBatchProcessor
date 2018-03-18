@@ -13,6 +13,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Mine data from your Revit projects for analytics or machine learning projects.
 - Automated milestoning of Revit projects.
 - Automated housekeeping tasks (e.g. place elements on appropriate worksets)
+- Batch upgrading of Revit projects and family files.
 - Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!
 
 ## Features
