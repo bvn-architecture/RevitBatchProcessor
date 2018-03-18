@@ -3,11 +3,37 @@
 
 Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
+## Use cases
+
+This tool doesn't _do_ any of these things, but it _allows_ you to do them:
+
+- Open all the Revit files across your Revit projects and run a health-check script against them. Keeping an eye on the health and performance of many Revit files is time-consuming. You could use this to check in on all your files daily and react to problems before they get too gnarly.
+- Perform project and family audits across your Revit projects.
+- Run large scale queries against many Revit files.
+- Mine data from your Revit projects for analytics or machine learning projects.
+- Automated milestoning of Revit projects.
+- Automated housekeeping tasks (e.g. place elements on appropriate worksets)
+- Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!
+
+## Features
+
+- Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2018. (Of course the required version of Revit must be installed!)
+- Custom task scripts written in Python (specifically IronPython). These scripts of course have full access to the Revit API in addition to some batch processing-related information. They can even execute Dynamo scripts with just a small amount of python code! (See [Sample Scripts](#sample-scripts))
+- Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work.
+- Option for custom pre- and post-processing task scripts. Useful if the overall batch processing task requires some additional setup / tear down work to be done.
+- Central file processing options (Create a new local file, Detach from central).
+- Option to process files (of the same Revit version) in the same Revit session, or to process each file in its own Revit session. The latter is useful if Revit happens to crash during processing, since this won't block further processing.
+- Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!
+- Ability to import and export settings. This feature combined with the simple [command-line interface](#command-line-interface) allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.
+
 ![Screenshot of the UI](BatchRvt_Screenshot.png)
 
-# Overview
+## Who's this for?
 
-Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
+> "With great power come great responsibility"
+[Spiderman](https://quoteinvestigator.com/2015/07/23/great-power/)
+
+This tool alows you to _do_ things with Revit on a very large scale. Because of this power, Python or Dynamo scripts that make modifications to Revit files (esp. workshared files) should be developed with the utmost care! You will need to be confident in your ability to write Python or Dynamo scripts that won't ruin your files en-masse. The Revit Batch Processor's 'Detach from Central' option should be used both while testing and for scripts that do not explicitly depend on working with a live workshared Central file (the 'Create New local' option).
 
 # Build & Installation Instructions
 
@@ -24,17 +50,6 @@ Open the solution file RevitBatchProcessor.sln in Visual Studio 2013 or later an
 Revit addins will be automatically deployed to the Addins folder for each available Revit version [2015-2018]. e.g. %APPDATA%\Autodesk\Revit\Addins\2018
 
 The BatchRvtGUI project is the GUI that drives the underlying engine (the BatchRvt project). Once built, run BatchRvtGUI.exe to start the Revit Batch Processor GUI.
-
-# Features
-
-- Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2018. (Of course the required version of Revit must be installed!)
-- Custom task scripts written in Python (specifically IronPython). These scripts of course have full access to the Revit API in addition to some batch processing-related information. They can even execute Dynamo scripts with just a small amount of python code! (See [Sample Scripts](#sample-scripts))
-- Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work.
-- Option for custom pre- and post-processing task scripts. Useful if the overall batch processing task requires some additional setup / tear down work to be done.
-- Central file processing options (Create a new local file, Detach from central).
-- Option to process files (of the same Revit version) in the same Revit session, or to process each file in its own Revit session. The latter is useful if Revit happens to crash during processing, since this won't block further processing.
-- Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!
-- Ability to import and export settings. This feature combined with the simple [command-line interface](#command-line-interface) allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.
 
 # Requirements
 
@@ -67,9 +82,14 @@ Daniel Rumery
 
 # Sample Scripts
 
+Some simple Task scripts to demonstrate how they work:
+
 'Hello World' task script:
 
 ```python
+'''Output "Hello Revit world!" to the log.'''
+
+# This section is common to all of these scripts. 
 import clr
 import System
 
@@ -87,6 +107,8 @@ uiapp = revit_script_util.GetUIApplication()
 doc = revit_script_util.GetScriptDocument()
 revitFilePath = revit_script_util.GetRevitFilePath()
 
+# The code above is boilerplate, everything below is yours!
+
 Output()
 Output("Hello Revit world!")
 ```
@@ -94,6 +116,8 @@ Output("Hello Revit world!")
 Task script to execute a Dynamo script:
 
 ```python
+'''Run a Dynamo workspace script on each Revit file.'''
+
 import clr
 import System
 
@@ -106,6 +130,8 @@ from revit_script_util import Output
 
 import revit_dynamo_util
 
+# Change this variable to the path of your Dynamo workspace file.
+# (Note that the Dynamo script must have been saved in 'Automatic' mode.)
 DYNAMO_SCRIPT_FILE_PATH = r"C:\DynamoScripts\MyDynamoWorkspace.dyn"
 
 sessionId = revit_script_util.GetSessionId()
@@ -116,12 +142,14 @@ doc = revit_script_util.GetScriptDocument()
 revitFilePath = revit_script_util.GetRevitFilePath()
 
 # Dynamo requires an active UIDocument, not just a loaded Document!
+# So we use UIApplication.OpenAndActivateDocument() here.
 Output()
 Output("Activating the document for Dynamo script automation.")
 uidoc = uiapp.OpenAndActivateDocument(doc.PathName)
 
 Output()
 Output("Executing Dynamo script.")
+# One line to execute the Dynamo script!
 revit_dynamo_util.ExecuteDynamoScript(uiapp, DYNAMO_SCRIPT_FILE_PATH)
 
 Output()
@@ -164,4 +192,3 @@ Feedback and suggestions for improvement are more than welcome! Please track and
 [ TO DO ]
 
 --->
-
