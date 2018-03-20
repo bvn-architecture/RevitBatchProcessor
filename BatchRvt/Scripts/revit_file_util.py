@@ -21,6 +21,10 @@
 import clr
 import System
 
+from System import Environment
+from System.IO import Path
+import path_util
+
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 
@@ -77,6 +81,27 @@ def CopyModel(app, sourceModelPath, destinationFilePath, overwrite=True):
       overwrite
     )
   return
+
+def CreateNewProjectFile(app, revitFilePath):
+  newDoc = app.NewProjectDocument(app.DefaultProjectTemplate)
+  saveAsOptions = SaveAsOptions()
+  saveAsOptions.OverwriteExistingFile = True
+  newDoc.SaveAs(revitFilePath, saveAsOptions)
+  return newDoc
+
+def OpenAndActivateBatchRvtTemporaryDocument(uiApplication):
+  application = uiApplication.Application
+  BATCHRVT_TEMPORARY_REVIT_FILE_PATH = Path.Combine(
+      Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+      "BatchRvt",
+      "TemporaryProject." + application.VersionNumber + ".rvt"
+    )
+  if not path_util.FileExists(BATCHRVT_TEMPORARY_REVIT_FILE_PATH):
+    path_util.CreateDirectoryForFilePath(BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
+    newDoc = CreateNewProjectFile(application, BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
+    newDoc.Close(False)
+  uiDoc = uiApplication.OpenAndActivateDocument(BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
+  return uiDoc
 
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False):
   if isinstance(modelPath, str):
