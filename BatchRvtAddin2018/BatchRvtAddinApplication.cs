@@ -41,20 +41,9 @@ namespace BatchRvt.Addin.Revit2018
         {
             var pluginFolderPath = typeof(BatchRvtAddinApplication).Assembly.Location;
 
-            controlledApplication.ApplicationInitialized +=
-                (sender, args) =>
-                {
-                    var uiApplication = new UIApplication(sender as Application);
+            var batchRvtExternalEventHandler = new BatchRvtExternalEventHandler(pluginFolderPath);
 
-                    try
-                    {
-                        ScriptHostUtil.ExecuteBatchScriptHost(pluginFolderPath, uiApplication);
-                    }
-                    catch (Exception e)
-                    {
-                        WinForms.MessageBox.Show(e.ToString(), ScriptHostUtil.BATCH_RVT_ERROR_WINDOW_TITLE);
-                    }
-                };
+            batchRvtExternalEventHandler.Raise();
         }
 
         public Result OnStartup(UIControlledApplication uiApplication)
@@ -67,6 +56,40 @@ namespace BatchRvt.Addin.Revit2018
         public Result OnShutdown(UIControlledApplication application)
         {
             return Result.Succeeded;
+        }
+    }
+
+    public class BatchRvtExternalEventHandler : IExternalEventHandler
+    {
+        private readonly ExternalEvent externalEvent_;
+        private readonly string pluginFolderPath_;
+
+        public BatchRvtExternalEventHandler(string pluginFolderPath)
+        {
+            this.externalEvent_ = ExternalEvent.Create(this);
+            this.pluginFolderPath_ = pluginFolderPath;
+        }
+
+        public void Execute(UIApplication uiApp)
+        {
+            try
+            {
+                ScriptHostUtil.ExecuteBatchScriptHost(this.pluginFolderPath_, uiApp);
+            }
+            catch (Exception e)
+            {
+                WinForms.MessageBox.Show(e.ToString(), ScriptHostUtil.BATCH_RVT_ERROR_WINDOW_TITLE);
+            }
+        }
+
+        public string GetName()
+        {
+            return "BatchRvt_ExternalEventHandler";
+        }
+
+        public ExternalEventRequest Raise()
+        {
+            return this.externalEvent_.Raise();
         }
     }
 }
