@@ -84,6 +84,9 @@ def SetCurrentScriptData(scriptData):
 def GetRevitFilePath():
   return SCRIPT_DATA_CONTAINER[0].RevitFilePath.GetValue()
 
+def GetOpenInUI():
+  return SCRIPT_DATA_CONTAINER[0].OpenInUI.GetValue()
+
 def GetProjectFolderName():
   projectFolderName = None
   revitFilePath = GetRevitFilePath()
@@ -152,18 +155,25 @@ def GetActiveDocument(uiapp):
   doc = uidoc.Document if uidoc is not None else None
   return doc
 
-def WithOpenedDetachedDocument(app, centralFilePath, documentAction, output):
+def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output):
+  app = uiapp.Application
   result = None
   output()
   output("Opening detached central file: " + centralFilePath)
   try:
     # TODO: decide if worksets should be closed or open (currently the script closes them)
-    doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, True)
+    if openInUI:
+      uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, True)
+      doc = uidoc.Document
+    else:
+      doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, True)
 
     try:
       result = documentAction(doc)
     finally:
       try:
+        if openInUI:
+          revit_file_util.OpenAndActivateBatchRvtTemporaryDocument(uiapp)
         revit_file_util.CloseWithoutSave(doc)
         output()
         output("Closed file: " + centralFilePath)
@@ -183,7 +193,8 @@ def WithOpenedDetachedDocument(app, centralFilePath, documentAction, output):
     raise
   return result
 
-def WithOpenedNewLocalDocument(app, centralFilePath, localFilePath, documentAction, output):
+def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
+  app = uiapp.Application
   result = None
   output()
   output("Opening central file: " + centralFilePath)
@@ -191,12 +202,18 @@ def WithOpenedNewLocalDocument(app, centralFilePath, localFilePath, documentActi
   output("New local file: " + localFilePath)
   try:
     # TODO: decide if worksets should be closed or open (currently the script closes them)
-    doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, True)
+    if openInUI:
+      uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, True)
+      doc = uidoc.Document
+    else:
+      doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, True)
 
     try:
       result = documentAction(doc)
     finally:
       try:
+        if openInUI:
+          revit_file_util.OpenAndActivateBatchRvtTemporaryDocument(uiapp)
         revit_file_util.CloseWithoutSave(doc)
         output()
         output("Closed local file: " + centralFilePath)
@@ -216,18 +233,25 @@ def WithOpenedNewLocalDocument(app, centralFilePath, localFilePath, documentActi
     raise
   return result
 
-def WithOpenedDocument(app, revitFilePath, documentAction, output):
+def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
+  app = uiapp.Application
   result = None
   output()
   output("Opening file: " + revitFilePath)
   try:
     # TODO: decide if worksets should be closed or open (currently the script closes them)
-    doc = revit_file_util.OpenDocumentFile(app, revitFilePath)
+    if openInUI:
+      uidoc = revit_file_util.OpenAndActivateDocumentFile(uiapp, revitFilePath)
+      doc = uidoc.Document
+    else:
+      doc = revit_file_util.OpenDocumentFile(app, revitFilePath)
 
     try:
       result = documentAction(doc)
     finally:
       try:
+        if openInUI:
+          revit_file_util.OpenAndActivateBatchRvtTemporaryDocument(uiapp)
         revit_file_util.CloseWithoutSave(doc)
         output()
         output("Closed file: " + revitFilePath)
@@ -257,23 +281,23 @@ def WithAutomatedErrorHandling(uiapp, revitAction, output):
   result = WithExceptionLogging(action, output)
   return result
 
-def RunDetachedDocumentAction(uiapp, centralFilePath, documentAction, output):
+def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, documentAction, output):
   def revitAction():
-    result = WithOpenedDetachedDocument(uiapp.Application, centralFilePath, documentAction, output)
+    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output)
     return result
   result = WithAutomatedErrorHandling(uiapp, revitAction, output)
   return result
 
-def RunNewLocalDocumentAction(uiapp, centralFilePath, localFilePath, documentAction, output):
+def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
   def revitAction():
-    result = WithOpenedNewLocalDocument(uiapp.Application, centralFilePath, localFilePath, documentAction, output)
+    result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output)
     return result
   result = WithAutomatedErrorHandling(uiapp, revitAction, output)
   return result
 
-def RunDocumentAction(uiapp, revitFilePath, documentAction, output):
+def RunDocumentAction(uiapp, openInUI, revitFilePath, documentAction, output):
   def revitAction():
-    result = WithOpenedDocument(uiapp.Application, revitFilePath, documentAction, output)
+    result = WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output)
     return result
   result = WithAutomatedErrorHandling(uiapp, revitAction, output)
   return result

@@ -97,6 +97,7 @@ def RunBatchTaskScript(scriptFilePath):
   uiapp = revit_session.GetSessionUIApplication()
   sessionId = revit_script_util.GetSessionId()
   centralFilePath = revit_script_util.GetRevitFilePath()
+  openInUI = revit_script_util.GetOpenInUI()
   enableDataExport = revit_script_util.GetEnableDataExport()
   dataExportFolderPath = revit_script_util.GetDataExportFolderPath()
   showMessageBoxOnTaskError = revit_script_util.GetShowMessageBoxOnTaskError()
@@ -202,11 +203,11 @@ def RunBatchTaskScript(scriptFilePath):
             output()
             output("WARNING: failed to delete the local file!")
           path_util.CreateDirectoryForFilePath(localFilePath)
-          result = revit_script_util.RunNewLocalDocumentAction(uiapp, centralFilePath, localFilePath, processDocument, output)
+          result = revit_script_util.RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, processDocument, output)
         elif isCentralModel or isLocalModel:
-          result = revit_script_util.RunDetachedDocumentAction(uiapp, centralFilePath, processDocument, output)
+          result = revit_script_util.RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, processDocument, output)
         else:
-          result = revit_script_util.RunDocumentAction(uiapp, centralFilePath, processDocument, output)
+          result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, processDocument, output)
     except Exception, e:
       aborted = True
       snapshotError = exception_util.GetExceptionDetails(e)

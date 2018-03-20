@@ -70,6 +70,7 @@ namespace BatchRvtUtil
         public readonly EnumSetting<BatchRvt.RevitFileProcessingOption> RevitFileProcessingOption = new EnumSetting<BatchRvt.RevitFileProcessingOption>("revitFileProcessingOption");
         public readonly BooleanSetting IfNotAvailableUseMinimumAvailableRevitVersion = new BooleanSetting("ifNotAvailableUseMinimumAvailableRevitVersion");
         public readonly EnumSetting<RevitVersion.SupportedRevitVersion> BatchRevitTaskRevitVersion = new EnumSetting<RevitVersion.SupportedRevitVersion>("batchRevitTaskRevitVersion");
+        public readonly BooleanSetting OpenInUI = new BooleanSetting("openInUI");
 
         public BatchRvtSettings()
         {
@@ -91,7 +92,8 @@ namespace BatchRvtUtil
                         this.SingleRevitTaskRevitVersion,
                         this.RevitFileProcessingOption,
                         this.IfNotAvailableUseMinimumAvailableRevitVersion,
-                        this.BatchRevitTaskRevitVersion
+                        this.BatchRevitTaskRevitVersion,
+                        this.OpenInUI
                     }
                 );
         }

@@ -83,6 +83,7 @@ class BatchRvtConfig:
     self.RevitFileProcessingOption = None
     self.IfNotAvailableUseMinimumAvailableRevitVersion = None
     self.BatchRevitTaskRevitVersion = None
+    self.OpenInUI = False
 
     return
 
@@ -167,6 +168,7 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
   batchRvtConfig.RevitFileProcessingOption = batchRvtSettings.RevitFileProcessingOption.GetValue()
   batchRvtConfig.IfNotAvailableUseMinimumAvailableRevitVersion = batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.GetValue()
   batchRvtConfig.BatchRevitTaskRevitVersion = batchRvtSettings.BatchRevitTaskRevitVersion.GetValue()
+  batchRvtConfig.OpenInUI = batchRvtSettings.OpenInUI.GetValue()
 
   if not File.Exists(batchRvtConfig.ScriptFilePath):
     output()

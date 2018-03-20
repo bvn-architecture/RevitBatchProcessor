@@ -298,6 +298,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
         scriptData = ScriptDataUtil.ScriptData()
         scriptData.SessionId.SetValue(batchRvtConfig.SessionId)
         scriptData.RevitFilePath.SetValue(revitFilePath)
+        scriptData.OpenInUI.SetValue(batchRvtConfig.OpenInUI)
         scriptData.EnableDataExport.SetValue(batchRvtConfig.EnableDataExport)
         scriptData.SessionDataFolderPath.SetValue(batchRvtConfig.SessionDataFolderPath)
         scriptData.DataExportFolderPath.SetValue(snapshotDataExportFolderPath)
