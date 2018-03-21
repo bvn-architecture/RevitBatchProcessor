@@ -480,7 +480,7 @@ namespace BatchRvtGUI
             BrowseForExistingScriptFile(
                     "Select Task Python script",
                     scriptFilePath => { this.taskScriptTextBox.Text = scriptFilePath; },
-                    ScriptType.Python,
+                    ScriptType.Any,
                     PathUtil.GetExistingFileDirectoryPath(this.taskScriptTextBox.Text)
                 );
         }

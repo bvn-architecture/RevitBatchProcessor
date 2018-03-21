@@ -266,18 +266,18 @@
             this.taskScriptLabel.AutoSize = true;
             this.taskScriptLabel.Location = new System.Drawing.Point(6, 24);
             this.taskScriptLabel.Name = "taskScriptLabel";
-            this.taskScriptLabel.Size = new System.Drawing.Size(91, 13);
+            this.taskScriptLabel.Size = new System.Drawing.Size(121, 13);
             this.taskScriptLabel.TabIndex = 0;
-            this.taskScriptLabel.Text = "Task Script (*.py):";
+            this.taskScriptLabel.Text = "Task Script (*.py; *.dyn):";
             // 
             // taskScriptTextBox
             // 
             this.taskScriptTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.taskScriptTextBox.Location = new System.Drawing.Point(112, 21);
+            this.taskScriptTextBox.Location = new System.Drawing.Point(133, 21);
             this.taskScriptTextBox.Name = "taskScriptTextBox";
             this.taskScriptTextBox.ReadOnly = true;
-            this.taskScriptTextBox.Size = new System.Drawing.Size(524, 20);
+            this.taskScriptTextBox.Size = new System.Drawing.Size(503, 20);
             this.taskScriptTextBox.TabIndex = 1;
             // 
             // browseScriptButton
