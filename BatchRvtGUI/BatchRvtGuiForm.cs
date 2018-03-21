@@ -41,6 +41,7 @@ namespace BatchRvtGUI
         private const string NEW_PREPROCESSING_SCRIPT_FILENAME = "new_pre_processing_script.py";
         private const string NEW_POSTPROCESSING_SCRIPT_FILENAME = "new_post_processing_script.py";
 
+        private enum ScriptType { Python = 0, Dynamo = 1, Any = 2 }
         private enum SaveNewScriptType { TaskScript = 0, PreProcessingScript = 1, PostProcessingScript = 2 }
 
         private const string TEMPLATE_TASK_SCRIPT_FILENAME = "template_task_script.py";
@@ -49,6 +50,9 @@ namespace BatchRvtGUI
 
         private const string PYTHON_SCRIPT_EXTENSION = ".py";
         private const string PYTHON_SCRIPT_FILTER = "Python files (*.py)|*.py";
+        private const string DYNAMO_SCRIPT_EXTENSION = ".dyn";
+        private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
+        private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
 
         private const int SETUP_HEIGHT = 614;
         private const int SETUP_INITIAL_WIDTH = 875;
@@ -476,6 +480,7 @@ namespace BatchRvtGUI
             BrowseForExistingScriptFile(
                     "Select Task Python script",
                     scriptFilePath => { this.taskScriptTextBox.Text = scriptFilePath; },
+                    ScriptType.Python,
                     PathUtil.GetExistingFileDirectoryPath(this.taskScriptTextBox.Text)
                 );
         }
@@ -544,13 +549,25 @@ namespace BatchRvtGUI
             return;
         }
 
-        private void BrowseForExistingScriptFile(string dialogTitle, Action<string> scriptFileAction, string initialDirectory = null)
+        private void BrowseForExistingScriptFile(
+                string dialogTitle,
+                Action<string> scriptFileAction,
+                ScriptType scriptType,
+                string initialDirectory = null
+            )
         {
+            var scriptDefaultExtension = (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_EXTENSION : PYTHON_SCRIPT_EXTENSION;
+            var scriptFilter = (
+                    (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_FILTER :
+                    (scriptType == ScriptType.Python) ? PYTHON_SCRIPT_FILTER :
+                    ANY_SCRIPTS_FILTER
+                );
+
             BrowseForFile(
                     dialogTitle,
                     scriptFileAction,
-                    PYTHON_SCRIPT_EXTENSION,
-                    PYTHON_SCRIPT_FILTER,
+                    scriptDefaultExtension,
+                    scriptFilter,
                     true,
                     initialDirectory
                 );
@@ -637,6 +654,7 @@ namespace BatchRvtGUI
             BrowseForExistingScriptFile(
                     "Select Pre-Processing Python script",
                     scriptFilePath => { this.preProcessingScriptTextBox.Text = scriptFilePath; },
+                    ScriptType.Python,
                     PathUtil.GetExistingFileDirectoryPath(this.preProcessingScriptTextBox.Text)
                 );
         }
@@ -646,6 +664,7 @@ namespace BatchRvtGUI
             BrowseForExistingScriptFile(
                     "Select Post-Processing Python script",
                     scriptFilePath => { this.postProcessingScriptTextBox.Text = scriptFilePath; },
+                    ScriptType.Python,
                     PathUtil.GetExistingFileDirectoryPath(this.postProcessingScriptTextBox.Text)
                 );
         }
@@ -800,6 +819,7 @@ namespace BatchRvtGUI
                             ShowErrorMessageBox("ERROR: Failed to Save the new script!");
                         }
                     },
+                    ScriptType.Python,
                     PathUtil.GetExistingFileDirectoryPath(this.taskScriptTextBox.Text),
                     NEW_TASK_SCRIPT_FILENAME
                 );
@@ -821,6 +841,7 @@ namespace BatchRvtGUI
                             ShowErrorMessageBox("ERROR: Failed to Save the new script!");
                         }
                     },
+                    ScriptType.Python,
                     PathUtil.GetExistingFileDirectoryPath(this.preProcessingScriptTextBox.Text),
                     NEW_PREPROCESSING_SCRIPT_FILENAME
                 );
@@ -842,18 +863,28 @@ namespace BatchRvtGUI
                             ShowErrorMessageBox("ERROR: Failed to Save the new script!");
                         }
                     },
+                    ScriptType.Python,
                     PathUtil.GetExistingFileDirectoryPath(this.postProcessingScriptTextBox.Text),
                     NEW_POSTPROCESSING_SCRIPT_FILENAME
                 );
         }
 
-        private void BrowseForSaveScriptFile(string dialogTitle, Action<string> scriptFileAction, string initialDirectory = null, string initialFileName = null)
+        private void BrowseForSaveScriptFile(
+                string dialogTitle,
+                Action<string> scriptFileAction,
+                ScriptType scriptType,
+                string initialDirectory = null,
+                string initialFileName = null
+            )
         {
+            var scriptDefaultExtension = (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_EXTENSION : PYTHON_SCRIPT_EXTENSION;
+            var scriptFilter = (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_FILTER : PYTHON_SCRIPT_FILTER;
+
             BrowseForSave(
                     dialogTitle,
                     scriptFileAction,
-                    PYTHON_SCRIPT_EXTENSION,
-                    PYTHON_SCRIPT_FILTER,
+                    scriptDefaultExtension,
+                    scriptFilter,
                     initialDirectory,
                     initialFileName
                 );
