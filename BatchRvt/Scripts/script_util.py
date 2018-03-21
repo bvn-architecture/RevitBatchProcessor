@@ -27,6 +27,9 @@ from std_io_util import Output
 import path_util
 from path_util import GetProjectFolderNameFromRevitProjectFilePath # Might come in handy for pre/post-processing scripts.
 
+PYTHON_SCRIPT_FILE_EXTENSION = ".py"
+DYNAMO_SCRIPT_FILE_EXTENSION = ".dyn"
+
 SESSION_ID_CONTAINER = [None]
 EXPORT_FOLDER_PATH_CONTAINER = [None]
 SESSION_DATA_FOLDER_PATH_CONTAINER = [None]

@@ -172,7 +172,12 @@ def RunBatchTaskScript(scriptFilePath):
         def executeTaskScript():
           output()
           output("Task script operation started.")
-          script_util.ExecuteScript(scriptFilePath)
+          if path_util.HasFileExtension(scriptFilePath, script_util.DYNAMO_SCRIPT_FILE_EXTENSION):
+            import revit_dynamo_util
+            revit_dynamo_util.ExecuteDynamoScript(uiapp, scriptFilePath, False)
+          else:
+            script_util.ExecuteScript(scriptFilePath)
+          
           output()
           output("Task script operation completed.")
           return
@@ -185,7 +190,7 @@ def RunBatchTaskScript(scriptFilePath):
         return result
 
       result = None
-      activeDoc = revit_script_util.GetActiveDocument(uiapp)
+      activeDoc = None #revit_script_util.GetActiveDocument(uiapp)
       if activeDoc is not None:
         result = processDocument(activeDoc)
       else:

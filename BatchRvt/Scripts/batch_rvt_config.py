@@ -31,6 +31,7 @@ import snapshot_data_util
 import session_data_util
 import revit_file_list
 import batch_rvt_util
+import script_util
 from batch_rvt_util import CommandSettings, BatchRvtSettings, BatchRvt, RevitVersion
 
 LOG_NAME = "BatchRvt"
@@ -179,6 +180,9 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
     output("Task Script:")
     output()
     output("\t" + batchRvtConfig.ScriptFilePath)
+
+    if path_util.HasFileExtension(batchRvtConfig.ScriptFilePath, script_util.DYNAMO_SCRIPT_FILE_EXTENSION):
+      batchRvtConfig.OpenInUI = True # Always open and activate documents in the UI when executing a Dynamo task script.
 
     if batchRvtConfig.ShowMessageBoxOnTaskError:
       output()
