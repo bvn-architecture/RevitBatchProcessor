@@ -172,11 +172,10 @@ def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction,
       result = documentAction(doc)
     finally:
       try:
-        if openInUI:
-          revit_file_util.OpenAndActivateBatchRvtTemporaryDocument(uiapp)
-        revit_file_util.CloseWithoutSave(doc)
-        output()
-        output("Closed file: " + centralFilePath)
+        if not openInUI:
+          revit_file_util.CloseWithoutSave(doc)
+          output()
+          output("Closed file: " + centralFilePath)
       except Exception, e:
         output()
         output("WARNING: Couldn't close the document!")
@@ -212,11 +211,10 @@ def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, 
       result = documentAction(doc)
     finally:
       try:
-        if openInUI:
-          revit_file_util.OpenAndActivateBatchRvtTemporaryDocument(uiapp)
-        revit_file_util.CloseWithoutSave(doc)
-        output()
-        output("Closed local file: " + centralFilePath)
+        if not openInUI:
+          revit_file_util.CloseWithoutSave(doc)
+          output()
+          output("Closed local file: " + centralFilePath)
       except Exception, e:
         output()
         output("WARNING: Couldn't close the local file!")
@@ -250,11 +248,10 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
       result = documentAction(doc)
     finally:
       try:
-        if openInUI:
-          revit_file_util.OpenAndActivateBatchRvtTemporaryDocument(uiapp)
-        revit_file_util.CloseWithoutSave(doc)
-        output()
-        output("Closed file: " + revitFilePath)
+        if not openInUI:
+          revit_file_util.CloseWithoutSave(doc)
+          output()
+          output("Closed file: " + revitFilePath)
       except Exception, e:
         output()
         output("WARNING: Couldn't close the document!")
