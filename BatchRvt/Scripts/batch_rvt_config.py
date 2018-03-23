@@ -181,8 +181,15 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
     output()
     output("\t" + batchRvtConfig.ScriptFilePath)
 
-    if path_util.HasFileExtension(batchRvtConfig.ScriptFilePath, script_util.DYNAMO_SCRIPT_FILE_EXTENSION):
+    isDynamoTaskScript = path_util.HasFileExtension(batchRvtConfig.ScriptFilePath, script_util.DYNAMO_SCRIPT_FILE_EXTENSION)
+
+    if isDynamoTaskScript:
       batchRvtConfig.OpenInUI = True # Always open and activate documents in the UI when executing a Dynamo task script.
+
+    if isDynamoTaskScript:
+      # Always use a separate Revit session for each Revit file when executing a Dynamo task script.
+      # This restriction is due a limitation on closing documents that are active in the UI (which Dynamo requires).
+      batchRvtConfig.RevitSessionOption = BatchRvt.RevitSessionOption.UseSeparateSessionPerFile
 
     if batchRvtConfig.ShowMessageBoxOnTaskError:
       output()
