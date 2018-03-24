@@ -185,9 +185,9 @@
             this.enableSingleRevitTaskProcessingCheckBox.AutoSize = true;
             this.enableSingleRevitTaskProcessingCheckBox.Location = new System.Drawing.Point(6, 19);
             this.enableSingleRevitTaskProcessingCheckBox.Name = "enableSingleRevitTaskProcessingCheckBox";
-            this.enableSingleRevitTaskProcessingCheckBox.Size = new System.Drawing.Size(201, 17);
+            this.enableSingleRevitTaskProcessingCheckBox.Size = new System.Drawing.Size(298, 17);
             this.enableSingleRevitTaskProcessingCheckBox.TabIndex = 0;
-            this.enableSingleRevitTaskProcessingCheckBox.Text = "Enable Single Revit Task Processing";
+            this.enableSingleRevitTaskProcessingCheckBox.Text = "Enable Single Revit Task Processing (Python scripts only)";
             this.enableSingleRevitTaskProcessingCheckBox.UseVisualStyleBackColor = true;
             this.enableSingleRevitTaskProcessingCheckBox.CheckedChanged += new System.EventHandler(this.enableSingleRevitTaskProcessingCheckBox_CheckedChanged);
             // 
