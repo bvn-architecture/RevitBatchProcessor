@@ -23,7 +23,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 ## Features
 
 - Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2018. (Of course the required version of Revit must be installed!)
-- Custom task scripts written in Python (specifically IronPython). These scripts of course have full access to the Revit API in addition to some batch processing-related information. They can even execute Dynamo scripts with just a small amount of python code! (See [Sample Scripts](#sample-scripts))
+- Custom task scripts written in Python or Dynamo! Python scripts have full access to the Revit API. Dynamo scripts can of course do whatever Dynamo can do :)
 - Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work.
 - Option for custom pre- and post-processing task scripts. Useful if the overall batch processing task requires some additional setup / tear down work to be done.
 - Central file processing options (Create a new local file, Detach from central).
@@ -44,7 +44,7 @@ This tool enables you to do things with Revit on a very large scale. Because of 
 
 ## Installer
 
-[Installer for Revit Batch Processor v1.0](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/2018.03.15/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.1](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/2018.03.24/RevitBatchProcessorSetup.exe)
 
 The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
 
@@ -118,49 +118,6 @@ Output()
 Output("Hello Revit world!")
 ```
 
-Task script to execute a Dynamo script:
-
-```python
-'''Run a Dynamo workspace script on each Revit file.'''
-
-import clr
-import System
-
-clr.AddReference("RevitAPI")
-clr.AddReference("RevitAPIUI")
-from Autodesk.Revit.DB import *
-
-import revit_script_util
-from revit_script_util import Output
-
-import revit_dynamo_util
-
-# Change this variable to the path of your Dynamo workspace file.
-# (Note that the Dynamo script must have been saved in 'Automatic' mode.)
-DYNAMO_SCRIPT_FILE_PATH = r"C:\DynamoScripts\MyDynamoWorkspace.dyn"
-
-sessionId = revit_script_util.GetSessionId()
-uiapp = revit_script_util.GetUIApplication()
-
-# NOTE: these only make sense for batch Revit file processing mode.
-doc = revit_script_util.GetScriptDocument()
-revitFilePath = revit_script_util.GetRevitFilePath()
-
-# Dynamo requires an active UIDocument, not just a loaded Document!
-# So we use UIApplication.OpenAndActivateDocument() here.
-Output()
-Output("Activating the document for Dynamo script automation.")
-uidoc = uiapp.OpenAndActivateDocument(doc.PathName)
-
-Output()
-Output("Executing Dynamo script.")
-# One line to execute the Dynamo script!
-revit_dynamo_util.ExecuteDynamoScript(uiapp, DYNAMO_SCRIPT_FILE_PATH)
-
-Output()
-Output("Finished Dynamo script.")
-```
-
 # Command-line Interface
 
 Revit Batch Processor can be run from the command-line (bypassing the GUI). First configure and export the required processing settings from the GUI application. Once this is done you can simply run the command line utility **BatchRvt.exe** passing the exported settings file path as an argument:
@@ -188,7 +145,7 @@ Feedback and suggestions for improvement are more than welcome! Please track and
 # Known Limitations / Issues
 
 - Dynamo scripts executed from a task script MUST have been saved with the 'Automatic' Run mode. (Revit Batch Processor cannot execute Dynamo scripts saved in 'Manual' Run mode.)
-- Executing Dynamo scripts from a task script requires that the Revit document is opened and active in the UI (See [Sample Scripts](#sample-scripts) for how to do this). Due to the context in which Revit Batch Processor operates within Revit, such active UI documents cannot be closed during the Revit session. Because of this, if many files are to be processed with a Dynamo script it is recommended to process them using the one-Revit-session-per-file option.
+- Dynamo scripts will always be executed using the 'Use separate Revit session for each Revit file' option. This restriction is due to the context in which Revit Batch Processor operates with the Revit API, which prevents the active UI document from being closed or switched during the Revit session. (Note that When executing a Dynamo task script, the Revit Batch Processor opens the document in the UI and is therefore subject to this Revit API limitation. For Python task scripts, the Revit Batch Processor only opens the document in memory, so Python scripts do not suffer this restriction!)
 
 <!---
 
