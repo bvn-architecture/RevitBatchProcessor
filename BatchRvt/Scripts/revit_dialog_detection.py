@@ -138,7 +138,7 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
         output()
         output("'" + enabledDialog.WindowText + "' dialog box detected.")
         DismissRevitDialogBox(enabledDialog.WindowText, buttons, RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT, output)
-      elif enabledDialog.WindowText in ["Revit", str.Empty] and len(buttons) == 0 and len(win32Buttons) == 1:
+      elif enabledDialog.WindowText in ["Revit", str.Empty] and len(buttons) == 0 and len(win32Buttons) > 0:
         output()
         output("'" + enabledDialog.WindowText + "' dialog box detected.")
         staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
@@ -150,7 +150,7 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
             if not str.IsNullOrWhiteSpace(staticControlText):
               output()
               output(staticControlText)
-          DismissRevitDialogBox(enabledDialog.WindowText, win32Buttons, OK_BUTTON_TEXT, output)
+        SendButtonClick(win32Buttons, output)
       else:
         output()
         output("WARNING: unhandled Revit dialog box detected!")
