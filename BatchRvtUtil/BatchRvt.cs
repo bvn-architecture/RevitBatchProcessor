@@ -23,6 +23,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.IO;
+using System.Globalization;
 
 namespace BatchRvtUtil
 {
@@ -49,6 +50,17 @@ namespace BatchRvtUtil
         private static string ConstructCommandLineArguments(IEnumerable<KeyValuePair<string, string>> arguments)
         {
             return string.Join(" ", arguments.Select(arg => "--" + arg.Key + " " + arg.Value));
+        }
+
+        public static bool IsBatchRvtLine(string line)
+        {
+            var parts = line.Split();
+
+            var timeSpan = default(TimeSpan);
+
+            var success = TimeSpan.TryParseExact(parts.First(), @"hh\:mm\:ss", CultureInfo.InvariantCulture, out timeSpan);
+
+            return success;
         }
 
         public static Process StartBatchRvt(

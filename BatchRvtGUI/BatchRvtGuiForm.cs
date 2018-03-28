@@ -447,7 +447,16 @@ namespace BatchRvtGUI
 
             foreach (var line in lines)
             {
-                this.batchRvtOutputTextBox.AppendText(line + Environment.NewLine);
+                var fullLine = line + Environment.NewLine;
+
+                if (!BatchRvt.IsBatchRvtLine(line))
+                {
+                    var timestamp = DateTime.Now.ToString("HH:mm:ss");
+
+                    fullLine = timestamp + " : [ REVIT MESSAGE ] : " + fullLine;
+                }
+
+                this.batchRvtOutputTextBox.AppendText(fullLine);
             }
 
             linesAndPendingTask = StreamIOUtil.ReadAvailableLines(this.batchRvtProcess.StandardError, this.pendingErrorReadLineTask);
@@ -461,7 +470,7 @@ namespace BatchRvtGUI
                     continue;
                 }
 
-                this.batchRvtOutputTextBox.AppendText(line + Environment.NewLine);
+                this.batchRvtOutputTextBox.AppendText("[ REVIT ERROR MESSAGE ] : " + line + Environment.NewLine);
             }
 
             if (isBatchRvtRunning)
