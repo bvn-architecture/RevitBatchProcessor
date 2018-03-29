@@ -456,7 +456,10 @@ namespace BatchRvtGUI
                     fullLine = timestamp + " : [ REVIT MESSAGE ] : " + fullLine;
                 }
 
-                this.batchRvtOutputTextBox.AppendText(fullLine);
+                if (BatchRvt.IsBatchRvtLine(line)) // Do not show non-BatchRvt-related output. (TODO: reconsider?)
+                {
+                    this.batchRvtOutputTextBox.AppendText(fullLine);
+                }
             }
 
             linesAndPendingTask = StreamIOUtil.ReadAvailableLines(this.batchRvtProcess.StandardError, this.pendingErrorReadLineTask);
