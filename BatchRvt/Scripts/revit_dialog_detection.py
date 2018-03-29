@@ -153,7 +153,7 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
         SendButtonClick(win32Buttons, output)
       else:
         output()
-        output("WARNING: unhandled Revit dialog box detected!")
+        output("Revit dialog box detected!")
         output()
         output("\tDialog box title: '" + enabledDialog.WindowText + "'")
 
