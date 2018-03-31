@@ -10,8 +10,6 @@ from System.IO import File, Path
 clr.AddReference("DynamoRevitDS")
 from Dynamo.Applications import DynamoRevit, DynamoRevitCommandData
 
-from batch_rvt_util import BatchRvt
-
 
 DYNAMO_RUNTYPE_AUTOMATIC = "Automatic"
 DYNAMO_RUNTYPE_MANUAL = "Manual"
@@ -79,7 +77,9 @@ def ExecuteDynamoScriptInternal(uiapp, dynamoScriptFilePath, showUI=False):
 
 def ExecuteDynamoScript(uiapp, dynamoScriptFilePath, showUI=False):
   externalCommandResult = None
-  tempDynamoScriptFilePath = Path.Combine(BatchRvt.GetDataFolderPath(), Path.GetRandomFileName())
+  # NOTE: The temporary copy of the Dynamo script file is created in same folder as the original so
+  # that any relative paths in the script won't break.
+  tempDynamoScriptFilePath = Path.Combine(Path.GetDirectoryName(dynamoScriptFilePath), Path.GetRandomFileName())
   File.Copy(dynamoScriptFilePath, tempDynamoScriptFilePath)
   try:
     SetDynamoScriptRunType(tempDynamoScriptFilePath, DYNAMO_RUNTYPE_AUTOMATIC)
