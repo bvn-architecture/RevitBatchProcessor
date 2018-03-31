@@ -5,7 +5,7 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 ## Latest version
 
-[Installer for Revit Batch Processor v1.2.1](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/2018.03.31/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.2.2](https://github.com/bvn-architecture/RevitBatchProcessor/releases/latest)
 
 ## Use cases
 
@@ -44,7 +44,7 @@ This tool enables you to do things with Revit on a very large scale. Because of 
 
 ## Installer
 
-[Installer for Revit Batch Processor v1.2.1](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/2018.03.31/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.2.2](https://github.com/bvn-architecture/RevitBatchProcessor/releases/latest)
 
 The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
 
@@ -145,6 +145,7 @@ Feedback and suggestions for improvement are more than welcome! Please track and
 # Known Limitations / Issues
 
 - Dynamo scripts will always be executed using the 'Use separate Revit session for each Revit file' option. This restriction is due to the context in which Revit Batch Processor operates with the Revit API, which prevents the active UI document from being closed or switched during the Revit session. (Note that When executing a Dynamo task script, the Revit Batch Processor opens the document in the UI and is therefore subject to this Revit API limitation. For Python task scripts, the Revit Batch Processor only opens the document in memory, so Python scripts do not suffer this restriction!)
+- The Revit Batch Processor requires write access to the folder containing the Dynamo script. This because it makes a temporary copy of the Dynamo script in the same folder as the original. The temporary copy is made so that the script's Run mode can be temporarily set to 'Automatic' (if it isn't already). It is created in the same folder as the original so that any relative paths in the script will remain valid.
 
 <!---
 
