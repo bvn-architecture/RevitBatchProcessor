@@ -5,8 +5,13 @@ import System
 clr.AddReference("System.Xml")
 from System.Xml import XmlDocument
 
+from System.IO import File, Path
+
 clr.AddReference("DynamoRevitDS")
 from Dynamo.Applications import DynamoRevit, DynamoRevitCommandData
+
+from batch_rvt_util import BatchRvt
+
 
 DYNAMO_RUNTYPE_AUTOMATIC = "Automatic"
 DYNAMO_RUNTYPE_MANUAL = "Manual"
@@ -38,7 +43,7 @@ def GetDynamoScriptRunType(dynamoScriptFilePath):
 
 # NOTE: Dynamo requires an active UIDocument! The document must be active before executing this function.
 #       The Dynamo script must have been saved with the 'Automatic' run mode!
-def ExecuteDynamoScript(uiapp, dynamoScriptFilePath, showUI=False):
+def ExecuteDynamoScriptInternal(uiapp, dynamoScriptFilePath, showUI=False):
   dynamoScriptRunType = GetDynamoScriptRunType(dynamoScriptFilePath)
   if dynamoScriptRunType is None:
     raise Exception("Could not determine the Run mode of this Dynamo script!")
@@ -70,4 +75,15 @@ def ExecuteDynamoScript(uiapp, dynamoScriptFilePath, showUI=False):
 
   dynamoRevit = DynamoRevit()
   externalCommandResult = dynamoRevit.ExecuteCommand(dynamoRevitCommandData)
+  return externalCommandResult
+
+def ExecuteDynamoScript(uiapp, dynamoScriptFilePath, showUI=False):
+  externalCommandResult = None
+  tempDynamoScriptFilePath = Path.Combine(BatchRvt.GetDataFolderPath(), Path.GetRandomFileName())
+  File.Copy(dynamoScriptFilePath, tempDynamoScriptFilePath)
+  try:
+    SetDynamoScriptRunType(tempDynamoScriptFilePath, DYNAMO_RUNTYPE_AUTOMATIC)
+    externalCommandResult = ExecuteDynamoScriptInternal(uiapp, tempDynamoScriptFilePath, showUI)
+  finally:
+    File.Delete(tempDynamoScriptFilePath)
   return externalCommandResult

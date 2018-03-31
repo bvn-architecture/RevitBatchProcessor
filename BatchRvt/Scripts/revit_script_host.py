@@ -24,7 +24,7 @@ import System
 from System.Diagnostics import Process
 clr.AddReference("System.Windows.Forms")
 from System.Windows.Forms import Application
-from System.IO import File, Path
+from System.IO import File
 
 import thread_util
 import script_environment
@@ -173,17 +173,10 @@ def RunBatchTaskScript(scriptFilePath):
           output()
           output("Task script operation started.")
           if path_util.HasFileExtension(scriptFilePath, script_util.DYNAMO_SCRIPT_FILE_EXTENSION):
-            tempDynamoScriptFilePath = Path.Combine(BatchRvt.GetDataFolderPath(), Path.GetRandomFileName())
-            File.Copy(scriptFilePath, tempDynamoScriptFilePath)
-            try:
-              import revit_dynamo_util
-              revit_dynamo_util.SetDynamoScriptRunType(tempDynamoScriptFilePath, revit_dynamo_util.DYNAMO_RUNTYPE_AUTOMATIC)
-              revit_dynamo_util.ExecuteDynamoScript(uiapp, tempDynamoScriptFilePath, False)
-            finally:
-              File.Delete(tempDynamoScriptFilePath)
+            import revit_dynamo_util
+            revit_dynamo_util.ExecuteDynamoScript(uiapp, scriptFilePath, False)
           else:
             script_util.ExecuteScript(scriptFilePath)
-          
           output()
           output("Task script operation completed.")
           return
