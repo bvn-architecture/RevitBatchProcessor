@@ -13,6 +13,19 @@ DYNAMO_RUNTYPE_MANUAL = "Manual"
 DYNAMO_WORKSPACE_NODE = "Workspace"
 DYNAMO_RUNTYPE_ATTRIBUTE = "RunType"
 
+def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
+  prevRunType = None
+  doc = XmlDocument()
+  try:
+    doc.Load(dynamoScriptFilePath)
+    dynamoRunTypeAttribute = doc[DYNAMO_WORKSPACE_NODE].Attributes[DYNAMO_RUNTYPE_ATTRIBUTE]
+    prevRunType = dynamoRunTypeAttribute.Value
+    dynamoRunTypeAttribute.Value = runType
+    doc.Save(dynamoScriptFilePath)
+  except Exception, e:
+    prevRunType = None
+  return prevRunType
+
 def GetDynamoScriptRunType(dynamoScriptFilePath):
   runType = None
   doc = XmlDocument()
