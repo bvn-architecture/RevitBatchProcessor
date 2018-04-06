@@ -70,6 +70,24 @@ def ShowRevitScriptOutput(scriptOutputStream, output, pendingReadLineTask=None):
       output("\t" + "- " + line)
   return pendingReadLineTask
 
+def ShowRevitProcessOutput(processOutputStream, output, pendingReadLineTask=None):
+  outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(processOutputStream, pendingReadLineTask)
+  if outputLines.Any():
+    for line in outputLines:
+      if False: # Change to True to see Revit standard output (non-script output)
+        output("\t" + "- [ REVIT MESSAGE ] : " + line)
+  return pendingReadLineTask
+
+def ShowRevitProcessError(processErrorStream, output, pendingReadLineTask=None):
+  outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(processErrorStream, pendingReadLineTask)
+  if outputLines.Any():
+    for line in outputLines:
+      if line.StartsWith("log4cplus:"): # ignore pesky log4cplus messages (an Autodesk thing?)
+        pass
+      else:
+        output("\t" + "- [ REVIT ERROR MESSAGE ] : " + line)
+  return pendingReadLineTask
+
 def RunScriptedRevitSession(revitVersion, batchRvtScriptsFolderPath, scriptFilePath, scriptDatas, output):
   scriptDataFilePath = ScriptDataUtil.GetUniqueScriptDataFilePath()
   ScriptDataUtil.SaveManyToFile(scriptDataFilePath, scriptDatas)
@@ -105,10 +123,14 @@ def RunScriptedRevitSession(revitVersion, batchRvtScriptsFolderPath, scriptFileP
         ]
 
       pendingReadLineTask = [None] # Needs to be a list so it can be captured by reference in closures.
+      pendingProcessOutputReadLineTask = [None]
+      pendingProcessErrorReadLineTask = [None]
       
       snapshotDataFilesExistTimestamp = [None] # Needs to be a list so it can be captured by reference in closures.
 
       def monitoringAction():
+        pendingProcessOutputReadLineTask[0] = ShowRevitProcessOutput(hostRevitProcess.StandardOutput, output, pendingProcessOutputReadLineTask[0])
+        pendingProcessErrorReadLineTask[0] = ShowRevitProcessError(hostRevitProcess.StandardError, output, pendingProcessErrorReadLineTask[0])
         pendingReadLineTask[0] = ShowRevitScriptOutput(scriptOutputStreamReader, output, pendingReadLineTask[0])
         
         if snapshotDataFilesExistTimestamp[0] is not None:
