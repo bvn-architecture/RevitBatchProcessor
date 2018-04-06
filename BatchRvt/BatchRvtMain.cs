@@ -58,12 +58,23 @@ namespace BatchRvtCommand
         {
             Console.Title = BatchRvtConsoleTitle;
 
-            Console.SetWindowSize(
-                    Math.Min(WindowWidth, Console.LargestWindowWidth),
-                    Math.Min(WindowHeight, Console.LargestWindowHeight)
-                );
+            try
+            {
+                Console.SetWindowSize(
+                        Math.Min(WindowWidth, Console.LargestWindowWidth),
+                        Math.Min(WindowHeight, Console.LargestWindowHeight)
+                    );
 
-            Console.SetBufferSize(BufferWidth, BufferHeight);
+                Console.SetBufferSize(BufferWidth, BufferHeight);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Can occur when output has been redirected via the command-line.
+            }
+            catch (IOException e)
+            {
+                // Can occur when output has been redirected via the command-line.
+            }
 
             return;
         }
