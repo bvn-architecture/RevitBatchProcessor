@@ -243,6 +243,27 @@ namespace BatchRvtGUI
             return iuConfigItems;
         }
 
+        private double GetDisplaySettingPercentage()
+        {
+            var graphics = this.CreateGraphics();
+            var dpiX = graphics.DpiX;
+            return dpiX / 96f;
+        }
+
+        private static System.Drawing.Size Scale(System.Drawing.Size size, double scale)
+        {
+            return new System.Drawing.Size((int)(size.Width * scale), (int)(size.Height * scale));
+        }
+
+        private void AdjustWindowSizeForDisplaySetting()
+        {
+            var displaySettingPercentage = GetDisplaySettingPercentage();
+
+            this.MinimumSize = Scale(this.MinimumSize, displaySettingPercentage);
+            this.MaximumSize = Scale(this.MaximumSize, displaySettingPercentage);
+            this.Size = Scale(this.Size, displaySettingPercentage);
+        }
+
         private void BatchRvtGuiForm_Load(object sender, EventArgs e)
         {
             this.Text = WINDOW_TITLE;
@@ -254,6 +275,8 @@ namespace BatchRvtGUI
             this.MaximumSize = SETUP_MAXIMUM_SIZE;
             this.Size = SETUP_INITIAL_SIZE;
             this.MaximizeBox = false;
+
+            AdjustWindowSizeForDisplaySetting();
 
             bool isLoaded = LoadSettings();
 
@@ -434,6 +457,8 @@ namespace BatchRvtGUI
                 this.MaximumSize = RUNNING_MAXIMUM_SIZE;
                 this.Size = RUNNING_INITIAL_SIZE;
                 this.MaximizeBox = true;
+
+                AdjustWindowSizeForDisplaySetting();
                 
                 readBatchRvtOutput_Timer.Start();
             }
