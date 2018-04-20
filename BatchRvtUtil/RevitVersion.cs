@@ -48,13 +48,35 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2018, "2018" }
             };
 
-        private static readonly Dictionary<SupportedRevitVersion, string> REVIT_EXECUTABLE_FOLDER_PATHS =
-            new Dictionary<SupportedRevitVersion, string>()
+        private static readonly Dictionary<SupportedRevitVersion, IEnumerable<string>> REVIT_EXECUTABLE_FOLDER_PATHS =
+            new Dictionary<SupportedRevitVersion, IEnumerable<string>>()
             {
-                { SupportedRevitVersion.Revit2015, @"C:\Program Files\Autodesk\Revit 2015" },
-                { SupportedRevitVersion.Revit2016, @"C:\Program Files\Autodesk\Revit 2016" },
-                { SupportedRevitVersion.Revit2017, @"C:\Program Files\Autodesk\Revit 2017" },
-                { SupportedRevitVersion.Revit2018, @"C:\Program Files\Autodesk\Revit 2018" }
+                {
+                    SupportedRevitVersion.Revit2015,
+                    new [] {
+                        @"C:\Program Files\Autodesk\Revit 2015",
+                        @"C:\Program Files\Autodesk\Revit Architecture 2015"
+                    }
+                },
+                {
+                    SupportedRevitVersion.Revit2016,
+                    new [] {
+                        @"C:\Program Files\Autodesk\Revit 2016",
+                        @"C:\Program Files\Autodesk\Revit Architecture 2016"
+                    }
+                },
+                {
+                    SupportedRevitVersion.Revit2017,
+                    new [] {
+                        @"C:\Program Files\Autodesk\Revit 2017"
+                    }
+                },
+                {
+                    SupportedRevitVersion.Revit2018,
+                    new [] {
+                        @"C:\Program Files\Autodesk\Revit 2018"
+                    }
+                }
             };
 
         private static readonly Dictionary<SupportedRevitVersion, string> REVIT_LOCAL_FOLDER_PATHS =
@@ -68,8 +90,16 @@ namespace BatchRvtUtil
 
         public static string GetRevitExecutableFolderPath(SupportedRevitVersion revitVersion)
         {
-            return REVIT_EXECUTABLE_FOLDER_PATHS.ContainsKey(revitVersion) ?
-                REVIT_EXECUTABLE_FOLDER_PATHS[revitVersion] : null;
+            string revitExecutableFolderPath = null;
+
+            if (REVIT_EXECUTABLE_FOLDER_PATHS.ContainsKey(revitVersion))
+            {
+                revitExecutableFolderPath =
+                    REVIT_EXECUTABLE_FOLDER_PATHS[revitVersion]
+                    .FirstOrDefault(folderPath => File.Exists(Path.Combine(folderPath, REVIT_EXECUTABLE_FILE_NAME)));
+            }
+
+            return revitExecutableFolderPath;
         }
 
         public static string GetRevitExecutableFilePath(SupportedRevitVersion revitVersion)
