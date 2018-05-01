@@ -55,6 +55,21 @@ def FromLines(lines):
   rows = text_file_util.GetRowsFromLines(lines)
   return GetCentralFileListFromRows(rows)
 
+def IsExcelInstalled():
+  return System.Type.GetTypeFromProgID("Excel.Application") is not None
+
+def HasExcelFileExtension(filePath):
+  return any(path_util.HasFileExtension(filePath, extension) for extension in [".xlsx", ".xls"])
+
+def FromExcelFile(excelFilePath):
+  centralFilePaths = []
+  if IsExcelInstalled():
+    import excel_util
+    centralFilePaths = GetCentralFileListFromRows(excel_util.ReadRowsTextFromWorkbook(excelFilePath))
+  else:
+    raise Exception("ERROR: An Excel installation was not detected! Support for Excel files requires an Excel installation.")
+  return centralFilePaths 
+
 def FromConsole():
   return FromLines(console_util.ReadLines())
 
@@ -88,6 +103,8 @@ def GetRevitFileList(settingsFilePath):
   revitFileList = None
   if text_file_util.HasTextFileExtension(settingsFilePath):
     revitFileList = FromTextFile(settingsFilePath)
+  elif HasExcelFileExtension(settingsFilePath):
+    revitFileList = FromExcelFile(settingsFilePath)
   return revitFileList
 
 REVIT_VERSION_TEXT_PREFIXES_2015 = ["Autodesk Revit 2015", "Autodesk Revit Architecture 2015"]

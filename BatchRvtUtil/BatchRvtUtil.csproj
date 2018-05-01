@@ -44,6 +44,7 @@
     <Compile Include="BatchRvt.cs" />
     <Compile Include="CommandLineUtil.cs" />
     <Compile Include="CommandSettings.cs" />
+    <Compile Include="ExcelUtil.cs" />
     <Compile Include="JsonUtil.cs" />
     <Compile Include="LogFile.cs" />
     <Compile Include="Network.cs" />

@@ -94,10 +94,10 @@
             // 
             this.revitFileListTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.revitFileListTextBox.Location = new System.Drawing.Point(112, 42);
+            this.revitFileListTextBox.Location = new System.Drawing.Point(85, 42);
             this.revitFileListTextBox.Name = "revitFileListTextBox";
             this.revitFileListTextBox.ReadOnly = true;
-            this.revitFileListTextBox.Size = new System.Drawing.Size(624, 20);
+            this.revitFileListTextBox.Size = new System.Drawing.Size(651, 20);
             this.revitFileListTextBox.TabIndex = 2;
             // 
             // dataExportFolderTextBox
@@ -137,9 +137,9 @@
             this.revitFileListLabel.AutoSize = true;
             this.revitFileListLabel.Location = new System.Drawing.Point(6, 45);
             this.revitFileListLabel.Name = "revitFileListLabel";
-            this.revitFileListLabel.Size = new System.Drawing.Size(100, 13);
+            this.revitFileListLabel.Size = new System.Drawing.Size(73, 13);
             this.revitFileListLabel.TabIndex = 1;
-            this.revitFileListLabel.Text = "Revit File List (*.txt):";
+            this.revitFileListLabel.Text = "Revit File List:";
             // 
             // settingsGroupBox
             // 

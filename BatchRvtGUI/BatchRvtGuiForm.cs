@@ -296,7 +296,25 @@ namespace BatchRvtGUI
 
             this.UIConfiguration.UpdateUI();
 
+            VerifyExcelInstallation(this.revitFileListTextBox.Text);
+
             return isLoaded;
+        }
+
+        private void VerifyExcelInstallation(string filePath)
+        {
+            if (!string.IsNullOrWhiteSpace(filePath))
+            {
+                if (ExcelUtil.HasExcelExtension(filePath) && !ExcelUtil.IsExcelInstalled())
+                {
+                    MessageBox.Show(
+                            "WARNING: An Excel installation was not detected! Support for Excel files requires an Excel installation.",
+                            this.Text,
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                }
+            }
         }
 
         private bool SaveSettings(string filePath = null)
@@ -615,7 +633,7 @@ namespace BatchRvtGUI
             var openFileDialog = new OpenFileDialog();
 
             openFileDialog.DefaultExt = ".txt";
-            openFileDialog.Filter = "Text files (*.txt)|*.txt";
+            openFileDialog.Filter = "Revit File List (*.txt;*.xls;*.xlsx)|*.txt;*.xls;*.xlsx";
             openFileDialog.CheckFileExists = true;
             openFileDialog.ReadOnlyChecked = true;
             openFileDialog.Multiselect = false;
@@ -637,6 +655,8 @@ namespace BatchRvtGUI
                 if (!string.IsNullOrWhiteSpace(selectedFilePath))
                 {
                     this.revitFileListTextBox.Text = selectedFilePath;
+
+                    VerifyExcelInstallation(selectedFilePath);
                 }
             }
         }
