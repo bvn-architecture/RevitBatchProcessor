@@ -62,13 +62,8 @@ def HasExcelFileExtension(filePath):
   return any(path_util.HasFileExtension(filePath, extension) for extension in [".xlsx", ".xls"])
 
 def FromExcelFile(excelFilePath):
-  centralFilePaths = []
-  if IsExcelInstalled():
-    import excel_util
-    centralFilePaths = GetCentralFileListFromRows(excel_util.ReadRowsTextFromWorkbook(excelFilePath))
-  else:
-    raise Exception("ERROR: An Excel installation was not detected! Support for Excel files requires an Excel installation.")
-  return centralFilePaths 
+  import excel_util
+  return GetCentralFileListFromRows(excel_util.ReadRowsTextFromWorkbook(excelFilePath))
 
 def FromConsole():
   return FromLines(console_util.ReadLines())

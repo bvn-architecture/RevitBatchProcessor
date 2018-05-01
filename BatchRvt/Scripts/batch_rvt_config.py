@@ -98,6 +98,9 @@ class BatchRvtConfig:
       if not File.Exists(self.RevitFileListFilePath):
         output()
         output("ERROR: No Revit file list specified or file not found.")
+      elif revit_file_list.HasExcelFileExtension(self.RevitFileListFilePath) and not revit_file_list.IsExcelInstalled():
+        output()
+        output("ERROR: Could not read from the Excel Revit File list. An Excel installation was not detected!")
       else:
         revitFileList = revit_file_list.GetRevitFileList(self.RevitFileListFilePath)
         if revitFileList is None:
