@@ -91,7 +91,7 @@ def GetRevitFileList(settingsFilePath):
   return revitFileList
 
 REVIT_VERSION_TEXT_PREFIXES_2015 = ["Autodesk Revit 2015", "Autodesk Revit Architecture 2015"]
-REVIT_VERSION_TEXT_PREFIX_2016 = "Autodesk Revit 2016"
+REVIT_VERSION_TEXT_PREFIXES_2016 = ["Autodesk Revit 2016", "Autodesk Revit Architecture 2016"]
 REVIT_VERSION_TEXT_PREFIX_2017 = "Autodesk Revit 2017"
 REVIT_VERSION_TEXT_PREFIX_2018 = "Autodesk Revit 2018"
 
@@ -103,7 +103,7 @@ class SupportedRevitFileInfo():
     if revitVersionText is not None:
       if any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2015):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2015
-      elif revitVersionText.StartsWith(REVIT_VERSION_TEXT_PREFIX_2016):
+      elif any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2016):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2016
       elif revitVersionText.StartsWith(REVIT_VERSION_TEXT_PREFIX_2017):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2017
