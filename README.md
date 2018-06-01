@@ -119,6 +119,73 @@ Output()
 Output("Hello Revit world!")
 ```
 
+Python task script to execute a Dynamo script and the Save Revit file to a destination folder:
+
+NOTE: for this script we must use the 'Use separate session for each Revit file' option in the GUI because we are executing a Dynamo script.
+
+```python
+import clr
+import System
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+
+clr.AddReference("RevitAPI")
+clr.AddReference("RevitAPIUI")
+from Autodesk.Revit.DB import *
+
+import revit_script_util
+from revit_script_util import Output
+
+from System.IO import Path
+import revit_dynamo_util
+import revit_file_util
+
+
+# This should point to your Dynamo task script (*.dyn) file.
+DYNAMO_SCRIPT_FILE_PATH = r"C:\BatchProcessing\MyDynamoTaskScript.dyn"
+
+# Location to save the processed Revit files to.
+SAVE_FOLDER_PATH = r"C:\BatchProcessing\SavedRevitFiles"
+
+
+def SaveRevitFile(doc, originalRevitFilePath, saveFolderPath):
+  # Save the Revit model / family file in the new location.
+  revitFileName = Path.GetFileName(originalRevitFilePath)
+  saveRevitFilePath = Path.Combine(saveFolderPath, revitFileName)
+  if doc.IsWorkshared: # For workshared models.
+    saveRevitModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(saveRevitFilePath)
+    revit_file_util.SaveAsNewCentral(
+        doc,
+        saveRevitModelPath,
+        True # NOTE: this means overwrite the existing file if it exists; set to False if this is not desired.
+      )
+  else: # For non-workshared models and family files.
+    revit_file_util.SaveAs(
+        doc,
+        saveRevitFilePath,
+        True # NOTE: this means overwrite the existing file if it exists; set to False if this is not desired.
+      )
+  return
+
+
+sessionId = revit_script_util.GetSessionId()
+uiapp = revit_script_util.GetUIApplication()
+
+# NOTE: these only make sense for batch Revit file processing mode.
+doc = revit_script_util.GetScriptDocument()
+revitFilePath = revit_script_util.GetRevitFilePath()
+projectFolderName = revit_script_util.GetProjectFolderName()
+
+Output()
+Output("This task script is running!")
+
+# Execute the Dynamo script
+revit_dynamo_util.ExecuteDynamoScript(uiapp, DYNAMO_SCRIPT_FILE_PATH)
+
+# Save the Revit file to the destination folder.
+SaveRevitFile(doc, revitFilePath, SAVE_FOLDER_PATH)
+```
+
 # Command-line Interface
 
 Revit Batch Processor can be run from the command-line (bypassing the GUI). First configure and export the required processing settings from the GUI application. Once this is done you can simply run the command line utility **BatchRvt.exe** passing the exported settings file path as an argument:
