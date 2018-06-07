@@ -206,13 +206,15 @@ def Save(doc, compact=False, previewViewId=None):
 
 def SaveAs(
       doc,
-      fileOrModelPath,
+      modelPath,
       overwriteExisting=False,
       compact=False,
       previewViewId=None,
       worksharingSaveAsOptions=None,
       maximumBackups=None
     ):
+  if isinstance(modelPath, str):
+    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
   saveAsOptions = SaveAsOptions()
   saveAsOptions.Compact = compact
   saveAsOptions.OverwriteExistingFile = overwriteExisting
@@ -222,6 +224,7 @@ def SaveAs(
     saveAsOptions.SetWorksharingOptions(worksharingSaveAsOptions)
   if maximumBackups is not None:
     saveAsOptions.MaximumBackups = maximumBackups
+  doc.SaveAs(modelPath, saveAsOptions)
   return
 
 def CreateWorksharingSaveAsOptions(saveAsCentral=False, openWorksetsDefault=SimpleWorksetConfiguration.AskUserToSpecify, clearTransmitted=False):
