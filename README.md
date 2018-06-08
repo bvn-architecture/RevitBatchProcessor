@@ -159,6 +159,7 @@ def SaveRevitFile(doc, originalRevitFilePath, saveFolderPath):
         saveRevitModelPath,
         True # NOTE: this means overwrite the existing file if it exists; set to False if this is not desired.
       )
+    revit_file_util.RelinquishAll(doc) # Need to relinquish ownership of worksets after saving as new Central file.
   else: # For non-workshared models and family files.
     revit_file_util.SaveAs(
         doc,
