@@ -119,7 +119,7 @@ Output()
 Output("Hello Revit world!")
 ```
 
-Python task script to execute a Dynamo script and the Save Revit file to a destination folder:
+Python task script to execute a Dynamo script and then Save the Revit file to a destination folder:
 
 NOTE: for this script we must use the 'Use separate session for each Revit file' option in the GUI because we are executing a Dynamo script.
 
