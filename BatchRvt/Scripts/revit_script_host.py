@@ -41,6 +41,7 @@ import exception_util
 import revit_session
 import stream_io_util
 import script_util
+import revit_process_host
 from batch_rvt_util import BatchRvt, RevitVersion
 
 
@@ -276,7 +277,7 @@ def GetRevitProcessingOptionForSession(scriptDatas):
   revit_script_util.SetCurrentScriptData(oldScriptData)
   return revitProcessingOption
 
-def DoRevitSessionProcessing(scriptFilePath, scriptDataFilePath, output):
+def DoRevitSessionProcessing(scriptFilePath, scriptDataFilePath, batchRvtProcessUniqueId, output):
   results = []
   revit_script_util.SetUIApplication(revit_session.GetSessionUIApplication())
   revit_script_util.SetScriptDataFilePath(scriptDataFilePath)
@@ -286,6 +287,9 @@ def DoRevitSessionProcessing(scriptFilePath, scriptDataFilePath, output):
     if revitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing:
       for scriptData in scriptDatas:
         revit_script_util.SetCurrentScriptData(scriptData)
+        if not revit_process_host.IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
+          script_host_error.ShowScriptErrorMessageBox("ERROR: The BatchRvt process appears to have terminated! Operation aborted.")
+          break
         result = script_host_error.WithErrorHandling(
             lambda: RunBatchTaskScript(scriptFilePath),
             "ERROR: An error occurred while processing the file!",
@@ -308,6 +312,7 @@ def Main():
   outputPipeHandleString = script_environment.GetScriptOutputPipeHandleString(environmentVariables)
   scriptFilePath = script_environment.GetScriptFilePath(environmentVariables)
   scriptDataFilePath = script_environment.GetScriptDataFilePath(environmentVariables)
+  batchRvtProcessUniqueId = script_environment.GetBatchRvtProcessUniqueId(environmentVariables)
 
   if outputPipeHandleString is not None and scriptFilePath is not None:
 
@@ -319,7 +324,12 @@ def Main():
       def outputStreamWriterAction():
         revit_script_util.SetOutputFunction(stream_io_util.GetSafeWriteLine(outputStreamWriter))
         result = script_host_error.WithErrorHandling(
-            lambda: DoRevitSessionProcessing(scriptFilePath, scriptDataFilePath, revit_script_util.Output),
+            lambda: DoRevitSessionProcessing(
+                scriptFilePath,
+                scriptDataFilePath,
+                batchRvtProcessUniqueId,
+                revit_script_util.Output
+              ),
             "ERROR: An error occurred while executing the script host! Operation aborted.",
             output=revit_script_util.Output,
             showErrorMessageBox=False
