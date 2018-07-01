@@ -25,6 +25,8 @@ BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = "BATCHRVT__SCRIPTS_FOL
 SCRIPT_FILE_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_FILE_PATH"
 SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_DATA_FILE_PATH"
 SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_OUTPUT_PIPE_HANDLE_STRING"
+BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__PROCESS_UNIQUE_ID"
+
 
 def GetEnvironmentVariable(environmentVariables, variableName):
   return environmentVariables.Item[variableName]
@@ -65,6 +67,14 @@ def SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandle
     )
   return
 
+def SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId):
+  SetEnvironmentVariable(
+      environmentVariables,
+      BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME,
+      batchRvtProcessUniqueId
+    )
+  return
+
 def GetBatchRvtScriptsFolderPath(environmentVariables):
   return GetEnvironmentVariable(
       environmentVariables,
@@ -89,10 +99,24 @@ def GetScriptOutputPipeHandleString(environmentVariables):
         SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME
       )
 
-def InitEnvironmentVariables(environmentVariables, batchRvtScriptsFolderPath, scriptFilePath, scriptDataFilePath, scriptOutputPipeHandleString):
+def GetBatchRvtProcessUniqueId(environmentVariables):
+  return GetEnvironmentVariable(
+        environmentVariables,
+        BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME
+      )
+
+def InitEnvironmentVariables(
+    environmentVariables,
+    batchRvtScriptsFolderPath,
+    scriptFilePath,
+    scriptDataFilePath,
+    scriptOutputPipeHandleString,
+    batchRvtProcessUniqueId
+  ):
   SetBatchRvtScriptsFolderPath(environmentVariables, batchRvtScriptsFolderPath)
   SetScriptFilePath(environmentVariables, scriptFilePath)
   SetScriptDataFilePath(environmentVariables, scriptDataFilePath)
   SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandleString)
+  SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId)
   return
 
