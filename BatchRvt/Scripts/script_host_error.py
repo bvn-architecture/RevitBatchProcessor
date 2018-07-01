@@ -37,6 +37,11 @@ def SetDataInCurrentDomain(name, data):
   AppDomain.CurrentDomain.SetData(name, data)
   return
 
+def ShowScriptErrorMessageBox(errorMessage):
+  mainWindowHandle = winforms_util.WindowHandleWrapper.GetMainWindowHandle()
+  MessageBox.Show(mainWindowHandle, errorMessage, BATCH_RVT_ERROR_WINDOW_TITLE)
+  return
+
 def WithErrorHandling(action, errorMessage, output=None, showErrorMessageBox=False):
   result = None
 
@@ -51,12 +56,11 @@ def WithErrorHandling(action, errorMessage, output=None, showErrorMessageBox=Fal
       exception_util.LogOutputErrorDetails(e, output)
 
     if showErrorMessageBox:
-      mainWindowHandle = winforms_util.WindowHandleWrapper.GetMainWindowHandle()
-      fullMessage = StringBuilder()
-      fullMessage.AppendLine(errorMessage)
-      fullMessage.AppendLine()
-      fullMessage.AppendLine(exception_util.GetExceptionDetails(e))
-      MessageBox.Show(mainWindowHandle, fullMessage.ToString(), BATCH_RVT_ERROR_WINDOW_TITLE)
+      fullErrorMessage = StringBuilder()
+      fullErrorMessage.AppendLine(errorMessage)
+      fullErrorMessage.AppendLine()
+      fullErrorMessage.AppendLine(exception_util.GetExceptionDetails(e))
+      ShowScriptErrorMessageBox(fullErrorMessage.ToString())
 
     SetDataInCurrentDomain(SCRIPT_HOST_ERROR_DATA_VARIABLE, e)
 
