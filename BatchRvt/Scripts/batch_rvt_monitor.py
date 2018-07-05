@@ -312,35 +312,49 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
 
       batchRvtScriptsFolderPath = GetBatchRvtScriptsFolderPath()
 
-      batch_rvt_monitor_util.RunScriptedRevitSession(
-          revitVersion,
-          batchRvtScriptsFolderPath,
-          batchRvtConfig.ScriptFilePath,
-          scriptDatas,
-          Output
-        )
+      while scriptDatas.Any():
+        nextProgressNumber = batch_rvt_monitor_util.RunScriptedRevitSession(
+            revitVersion,
+            batchRvtScriptsFolderPath,
+            batchRvtConfig.ScriptFilePath,
+            scriptDatas,
+            progressNumber,
+            Output
+          )
 
-      if batchRvtConfig.EnableDataExport:
-        Output()
-        Output("Consolidating snapshots data.")
-        for snapshotDataExportFolderPath in snapshotDataExportFolderPaths:
-          snapshot_data_util.ConsolidateSnapshotData(snapshotDataExportFolderPath, Output)
-          # NOTE: Have disabled copying of journal files for now because if many files were processed
-          #       in the same Revit session, too many copies of a potentially large journal file
-          #       will be made. Consider modifying the logic so that the journal file is copied only
-          #       once per Revit seesion. Perhaps copy it to the BatchRvt session folder.
-          if False:
-            try:
-              snapshot_data_util.CopySnapshotRevitJournalFile(snapshotDataExportFolderPath, Output)
-            except Exception, e:
-              Output()
-              Output("WARNING: failed to copy the Revit session's journal file to snapshot data folder:")
-              Output()
-              Output("\t" + snapshotDataExportFolderPath)
-              exception_util.LogOutputErrorDetails(e, Output)
+        if nextProgressNumber is None:
+          Output()
+          Output("WARNING: The Revit session failed to initialize properly! No Revit files were processed in this session!")
+          progressNumber += sessionFilesCount
+          break
+        else:
+          progressNumber = nextProgressNumber
 
-      progressNumber += sessionFilesCount
+        scriptDatas = (
+            scriptDatas
+            .Where(lambda scriptData: scriptData.ProgressNumber.GetValue() >= progressNumber)
+            .ToList()
+          )
 
+        if batchRvtConfig.EnableDataExport:
+          Output()
+          Output("Consolidating snapshots data.")
+          for snapshotDataExportFolderPath in snapshotDataExportFolderPaths:
+            snapshot_data_util.ConsolidateSnapshotData(snapshotDataExportFolderPath, Output)
+            # NOTE: Have disabled copying of journal files for now because if many files were processed
+            #       in the same Revit session, too many copies of a potentially large journal file
+            #       will be made. Consider modifying the logic so that the journal file is copied only
+            #       once per Revit seesion. Perhaps copy it to the BatchRvt session folder.
+            if False:
+              try:
+                snapshot_data_util.CopySnapshotRevitJournalFile(snapshotDataExportFolderPath, Output)
+              except Exception, e:
+                Output()
+                Output("WARNING: failed to copy the Revit session's journal file to snapshot data folder:")
+                Output()
+                Output("\t" + snapshotDataExportFolderPath)
+                exception_util.LogOutputErrorDetails(e, Output)
+        
   return aborted
 
 def RunBatchRevitTasks(batchRvtConfig):

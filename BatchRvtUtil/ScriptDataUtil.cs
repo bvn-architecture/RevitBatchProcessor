@@ -28,7 +28,8 @@ namespace BatchRvtUtil
     public static class ScriptDataUtil
     {
         private const string SCRIPT_DATA_FILENAME_PREFIX = "Session.ScriptData.";
-        private const string SCRIPT_DATA_FILE_EXTENSION = ".json";
+        private const string SESSION_PROGRESS_RECORD_PREFIX = "Session.ProgressRecord.";
+        private const string JSON_FILE_EXTENSION = ".json";
 
         public class ScriptData : IPersistent
         {
@@ -199,10 +200,65 @@ namespace BatchRvtUtil
 
         public static string GetUniqueScriptDataFilePath()
         {
+            string uniqueId = Guid.NewGuid().ToString();
+
             return Path.Combine(
                     BatchRvt.GetDataFolderPath(),
-                    SCRIPT_DATA_FILENAME_PREFIX + Guid.NewGuid().ToString() + SCRIPT_DATA_FILE_EXTENSION
+                    SCRIPT_DATA_FILENAME_PREFIX + uniqueId + JSON_FILE_EXTENSION
                 );
+        }
+
+        public static string GetProgressRecordFilePath(string scriptDataFilePath)
+        {
+            string uniqueId = (
+                    Path.GetFileNameWithoutExtension(scriptDataFilePath)
+                    .Substring(SCRIPT_DATA_FILENAME_PREFIX.Length)
+                );
+
+            return Path.Combine(
+                    Path.GetDirectoryName(scriptDataFilePath),
+                    SESSION_PROGRESS_RECORD_PREFIX + uniqueId + JSON_FILE_EXTENSION
+                );
+        }
+
+        public static bool SetProgressNumber(string progressRecordFilePath, int progressNumber)
+        {
+            bool success = false;
+
+            try
+            {
+                var fileInfo = new FileInfo(progressRecordFilePath);
+
+                fileInfo.Directory.Create();
+
+                File.WriteAllText(fileInfo.FullName, progressNumber.ToString());
+
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
+            }
+
+            return success;
+        }
+
+        public static int? GetProgressNumber(string progressRecordFilePath)
+        {
+            int? progressNumber = null;
+
+            try
+            {
+                var fileInfo = new FileInfo(progressRecordFilePath);
+
+                progressNumber = int.Parse(File.ReadAllText(fileInfo.FullName).Trim());
+            }
+            catch (Exception e)
+            {
+                progressNumber = null;
+            }
+
+            return progressNumber;
         }
     }
 }

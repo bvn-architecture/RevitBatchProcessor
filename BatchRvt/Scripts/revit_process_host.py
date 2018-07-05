@@ -50,7 +50,14 @@ def IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
   batchRvtProcess = Process.GetProcesses().FirstOrDefault(IsBatchRvtProcess)
   return (batchRvtProcess is not None)
 
-def StartHostRevitProcess(revitVersion, batchRvtScriptsFolderPath, scriptFilePath, scriptDataFilePath, scriptOutputPipeHandleString):
+def StartHostRevitProcess(
+    revitVersion,
+    batchRvtScriptsFolderPath,
+    scriptFilePath,
+    scriptDataFilePath,
+    progressNumber,
+    scriptOutputPipeHandleString
+  ):
   batchRvtProcessUniqueId = GetUniqueIdForProcess(Process.GetCurrentProcess())
   def initEnvironmentVariables(environmentVariables):
     script_environment.InitEnvironmentVariables(
@@ -58,6 +65,7 @@ def StartHostRevitProcess(revitVersion, batchRvtScriptsFolderPath, scriptFilePat
         batchRvtScriptsFolderPath,
         scriptFilePath,
         scriptDataFilePath,
+        progressNumber,
         scriptOutputPipeHandleString,
         batchRvtProcessUniqueId
       )

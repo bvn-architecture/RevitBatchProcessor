@@ -88,7 +88,14 @@ def ShowRevitProcessError(processErrorStream, output, pendingReadLineTask=None):
         output("\t" + "- [ REVIT ERROR MESSAGE ] : " + line)
   return pendingReadLineTask
 
-def RunScriptedRevitSession(revitVersion, batchRvtScriptsFolderPath, scriptFilePath, scriptDatas, output):
+def RunScriptedRevitSession(
+    revitVersion,
+    batchRvtScriptsFolderPath,
+    scriptFilePath,
+    scriptDatas,
+    progressNumber,
+    output
+  ):
   scriptDataFilePath = ScriptDataUtil.GetUniqueScriptDataFilePath()
   ScriptDataUtil.SaveManyToFile(scriptDataFilePath, scriptDatas)
 
@@ -109,6 +116,7 @@ def RunScriptedRevitSession(revitVersion, batchRvtScriptsFolderPath, scriptFileP
             batchRvtScriptsFolderPath,
             scriptFilePath,
             scriptDataFilePath,
+            progressNumber,
             scriptOutputPipeHandleString
           )
         return hostRevitProcess
@@ -164,5 +172,9 @@ def RunScriptedRevitSession(revitVersion, batchRvtScriptsFolderPath, scriptFileP
     return
   
   stream_io_util.UsingStream(serverStream, serverStreamAction)
-  return
 
+  progressRecordFilePath = ScriptDataUtil.GetProgressRecordFilePath(scriptDataFilePath)
+  lastProgressNumber = ScriptDataUtil.GetProgressNumber(progressRecordFilePath)
+  nextProgressNumber = (lastProgressNumber + 1) if lastProgressNumber is not None else None
+
+  return nextProgressNumber

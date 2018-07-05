@@ -20,6 +20,8 @@
 
 import clr
 import System
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
 
 from System.Diagnostics import Process
 clr.AddReference("System.Windows.Forms")
@@ -43,6 +45,7 @@ import stream_io_util
 import script_util
 import revit_process_host
 from batch_rvt_util import BatchRvt, RevitVersion
+from revit_script_util import ScriptDataUtil
 
 
 END_SESSION_DELAY_IN_SECONDS = 5
@@ -277,11 +280,22 @@ def GetRevitProcessingOptionForSession(scriptDatas):
   revit_script_util.SetCurrentScriptData(oldScriptData)
   return revitProcessingOption
 
-def DoRevitSessionProcessing(scriptFilePath, scriptDataFilePath, batchRvtProcessUniqueId, output):
+def DoRevitSessionProcessing(
+    scriptFilePath,
+    scriptDataFilePath,
+    progressNumber,
+    batchRvtProcessUniqueId,
+    output
+  ):
   results = []
   revit_script_util.SetUIApplication(revit_session.GetSessionUIApplication())
   revit_script_util.SetScriptDataFilePath(scriptDataFilePath)
-  scriptDatas = revit_script_util.LoadScriptDatas()
+  scriptDatas = (
+      revit_script_util.LoadScriptDatas()
+      .Where(lambda scriptData: scriptData.ProgressNumber.GetValue() >= progressNumber)
+      .OrderBy(lambda scriptData: scriptData.ProgressNumber.GetValue())
+      .ToList()
+    )
   if len(scriptDatas) > 0:
     revitProcessingOption = GetRevitProcessingOptionForSession(scriptDatas)
     if revitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing:
@@ -290,6 +304,11 @@ def DoRevitSessionProcessing(scriptFilePath, scriptDataFilePath, batchRvtProcess
         if not revit_process_host.IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
           script_host_error.ShowScriptErrorMessageBox("ERROR: The BatchRvt process appears to have terminated! Operation aborted.")
           break
+        progressRecordFilePath = ScriptDataUtil.GetProgressRecordFilePath(scriptDataFilePath)
+        progressRecorded = ScriptDataUtil.SetProgressNumber(progressRecordFilePath, scriptData.ProgressNumber.GetValue())
+        if not progressRecorded:
+          output()
+          output("WARNING: Failed to update the session progress record file!")
         result = script_host_error.WithErrorHandling(
             lambda: RunBatchTaskScript(scriptFilePath),
             "ERROR: An error occurred while processing the file!",
@@ -312,6 +331,7 @@ def Main():
   outputPipeHandleString = script_environment.GetScriptOutputPipeHandleString(environmentVariables)
   scriptFilePath = script_environment.GetScriptFilePath(environmentVariables)
   scriptDataFilePath = script_environment.GetScriptDataFilePath(environmentVariables)
+  progressNumber = script_environment.GetProgressNumber(environmentVariables)
   batchRvtProcessUniqueId = script_environment.GetBatchRvtProcessUniqueId(environmentVariables)
 
   if outputPipeHandleString is not None and scriptFilePath is not None:
@@ -327,6 +347,7 @@ def Main():
             lambda: DoRevitSessionProcessing(
                 scriptFilePath,
                 scriptDataFilePath,
+                progressNumber,
                 batchRvtProcessUniqueId,
                 revit_script_util.Output
               ),

@@ -24,6 +24,7 @@ import System
 BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = "BATCHRVT__SCRIPTS_FOLDER_PATH"
 SCRIPT_FILE_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_FILE_PATH"
 SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_DATA_FILE_PATH"
+PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__PROGRESS_NUMBER"
 SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_OUTPUT_PIPE_HANDLE_STRING"
 BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__PROCESS_UNIQUE_ID"
 
@@ -59,6 +60,13 @@ def SetScriptDataFilePath(environmentVariables, scriptDataFilePath):
     )
   return
 
+def SetProgressNumber(environmentVariables, progressNumber):
+  SetEnvironmentVariable(
+      environmentVariables,
+      PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME,
+      str(progressNumber)
+    )
+
 def SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandleString):
   SetEnvironmentVariable(
       environmentVariables,
@@ -93,6 +101,13 @@ def GetScriptDataFilePath(environmentVariables):
       SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME
     )
 
+def GetProgressNumber(environmentVariables):
+  progressNumber = GetEnvironmentVariable(
+      environmentVariables,
+      PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME
+    )
+  return int(progressNumber)
+
 def GetScriptOutputPipeHandleString(environmentVariables):
   return GetEnvironmentVariable(
         environmentVariables,
@@ -110,12 +125,14 @@ def InitEnvironmentVariables(
     batchRvtScriptsFolderPath,
     scriptFilePath,
     scriptDataFilePath,
+    progressNumber,
     scriptOutputPipeHandleString,
     batchRvtProcessUniqueId
   ):
   SetBatchRvtScriptsFolderPath(environmentVariables, batchRvtScriptsFolderPath)
   SetScriptFilePath(environmentVariables, scriptFilePath)
   SetScriptDataFilePath(environmentVariables, scriptDataFilePath)
+  SetProgressNumber(environmentVariables, progressNumber)
   SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandleString)
   SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId)
   return
