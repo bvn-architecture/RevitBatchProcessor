@@ -210,6 +210,7 @@ def RunSingleRevitTask(batchRvtConfig):
         batchRvtScriptsFolderPath,
         batchRvtConfig.ScriptFilePath,
         [scriptData],
+        1,
         Output
       )
 
