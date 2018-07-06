@@ -37,6 +37,7 @@ namespace BatchRvtUtil
         // General Task Script settings
         public readonly StringSetting TaskScriptFilePath = new StringSetting("taskScriptFilePath");
         public readonly BooleanSetting ShowMessageBoxOnTaskScriptError = new BooleanSetting("showMessageBoxOnTaskScriptError");
+        public readonly IntegerSetting ProcessingTimeOutInMinutes = new IntegerSetting("processingTimeOutInMinutes");
 
         // Revit File List settings
         public readonly StringSetting RevitFileListFilePath = new StringSetting("revitFileListFilePath");
@@ -78,6 +79,7 @@ namespace BatchRvtUtil
                     new IPersistent[] {
                         this.TaskScriptFilePath,
                         this.ShowMessageBoxOnTaskScriptError,
+                        this.ProcessingTimeOutInMinutes,
                         this.RevitFileListFilePath,
                         this.EnableDataExport,
                         this.DataExportFolderPath,

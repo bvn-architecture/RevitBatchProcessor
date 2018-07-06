@@ -39,7 +39,7 @@ from batch_rvt_util import ScriptDataUtil
 SECONDS_PER_MINUTE = 60
 REVIT_PROCESS_EXIT_TIMEOUT_IN_SECONDS = 10 * SECONDS_PER_MINUTE
 REVIT_PROGRESS_CHECK_INTERVAL_IN_SECONDS = 5
-REVIT_PROGRESS_TIMEOUT_IN_MINUTES = -1
+
 
 def ShowSupportedRevitFileInfo(supportedRevitFileInfo, output):
   output()
@@ -105,6 +105,7 @@ def RunScriptedRevitSession(
     scriptFilePath,
     scriptDatas,
     progressNumber,
+    processingTimeOutInMinutes,
     output
   ):
   scriptDataFilePath = ScriptDataUtil.GetUniqueScriptDataFilePath()
@@ -166,11 +167,11 @@ def RunScriptedRevitSession(
               currentProgressRecordNumber[0] = progressRecordNumber
               progressRecordChangedTimeUtc[0] = time_util.GetDateTimeUtcNow()
 
-        if REVIT_PROGRESS_TIMEOUT_IN_MINUTES > 0:
+        if processingTimeOutInMinutes > 0:
           if currentProgressRecordNumber[0] != 0:
-            if time_util.GetSecondsElapsedSinceUtc(progressRecordChangedTimeUtc[0]) > (REVIT_PROGRESS_TIMEOUT_IN_MINUTES * 60):
+            if time_util.GetSecondsElapsedSinceUtc(progressRecordChangedTimeUtc[0]) > (processingTimeOutInMinutes * 60):
               output()
-              output("WARNING: Timed-out waiting for Revit file to be processed. Forcibly terminating the Revit process...")
+              output("WARNING: Timed-out waiting for Revit task / file to be processed. Forcibly terminating the Revit process...")
               TerminateHostRevitProcess(hostRevitProcess, output)
 
         if snapshotDataFilesExistTimestamp[0] is not None:

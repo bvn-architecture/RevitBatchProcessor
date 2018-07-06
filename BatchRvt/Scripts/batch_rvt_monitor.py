@@ -211,6 +211,7 @@ def RunSingleRevitTask(batchRvtConfig):
         batchRvtConfig.ScriptFilePath,
         [scriptData],
         1,
+        batchRvtConfig.ProcessingTimeOutInMinutes,
         Output
       )
 
@@ -320,6 +321,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
             batchRvtConfig.ScriptFilePath,
             scriptDatas,
             progressNumber,
+            batchRvtConfig.ProcessingTimeOutInMinutes,
             Output
           )
 

@@ -51,6 +51,7 @@ class BatchRvtConfig:
     # General Task Script settings
     self.ScriptFilePath = None
     self.ShowMessageBoxOnTaskError = None
+    self.ProcessingTimeOutInMinutes = 0
 
     # Revit File List settings
     self.RevitFileListFilePath = None
@@ -139,6 +140,7 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
   # General Task Script settings
   batchRvtConfig.ScriptFilePath = batchRvtSettings.TaskScriptFilePath.GetValue()
   batchRvtConfig.ShowMessageBoxOnTaskError = batchRvtSettings.ShowMessageBoxOnTaskScriptError.GetValue()
+  batchRvtConfig.ProcessingTimeOutInMinutes = batchRvtSettings.ProcessingTimeOutInMinutes.GetValue()
 
   # Revit File List settings
   batchRvtConfig.RevitFileListFilePath = batchRvtSettings.RevitFileListFilePath.GetValue()
@@ -197,6 +199,15 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
     if batchRvtConfig.ShowMessageBoxOnTaskError:
       output()
       output("Show Message Box on Task Script Error is enabled.")
+
+    if batchRvtConfig.ProcessingTimeOutInMinutes > 0:
+      output()
+      output("Revit Task / File processing time-out setting:")
+      output()
+      output(
+          "\t" + str(batchRvtConfig.ProcessingTimeOutInMinutes) +
+          " " + ("minute" if batchRvtConfig.ProcessingTimeOutInMinutes == 1 else "minutes")
+        )
 
     revitProcessingModeDescription = (
         "Batch Revit File processing" if batchRvtConfig.RevitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing
