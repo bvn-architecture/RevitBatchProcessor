@@ -177,13 +177,14 @@ def RelinquishAll(doc, shouldWaitForLockAvailabilityCallback=None):
   relinquishedItems = WorksharingUtils.RelinquishOwnership(doc, relinquishOptions, transactWithCentralOptions)
   return relinquishedItems
 
-def SaveAsNewCentral(doc, modelPath, overwrite=True):
+def SaveAsNewCentral(doc, modelPath, overwrite=True, clearTransmitted=False):
   saveAsOptions = SaveAsOptions()
   saveAsOptions.Compact = True
   saveAsOptions.OverwriteExistingFile = overwrite
   saveAsOptions.MaximumBackups = 1 # Can't set this to 0, unfortunately.
   worksharingSaveAsOptions = WorksharingSaveAsOptions()
   worksharingSaveAsOptions.SaveAsCentral = True
+  worksharingSaveAsOptions.ClearTransmitted = clearTransmitted
   saveAsOptions.SetWorksharingOptions(worksharingSaveAsOptions)
   doc.SaveAs(modelPath, saveAsOptions)
   return
