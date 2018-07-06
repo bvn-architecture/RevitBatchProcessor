@@ -45,7 +45,7 @@ def GetTimestampObject(dateTime):
   }
 
 def GetDateTimeDifferenceInSeconds(startDateTime, endDateTime):
-  return (endDateTime - startDateTime).Seconds
+  return int((endDateTime - startDateTime).TotalSeconds)
 
 def GetSecondsElapsedSince(dateTime):
   return GetDateTimeDifferenceInSeconds(dateTime, GetDateTimeNow())
