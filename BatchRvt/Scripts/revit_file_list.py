@@ -20,7 +20,7 @@
 
 import clr
 import System
-from System import ArgumentException
+from System import ArgumentException, NotSupportedException
 
 import text_file_util
 import console_util
@@ -72,7 +72,9 @@ class RevitFileInfo():
   def __init__(self, revitFilePath):
     try:
       revitFilePath = path_util.GetFullPath(revitFilePath)
-    except ArgumentException, e: # Catch ArgumentException exceptions such as 'Illegal characters in path.'
+    except ArgumentException, e: # Catch exceptions such as 'Illegal characters in path.'
+      pass
+    except NotSupportedException, e: # Catch exceptions such as 'The given path's format is not supported.'
       pass
     self.revitFilePath = revitFilePath
     return

@@ -92,6 +92,12 @@ def GetSupportedRevitFiles(batchRvtConfig):
         if not RevitFileExists(supportedRevitFileInfo)
       )
 
+    supportedRevitFileList = list(
+        supportedRevitFileInfo
+        for supportedRevitFileInfo in supportedRevitFileList
+        if RevitFileExists(supportedRevitFileInfo)
+      )
+
     unsupportedRevitFileList = list(
         supportedRevitFileInfo
         for supportedRevitFileInfo in supportedRevitFileList
