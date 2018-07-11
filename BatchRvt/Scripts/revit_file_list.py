@@ -21,6 +21,7 @@
 import clr
 import System
 from System import ArgumentException, NotSupportedException
+from System.IO import PathTooLongException
 
 import text_file_util
 import console_util
@@ -70,14 +71,24 @@ def FromConsole():
 
 class RevitFileInfo():
   def __init__(self, revitFilePath):
+    pathException = None
     try:
       revitFilePath = path_util.GetFullPath(revitFilePath)
     except ArgumentException, e: # Catch exceptions such as 'Illegal characters in path.'
-      pass
+      pathException = e
     except NotSupportedException, e: # Catch exceptions such as 'The given path's format is not supported.'
-      pass
+      pathException = e
+    except PathTooLongException, e: # Catch exceptions such as 'The specified path, file name, or both are too long.'
+      pathException = e
     self.revitFilePath = revitFilePath
+    self.pathException = pathException
     return
+
+  def IsValidFilePath(self):
+    return self.pathException is None
+
+  def IsFilePathTooLong(self):
+    return isinstance(self.pathException, PathTooLongException)
 
   def GetFullPath(self):
     return self.revitFilePath
