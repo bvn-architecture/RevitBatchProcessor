@@ -22,7 +22,7 @@ import clr
 import System
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import ModelPathUtils
-from Autodesk.Revit.Exceptions import OperationCanceledException, CorruptModelException
+from Autodesk.Revit.Exceptions import OperationCanceledException, CorruptModelException, InvalidOperationException
 
 import exception_util
 import path_util
@@ -155,80 +155,58 @@ def GetActiveDocument(uiapp):
   doc = uidoc.Document if uidoc is not None else None
   return doc
 
+def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
+  app = doc.Application
+  try:
+    if not isOpenedInUI:
+      revit_file_util.CloseWithoutSave(doc)
+      output()
+      output(closedMessage)
+  except Exception, e:
+    output()
+    output("WARNING: Couldn't close the document!")
+    if isinstance(e, InvalidOperationException):
+      output()
+      output(str(e.Message))
+    else:
+      exception_util.LogOutputErrorDetails(e, output, False)
+  app.PurgeReleasedAPIObjects()
+  return
+
 def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output):
   app = uiapp.Application
   result = None
   output()
-  output("Opening detached central file: " + centralFilePath)
+  output("Opening detached instance of central file: " + centralFilePath)
+  # TODO: decide if worksets should be closed or open (currently the script closes them)
+  if openInUI:
+    uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, True)
+    doc = uidoc.Document
+  else:
+    doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, True)
   try:
-    # TODO: decide if worksets should be closed or open (currently the script closes them)
-    if openInUI:
-      uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, True)
-      doc = uidoc.Document
-    else:
-      doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, True)
-
-    try:
-      result = documentAction(doc)
-    finally:
-      try:
-        if not openInUI:
-          revit_file_util.CloseWithoutSave(doc)
-          output()
-          output("Closed file: " + centralFilePath)
-      except Exception, e:
-        output()
-        output("WARNING: Couldn't close the document!")
-        exception_util.LogOutputErrorDetails(e, output, False)
-      app.PurgeReleasedAPIObjects()
-
-  except OperationCanceledException, e:
-    output()
-    output("ERROR: The operation was canceled: " + e.Message)
-    raise
-  except CorruptModelException, e:
-    output()
-    output("ERROR: Model is corrupt: " + e.Message)
-    raise
+    result = documentAction(doc)
+  finally:
+    SafeCloseWithoutSave(doc, openInUI, "Closed detached instance of central file: " + centralFilePath, output)
   return result
 
 def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
   app = uiapp.Application
   result = None
   output()
-  output("Opening central file: " + centralFilePath)
+  output("Opening local instance of central file: " + centralFilePath)
   output()
   output("New local file: " + localFilePath)
+  # TODO: decide if worksets should be closed or open (currently the script closes them)
+  if openInUI:
+    uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, True)
+    doc = uidoc.Document
+  else:
+    doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, True)
   try:
-    # TODO: decide if worksets should be closed or open (currently the script closes them)
-    if openInUI:
-      uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, True)
-      doc = uidoc.Document
-    else:
-      doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, True)
-
-    try:
-      result = documentAction(doc)
-    finally:
-      try:
-        if not openInUI:
-          revit_file_util.CloseWithoutSave(doc)
-          output()
-          output("Closed local file: " + centralFilePath)
-      except Exception, e:
-        output()
-        output("WARNING: Couldn't close the local file!")
-        exception_util.LogOutputErrorDetails(e, output, False)
-      app.PurgeReleasedAPIObjects()
-
-  except OperationCanceledException, e:
-    output()
-    output("ERROR: The operation was canceled: " + e.Message)
-    raise
-  except CorruptModelException, e:
-    output()
-    output("ERROR: Model is corrupt: " + e.Message)
-    raise
+    result = documentAction(doc)
+  finally:
+    SafeCloseWithoutSave(doc, openInUI, "Closed local file: " + localFilePath, output)
   return result
 
 def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
@@ -236,28 +214,21 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
   result = None
   output()
   output("Opening file: " + revitFilePath)
+  # TODO: decide if worksets should be closed or open (currently the script closes them)
+  if openInUI:
+    uidoc = revit_file_util.OpenAndActivateDocumentFile(uiapp, revitFilePath)
+    doc = uidoc.Document
+  else:
+    doc = revit_file_util.OpenDocumentFile(app, revitFilePath)
   try:
-    # TODO: decide if worksets should be closed or open (currently the script closes them)
-    if openInUI:
-      uidoc = revit_file_util.OpenAndActivateDocumentFile(uiapp, revitFilePath)
-      doc = uidoc.Document
-    else:
-      doc = revit_file_util.OpenDocumentFile(app, revitFilePath)
+    result = documentAction(doc)
+  finally:
+    SafeCloseWithoutSave(doc, openInUI, "Closed file: " + revitFilePath, output)
+  return result
 
-    try:
-      result = documentAction(doc)
-    finally:
-      try:
-        if not openInUI:
-          revit_file_util.CloseWithoutSave(doc)
-          output()
-          output("Closed file: " + revitFilePath)
-      except Exception, e:
-        output()
-        output("WARNING: Couldn't close the document!")
-        exception_util.LogOutputErrorDetails(e, output, False)
-      app.PurgeReleasedAPIObjects()
-
+def WithDocumentOpeningErrorReporting(documentOpeningAction):
+  try:
+    result = documentOpeningAction()
   except OperationCanceledException, e:
     output()
     output("ERROR: The operation was canceled: " + e.Message)
@@ -280,21 +251,30 @@ def WithAutomatedErrorHandling(uiapp, revitAction, output):
 
 def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, documentAction, output):
   def revitAction():
-    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output)
+    def documentOpeningAction():
+      result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output)
+      return result    
+    result = WithDocumentOpeningErrorReporting(documentOpeningAction)
     return result
   result = WithAutomatedErrorHandling(uiapp, revitAction, output)
   return result
 
 def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
   def revitAction():
-    result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output)
+    def documentOpeningAction():
+      result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output)
+      return result    
+    result = WithDocumentOpeningErrorReporting(documentOpeningAction)
     return result
   result = WithAutomatedErrorHandling(uiapp, revitAction, output)
   return result
 
 def RunDocumentAction(uiapp, openInUI, revitFilePath, documentAction, output):
   def revitAction():
-    result = WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output)
+    def documentOpeningAction():
+      result = WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output)
+      return result    
+    result = WithDocumentOpeningErrorReporting(documentOpeningAction)
     return result
   result = WithAutomatedErrorHandling(uiapp, revitAction, output)
   return result
