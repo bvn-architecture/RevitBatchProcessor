@@ -18,6 +18,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Automated milestoning of Revit projects.
 - Automated housekeeping tasks (e.g. place elements on appropriate worksets)
 - Batch upgrading of Revit projects and family files.
+- Testing your own Revit API scripts and Revit addins against a variety of Revit models and families in an automated manner.
 - Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!
 
 ## Features
