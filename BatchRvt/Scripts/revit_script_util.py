@@ -226,6 +226,34 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
     SafeCloseWithoutSave(doc, openInUI, "Closed file: " + revitFilePath, output)
   return result
 
+def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, documentAction, output):
+  def revitAction():
+    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output)
+    return result    
+  result = WithErrorReportingAndHandling(uiapp, revitAction, output)
+  return result
+
+def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
+  def revitAction():
+    result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output)
+    return result    
+  result = WithErrorReportingAndHandling(uiapp, revitAction, output)
+  return result
+
+def RunDocumentAction(uiapp, openInUI, revitFilePath, documentAction, output):
+  def revitAction():
+    result = WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output)
+    return result
+  result = WithErrorReportingAndHandling(uiapp, revitAction, output)
+  return result
+
+def WithErrorReportingAndHandling(uiapp, revitAction, output):
+  def action():
+    result = WithDocumentOpeningErrorReporting(revitAction)
+    return result
+  result = WithAutomatedErrorHandling(uiapp, action, output)
+  return result
+
 def WithDocumentOpeningErrorReporting(documentOpeningAction):
   try:
     result = documentOpeningAction()
@@ -247,35 +275,5 @@ def WithAutomatedErrorHandling(uiapp, revitAction, output):
     result = revit_failure_handling.WithFailuresProcessingHandler(uiapp.Application, action, output)
     return result
   result = WithExceptionLogging(action, output)
-  return result
-
-def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, documentAction, output):
-  def revitAction():
-    def documentOpeningAction():
-      result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output)
-      return result    
-    result = WithDocumentOpeningErrorReporting(documentOpeningAction)
-    return result
-  result = WithAutomatedErrorHandling(uiapp, revitAction, output)
-  return result
-
-def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
-  def revitAction():
-    def documentOpeningAction():
-      result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output)
-      return result    
-    result = WithDocumentOpeningErrorReporting(documentOpeningAction)
-    return result
-  result = WithAutomatedErrorHandling(uiapp, revitAction, output)
-  return result
-
-def RunDocumentAction(uiapp, openInUI, revitFilePath, documentAction, output):
-  def revitAction():
-    def documentOpeningAction():
-      result = WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output)
-      return result    
-    result = WithDocumentOpeningErrorReporting(documentOpeningAction)
-    return result
-  result = WithAutomatedErrorHandling(uiapp, revitAction, output)
   return result
 
