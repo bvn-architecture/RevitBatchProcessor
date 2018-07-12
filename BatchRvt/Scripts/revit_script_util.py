@@ -162,14 +162,15 @@ def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
       revit_file_util.CloseWithoutSave(doc)
       output()
       output(closedMessage)
+  except InvalidOperationException, e:
+    output()
+    output("WARNING: Couldn't close the document!")
+    output()
+    output(str(e.Message))
   except Exception, e:
     output()
     output("WARNING: Couldn't close the document!")
-    if isinstance(e, InvalidOperationException):
-      output()
-      output(str(e.Message))
-    else:
-      exception_util.LogOutputErrorDetails(e, output, False)
+    exception_util.LogOutputErrorDetails(e, output, False)
   app.PurgeReleasedAPIObjects()
   return
 
