@@ -37,6 +37,15 @@ def GetInterpretedFrameInfo(clsExceptionData):
       break
   return interpretedFrameInfo
 
+def GetClrException(exception):
+  return (
+      exception.clsException if isinstance(exception, exceptions.Exception)
+      else
+      exception if isinstance(exception, System.Exception)
+      else
+      None
+    )
+
 def LogOutputErrorDetails(exception, output, verbose=True):
   exceptionMessage = (
       str(exception.message) if isinstance(exception, exceptions.Exception)
@@ -48,13 +57,7 @@ def LogOutputErrorDetails(exception, output, verbose=True):
   output()
   output("Exception: [" + type(exception).__name__ + "] " + exceptionMessage)
   try:
-    clsException = (
-        exception.clsException if isinstance(exception, exceptions.Exception)
-        else
-        exception if isinstance(exception, System.Exception)
-        else
-        None
-      )
+    clsException = GetClrException(exception)
     if clsException is not None:
       clsExceptionType = clr.GetClrType(type(clsException))
       output(".NET exception: [" + str(clsExceptionType.Name) + "] " + str(clsException.Message))
