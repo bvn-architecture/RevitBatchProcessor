@@ -208,6 +208,8 @@ def RunSingleRevitTask(batchRvtConfig):
     scriptData.SessionDataFolderPath.SetValue(batchRvtConfig.SessionDataFolderPath)
     scriptData.ShowMessageBoxOnTaskScriptError.SetValue(batchRvtConfig.ShowMessageBoxOnTaskError)
     scriptData.RevitProcessingOption.SetValue(batchRvtConfig.RevitProcessingOption)
+    scriptData.ProgressNumber.SetValue(1)
+    scriptData.ProgressMax.SetValue(1)
 
     batchRvtScriptsFolderPath = GetBatchRvtScriptsFolderPath()
 
