@@ -332,21 +332,30 @@ namespace BatchRvtGUI
             {
                 var message = new StringBuilder();
 
-                message.AppendLine("Closing this window does not stop the Revit Batch Processor task (if it is already running).");
-                message.AppendLine();
-                message.AppendLine("Are you sure you want to close this window?");
+                message.AppendLine("Do you want to terminate the currently running task?");
 
                 var dialogResult = MessageBox.Show(
                         message.ToString(),
                         this.Text,
-                        MessageBoxButtons.YesNo,
+                        MessageBoxButtons.YesNoCancel,
                         MessageBoxIcon.Asterisk,
-                        MessageBoxDefaultButton.Button2
+                        MessageBoxDefaultButton.Button3
                     );
 
-                if (dialogResult != DialogResult.Yes)
+                if (dialogResult == DialogResult.Cancel)
                 {
                     e.Cancel = true;
+                }
+                else if (dialogResult == DialogResult.Yes)
+                {
+                    try
+                    {
+                        this.batchRvtProcess.Kill();
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO: report failure to kill the process?
+                    }
                 }
             }
 
