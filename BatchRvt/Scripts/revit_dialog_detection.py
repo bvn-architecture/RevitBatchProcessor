@@ -45,6 +45,8 @@ DO_NOT_SAVE_THE_PROJECT_TEXT = "Do not save the project"
 RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish all elements and worksets"
 RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish elements and worksets"
 
+HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION = [False]
+
 
 class RevitDialogInfo:
   def __init__(self, dialogHwnd):
@@ -121,7 +123,20 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
       if enabledDialog.WindowText == MODEL_UPGRADE_WINDOW_TITLE and len(buttons) == 0:
         pass # Do nothing for model upgrade dialog box. It has no buttons and will go away on its own.
       elif enabledDialog.WindowText == script_host_error.BATCH_RVT_ERROR_WINDOW_TITLE:
-        pass # Do nothing for BatchRvt error message windows.
+        # Report dialog detection but do nothing for BatchRvt error message windows.
+        if not HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION[0]:
+          output()
+          output("WARNING: Revit Batch Processor error window detected! Processing has halted!")
+          HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION[0] = True
+          staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
+          if len(staticControls) > 0:
+            output()
+            output("Dialog has the following static control text:")
+            for staticControl in staticControls:
+              staticControlText = staticControl.WindowText
+              if not str.IsNullOrWhiteSpace(staticControlText):
+                output()
+                output(staticControlText)
       elif enabledDialog.WindowText == CHANGES_NOT_SAVED_TITLE and len(buttons) == 4:
         output()
         output("'" + enabledDialog.WindowText + "' dialog box detected.")
