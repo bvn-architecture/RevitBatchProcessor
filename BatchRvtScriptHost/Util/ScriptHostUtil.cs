@@ -40,38 +40,43 @@ namespace BatchRvt.ScriptHost
                 object uiApplicationObject
             )
         {
-            var batchRvtScriptsFolderPath = GetBatchRvtScriptsFolderPath(GetEnvironmentVariables());
+            var environmentVariables = GetEnvironmentVariables();
 
-            if (batchRvtScriptsFolderPath != null)
+            if (environmentVariables != null)
             {
-                var engine = ScriptUtil.CreatePythonEngine();
+                var batchRvtScriptsFolderPath = GetBatchRvtScriptsFolderPath(environmentVariables);
 
-                ScriptUtil.AddBuiltinVariables(
-                        engine,
-                        new Dictionary<string, object> {
-                        { "__revit__", uiApplicationObject },
+                if (batchRvtScriptsFolderPath != null)
+                {
+                    var engine = ScriptUtil.CreatePythonEngine();
+
+                    ScriptUtil.AddBuiltinVariables(
+                            engine,
+                            new Dictionary<string, object> {
+                            { "__revit__", uiApplicationObject },
+                        });
+
+                    var mainModuleScope = ScriptUtil.CreateMainModule(engine);
+
+                    var pluginFullFolderPath = Path.GetFullPath(pluginFolderPath);
+                    var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, BatchScriptHostFilename);
+                    var batchRvtFolderPath = GetParentFolder(RemoveTrailingDirectorySeparators(batchRvtScriptsFolderPath));
+
+                    ScriptUtil.AddSearchPaths(engine, new[] {
+                        batchRvtScriptsFolderPath,
+                        pluginFullFolderPath,
+                        batchRvtFolderPath
                     });
 
-                var mainModuleScope = ScriptUtil.CreateMainModule(engine);
+                    ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
 
-                var pluginFullFolderPath = Path.GetFullPath(pluginFolderPath);
-                var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, BatchScriptHostFilename);
-                var batchRvtFolderPath = GetParentFolder(RemoveTrailingDirectorySeparators(batchRvtScriptsFolderPath));
+                    var scriptSource = ScriptUtil.CreateScriptSourceFromFile(engine, scriptHostFilePath);
 
-                ScriptUtil.AddSearchPaths(engine, new[] {
-                    batchRvtScriptsFolderPath,
-                    pluginFullFolderPath,
-                    batchRvtFolderPath
-                });
+                    scriptSource.Execute(mainModuleScope);
+                }
 
-                ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
-
-                var scriptSource = ScriptUtil.CreateScriptSourceFromFile(engine, scriptHostFilePath);
-
-                scriptSource.Execute(mainModuleScope);
+                return;
             }
-
-            return;
         }
 
         private static string GetParentFolder(string folderPath)
@@ -99,7 +104,19 @@ namespace BatchRvt.ScriptHost
 
         private static StringDictionary GetEnvironmentVariables()
         {
-            return Process.GetCurrentProcess().StartInfo.EnvironmentVariables;
+            StringDictionary environmentVariables = null;
+
+            // NOTE: Have encountered (at least once) a NullReferenceException upon accessing the EnvironmentVariables property!
+            try
+            {
+                environmentVariables = Process.GetCurrentProcess().StartInfo.EnvironmentVariables;
+            }
+            catch (NullReferenceException e)
+            {
+                environmentVariables = null;
+            }
+
+            return environmentVariables;
         }
     }
 }
