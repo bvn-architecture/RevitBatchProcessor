@@ -348,6 +348,8 @@
             this.timeOutNumericUpDown.Name = "timeOutNumericUpDown";
             this.timeOutNumericUpDown.Size = new System.Drawing.Size(46, 20);
             this.timeOutNumericUpDown.TabIndex = 3;
+            this.timeOutNumericUpDown.ValueChanged += new System.EventHandler(this.timeOutNumericUpDown_ValueChanged);
+            this.timeOutNumericUpDown.Leave += new System.EventHandler(this.timeOutNumericUpDown_Leave);
             // 
             // perFileProcessingTimeOutCheckBox
             // 
@@ -358,6 +360,7 @@
             this.perFileProcessingTimeOutCheckBox.TabIndex = 2;
             this.perFileProcessingTimeOutCheckBox.Text = "Per-File processing Time-out (in minutes):";
             this.perFileProcessingTimeOutCheckBox.UseVisualStyleBackColor = true;
+            this.perFileProcessingTimeOutCheckBox.CheckedChanged += new System.EventHandler(this.perFileProcessingTimeOutCheckBox_CheckedChanged);
             // 
             // useSameRevitSessionRadioButton
             // 

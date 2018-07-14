@@ -171,6 +171,14 @@ namespace BatchRvtGUI
                             () => {
                                 this.useSeparateRevitSessionRadioButton.Checked = (this.Settings.RevitSessionOption.GetValue() == BatchRvt.RevitSessionOption.UseSeparateSessionPerFile);
                                 this.useSameRevitSessionRadioButton.Checked = (this.Settings.RevitSessionOption.GetValue() == BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion);
+                                var processingTimeOutInMinutes = this.Settings.ProcessingTimeOutInMinutes.GetValue();
+                                if (processingTimeOutInMinutes < 0)
+                                {
+                                    processingTimeOutInMinutes = 0;
+                                }
+                                this.perFileProcessingTimeOutCheckBox.Checked = processingTimeOutInMinutes > 0;
+                                this.timeOutNumericUpDown.Value = processingTimeOutInMinutes;
+                                UpdateRevitSessionControls();
                             },
                             () => {
                                 this.Settings.RevitSessionOption.SetValue(
@@ -178,6 +186,14 @@ namespace BatchRvtGUI
                                         BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion :
                                         BatchRvt.RevitSessionOption.UseSeparateSessionPerFile
                                     );
+
+                                var processingTimeOutInMinutes = (int)this.timeOutNumericUpDown.Value;
+                                if (processingTimeOutInMinutes < 0)
+                                {
+                                    processingTimeOutInMinutes = 0;
+                                }
+
+                                this.Settings.ProcessingTimeOutInMinutes.SetValue(this.perFileProcessingTimeOutCheckBox.Checked ? processingTimeOutInMinutes : 0);
                             }
                         ),
 
@@ -293,12 +309,6 @@ namespace BatchRvtGUI
             bool isLoaded = LoadSettings();
 
             // TODO: show error message if load failed!!
-
-            // TODO: implement time-out setting in the UI and remove these lines that disable those controls!
-            this.perFileProcessingTimeOutCheckBox.Enabled = false;
-            this.perFileProcessingTimeOutCheckBox.Visible = false;
-            this.timeOutNumericUpDown.Enabled = false;
-            this.timeOutNumericUpDown.Visible = false;
         }
 
         private bool LoadSettings(string filePath = null)
@@ -790,6 +800,26 @@ namespace BatchRvtGUI
             this.singleRevitTaskRevitVersionComboBox.Enabled = singleTaskEnabled;
         }
 
+        private void perFileProcessingTimeOutCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateRevitSessionControls();
+        }
+
+        private void UpdateRevitSessionControls()
+        {
+            bool perFileProcessingTimeOutEnabled = this.perFileProcessingTimeOutCheckBox.Checked;
+
+            if (perFileProcessingTimeOutEnabled)
+            {
+                // If time-out option is enabled but the current numeric value is 0, set a sensible default / initial value for the time-out.
+                if (this.timeOutNumericUpDown.Value == 0)
+                {
+                    this.timeOutNumericUpDown.Value = 15;
+                }
+            }
+            this.timeOutNumericUpDown.Enabled = perFileProcessingTimeOutEnabled;
+        }
+
         private void UpdatePreProcessingScriptControls()
         {
             var isChecked = this.executePreProcessingScriptCheckBox.Checked;
@@ -1053,6 +1083,24 @@ namespace BatchRvtGUI
             }
 
             this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, isChecked ? 572 : 572 - advancedSettingsHiddenSizeReductionAmount);
+        }
+
+        private void timeOutNumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            if (this.perFileProcessingTimeOutCheckBox.Checked && this.timeOutNumericUpDown.Value == 0)
+            {
+                this.perFileProcessingTimeOutCheckBox.Checked = false;
+                UpdateRevitSessionControls();
+            }
+        }
+
+        private void timeOutNumericUpDown_Leave(object sender, EventArgs e)
+        {
+            // Detect if the numeric time-out value was left blank and set it to 0.
+            if (string.IsNullOrWhiteSpace(this.timeOutNumericUpDown.Controls[1].Text))
+            {
+                this.timeOutNumericUpDown.Value = 0;
+            }
         }
     }
 }
