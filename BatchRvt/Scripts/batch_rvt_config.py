@@ -218,52 +218,52 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
     output()
     output("\t" + revitProcessingModeDescription)
 
-  if batchRvtConfig.EnableDataExport:
-    if str.IsNullOrWhiteSpace(batchRvtConfig.DataExportFolderPath):
-      output()
-      output("ERROR: No data export folder specified.")
-      aborted = True
-    else:
-      output()
-      output("Data Export is enabled.")
-      output()
-      output("Data Export Folder:")
-      output()
-      output("\t" + batchRvtConfig.DataExportFolderPath)
+    if batchRvtConfig.EnableDataExport:
+      if str.IsNullOrWhiteSpace(batchRvtConfig.DataExportFolderPath):
+        output()
+        output("ERROR: No data export folder specified.")
+        aborted = True
+      else:
+        output()
+        output("Data Export is enabled.")
+        output()
+        output("Data Export Folder:")
+        output()
+        output("\t" + batchRvtConfig.DataExportFolderPath)
 
-      batchRvtConfig.SessionDataFolderPath = (
-          session_data_util.GetSessionFolderPath(
-              batchRvtConfig.DataExportFolderPath,
-              batchRvtConfig.SessionStartTime
-            )
-        )
+        batchRvtConfig.SessionDataFolderPath = (
+            session_data_util.GetSessionFolderPath(
+                batchRvtConfig.DataExportFolderPath,
+                batchRvtConfig.SessionStartTime
+              )
+          )
 
-      output()
-      output("Session Folder:")
-      output()
-      output("\t" + batchRvtConfig.SessionDataFolderPath)
+        output()
+        output("Session Folder:")
+        output()
+        output("\t" + batchRvtConfig.SessionDataFolderPath)
 
-  if batchRvtConfig.ExecutePreProcessingScript:
-    if not File.Exists(batchRvtConfig.PreProcessingScriptFilePath):
-      output()
-      output("ERROR: Pre-processing script file does not exist.")
-      aborted = True
-    else:
-      output()
-      output("Pre-Processing Script:")
-      output()
-      output("\t" + batchRvtConfig.PreProcessingScriptFilePath)
+    if batchRvtConfig.ExecutePreProcessingScript:
+      if not File.Exists(batchRvtConfig.PreProcessingScriptFilePath):
+        output()
+        output("ERROR: Pre-processing script file does not exist.")
+        aborted = True
+      else:
+        output()
+        output("Pre-Processing Script:")
+        output()
+        output("\t" + batchRvtConfig.PreProcessingScriptFilePath)
 
-  if batchRvtConfig.ExecutePostProcessingScript:
-    if not File.Exists(batchRvtConfig.PostProcessingScriptFilePath):
-      output()
-      output("ERROR: Post-processing script file does not exist.")
-      aborted = True
-    else:
-      output()
-      output("Post-Processing Script:")
-      output()
-      output("\t" + batchRvtConfig.PostProcessingScriptFilePath)
+    if batchRvtConfig.ExecutePostProcessingScript:
+      if not File.Exists(batchRvtConfig.PostProcessingScriptFilePath):
+        output()
+        output("ERROR: Post-processing script file does not exist.")
+        aborted = True
+      else:
+        output()
+        output("Post-Processing Script:")
+        output()
+        output("\t" + batchRvtConfig.PostProcessingScriptFilePath)
     
     centralFileProcessingDescription = (
         "Create New Local" if (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.CreateNewLocal)
