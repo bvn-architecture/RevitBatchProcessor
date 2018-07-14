@@ -107,6 +107,7 @@ def RunBatchTaskScript(scriptFilePath):
   showMessageBoxOnTaskError = revit_script_util.GetShowMessageBoxOnTaskError()
   centralFileOpenOption = revit_script_util.GetCentralFileOpenOption()
   deleteLocalAfter = revit_script_util.GetDeleteLocalAfter()
+  discardWorksetsOnDetach = revit_script_util.GetDiscardWorksetsOnDetach()
   progressNumber = revit_script_util.GetProgressNumber()
   progressMax = revit_script_util.GetProgressMax()
   output = revit_script_util.Output
@@ -213,7 +214,7 @@ def RunBatchTaskScript(scriptFilePath):
           path_util.CreateDirectoryForFilePath(localFilePath)
           result = revit_script_util.RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, processDocument, output)
         elif isCentralModel or isLocalModel:
-          result = revit_script_util.RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, processDocument, output)
+          result = revit_script_util.RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksetsOnDetach, processDocument, output)
         else:
           result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, processDocument, output)
     except Exception, e:

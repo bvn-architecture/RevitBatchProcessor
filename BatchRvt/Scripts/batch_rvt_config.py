@@ -71,6 +71,7 @@ class BatchRvtConfig:
     # Central File Processing settings
     self.CentralFileOpenOption = None
     self.DeleteLocalAfter = None
+    self.DiscardWorksetsOnDetach = None
 
     # Revit Session settings
     self.RevitSessionOption = None
@@ -160,6 +161,7 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
   # Central File Processing settings
   batchRvtConfig.CentralFileOpenOption = batchRvtSettings.CentralFileOpenOption.GetValue()
   batchRvtConfig.DeleteLocalAfter = batchRvtSettings.DeleteLocalAfter.GetValue()
+  batchRvtConfig.DiscardWorksetsOnDetach = batchRvtSettings.DiscardWorksetsOnDetach.GetValue()
 
   # Revit Session settings
   batchRvtConfig.RevitSessionOption = batchRvtSettings.RevitSessionOption.GetValue()
@@ -276,7 +278,11 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
     if (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.CreateNewLocal):
       if (batchRvtConfig.DeleteLocalAfter):
         output()
-        output("\t" + "(Local File will be deleted after processing.)")
+        output("\t" + "Local File will be deleted after processing.")
+    elif (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.Detach):
+      if (batchRvtConfig.DiscardWorksetsOnDetach):
+        output()
+        output("\t" + "Worksets will be discarded upon detach.")
 
   return aborted
 

@@ -154,6 +154,7 @@ namespace BatchRvtGUI
                                 this.detachFromCentralRadioButton.Checked = (this.Settings.CentralFileOpenOption.GetValue() == BatchRvt.CentralFileOpenOption.Detach);
                                 this.createNewLocalRadioButton.Checked = (this.Settings.CentralFileOpenOption.GetValue() == BatchRvt.CentralFileOpenOption.CreateNewLocal);
                                 this.deleteLocalAfterCheckBox.Checked = this.Settings.DeleteLocalAfter.GetValue();
+                                this.discardWorksetsCheckBox.Checked = this.Settings.DiscardWorksetsOnDetach.GetValue();
                                 UpdateCentralFileProcessingControls();
                             },
                             () => {
@@ -163,6 +164,7 @@ namespace BatchRvtGUI
                                         BatchRvt.CentralFileOpenOption.Detach
                                     );
                                 this.Settings.DeleteLocalAfter.SetValue(this.deleteLocalAfterCheckBox.Checked);
+                                this.Settings.DiscardWorksetsOnDetach.SetValue(this.discardWorksetsCheckBox.Checked);
                             }
                         ),
 
@@ -309,10 +311,6 @@ namespace BatchRvtGUI
             bool isLoaded = LoadSettings();
 
             // TODO: show error message if load failed!!
-
-            // TODO: enable control when the 'discard worksets' option is functional.
-            this.discardWorksetsCheckBox.Checked = false;
-            this.discardWorksetsCheckBox.Enabled = false;
         }
 
         private bool LoadSettings(string filePath = null)
@@ -869,6 +867,7 @@ namespace BatchRvtGUI
         private void UpdateCentralFileProcessingControls()
         {
             this.deleteLocalAfterCheckBox.Enabled = this.createNewLocalRadioButton.Checked;
+            this.discardWorksetsCheckBox.Enabled = this.detachFromCentralRadioButton.Checked;
         }
 
         private void useFileRevitVersionRadioButton_CheckedChanged(object sender, EventArgs e)

@@ -118,6 +118,9 @@ def GetCentralFileOpenOption():
 def GetDeleteLocalAfter():
   return SCRIPT_DATA_CONTAINER[0].DeleteLocalAfter.GetValue()
 
+def GetDiscardWorksetsOnDetach():
+  return SCRIPT_DATA_CONTAINER[0].DiscardWorksetsOnDetach.GetValue()
+
 def GetProgressNumber():
   return SCRIPT_DATA_CONTAINER[0].ProgressNumber.GetValue()
 
@@ -174,17 +177,23 @@ def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
   app.PurgeReleasedAPIObjects()
   return
 
-def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output):
+def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, documentAction, output):
   app = uiapp.Application
   result = None
   output()
   output("Opening detached instance of central file: " + centralFilePath)
   # TODO: decide if worksets should be closed or open (currently the script closes them)
   if openInUI:
-    uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, True)
+    if discardWorksets:
+      uidoc = revit_file_util.OpenAndActivateDetachAndDiscardWorksets(uiapp, centralFilePath)
+    else:
+      uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, True)
     doc = uidoc.Document
   else:
-    doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, True)
+    if discardWorksets:
+      doc = revit_file_util.OpenDetachAndDiscardWorksets(app, centralFilePath)
+    else:
+      doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, True)
   try:
     result = documentAction(doc)
   finally:
@@ -227,9 +236,9 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
     SafeCloseWithoutSave(doc, openInUI, "Closed file: " + revitFilePath, output)
   return result
 
-def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, documentAction, output):
+def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, documentAction, output):
   def revitAction():
-    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, documentAction, output)
+    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, documentAction, output)
     return result    
   result = WithErrorReportingAndHandling(uiapp, revitAction, output)
   return result

@@ -161,6 +161,20 @@ def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllW
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
+def OpenDetachAndDiscardWorksets(application, modelPath):
+  if isinstance(modelPath, str):
+    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+  openOptions = OpenOptions()
+  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
+  return application.OpenDocumentFile(modelPath, openOptions)
+
+def OpenAndActivateDetachAndDiscardWorksets(uiApplication, modelPath):
+  if isinstance(modelPath, str):
+    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+  openOptions = OpenOptions()
+  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
+  return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
+
 def OpenDocumentFile(application, modelPath):
   if isinstance(modelPath, ModelPath):
     modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
