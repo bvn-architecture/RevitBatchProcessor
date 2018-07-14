@@ -250,12 +250,12 @@ def RunDocumentAction(uiapp, openInUI, revitFilePath, documentAction, output):
 
 def WithErrorReportingAndHandling(uiapp, revitAction, output):
   def action():
-    result = WithDocumentOpeningErrorReporting(revitAction)
+    result = WithDocumentOpeningErrorReporting(revitAction, output)
     return result
   result = WithAutomatedErrorHandling(uiapp, action, output)
   return result
 
-def WithDocumentOpeningErrorReporting(documentOpeningAction):
+def WithDocumentOpeningErrorReporting(documentOpeningAction, output):
   try:
     result = documentOpeningAction()
   except OperationCanceledException, e:
