@@ -73,6 +73,9 @@ namespace BatchRvtUtil
         public readonly EnumSetting<RevitVersion.SupportedRevitVersion> BatchRevitTaskRevitVersion = new EnumSetting<RevitVersion.SupportedRevitVersion>("batchRevitTaskRevitVersion");
         public readonly BooleanSetting OpenInUI = new BooleanSetting("openInUI");
 
+        // UI settings
+        public readonly BooleanSetting ShowAdvancedSettings = new BooleanSetting("showAdvancedSettings");
+
         public BatchRvtSettings()
         {
             this.persistentSettings = new PersistentSettings(
@@ -95,7 +98,8 @@ namespace BatchRvtUtil
                         this.RevitFileProcessingOption,
                         this.IfNotAvailableUseMinimumAvailableRevitVersion,
                         this.BatchRevitTaskRevitVersion,
-                        this.OpenInUI
+                        this.OpenInUI,
+                        this.ShowAdvancedSettings
                     }
                 );
         }

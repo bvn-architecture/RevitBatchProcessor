@@ -46,9 +46,12 @@
             this.showMessageBoxOnTaskScriptErrorCheckBox = new System.Windows.Forms.CheckBox();
             this.taskScriptLabel = new System.Windows.Forms.Label();
             this.taskScriptTextBox = new System.Windows.Forms.TextBox();
+            this.taskScriptNewScriptButton = new System.Windows.Forms.Button();
             this.browseScriptButton = new System.Windows.Forms.Button();
             this.batchRevitFileProcessingGroupBox = new System.Windows.Forms.GroupBox();
             this.revitSessionGroupBox = new System.Windows.Forms.GroupBox();
+            this.timeOutNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.perFileProcessingTimeOutCheckBox = new System.Windows.Forms.CheckBox();
             this.useSameRevitSessionRadioButton = new System.Windows.Forms.RadioButton();
             this.useSeparateRevitSessionRadioButton = new System.Windows.Forms.RadioButton();
             this.enableBatchProcessingCheckBox = new System.Windows.Forms.CheckBox();
@@ -65,6 +68,8 @@
             this.executePostProcessingScriptCheckBox = new System.Windows.Forms.CheckBox();
             this.executePreProcessingScriptCheckBox = new System.Windows.Forms.CheckBox();
             this.postProcessingScriptTextBox = new System.Windows.Forms.TextBox();
+            this.postProcessingScriptNewScriptButton = new System.Windows.Forms.Button();
+            this.preProcessingScriptNewScriptButton = new System.Windows.Forms.Button();
             this.postProcessingScriptBrowseButton = new System.Windows.Forms.Button();
             this.preProcessingScriptTextBox = new System.Windows.Forms.TextBox();
             this.preProcessingScriptBrowseButton = new System.Windows.Forms.Button();
@@ -75,15 +80,14 @@
             this.batchRvtOutputTextBox = new System.Windows.Forms.TextBox();
             this.importSettingsButton = new System.Windows.Forms.Button();
             this.exportSettingsButton = new System.Windows.Forms.Button();
-            this.taskScriptNewScriptButton = new System.Windows.Forms.Button();
-            this.preProcessingScriptNewScriptButton = new System.Windows.Forms.Button();
-            this.postProcessingScriptNewScriptButton = new System.Windows.Forms.Button();
+            this.showAdvancedSettingsCheckBox = new System.Windows.Forms.CheckBox();
             this.settingsGroupBox.SuspendLayout();
             this.singleRevitTaskProcessingGroupBox.SuspendLayout();
             this.dataExportGroupBox.SuspendLayout();
             this.taskScriptGroupBox.SuspendLayout();
             this.batchRevitFileProcessingGroupBox.SuspendLayout();
             this.revitSessionGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.timeOutNumericUpDown)).BeginInit();
             this.centralFileProcessingGroupBox.SuspendLayout();
             this.revitFileProcessingGroupBox.SuspendLayout();
             this.preAndPostProcessingGroupBox.SuspendLayout();
@@ -170,6 +174,7 @@
             this.singleRevitTaskProcessingGroupBox.TabIndex = 1;
             this.singleRevitTaskProcessingGroupBox.TabStop = false;
             this.singleRevitTaskProcessingGroupBox.Text = "Single Revit Task Processing";
+            this.singleRevitTaskProcessingGroupBox.Visible = false;
             // 
             // singleRevitTaskRevitVersionComboBox
             // 
@@ -214,6 +219,7 @@
             this.dataExportGroupBox.TabIndex = 4;
             this.dataExportGroupBox.TabStop = false;
             this.dataExportGroupBox.Text = "Data Export";
+            this.dataExportGroupBox.Visible = false;
             // 
             // dataExportBaseFolderLabel
             // 
@@ -260,6 +266,7 @@
             this.showMessageBoxOnTaskScriptErrorCheckBox.TabIndex = 3;
             this.showMessageBoxOnTaskScriptErrorCheckBox.Text = "Show Message Box on Task Script Error";
             this.showMessageBoxOnTaskScriptErrorCheckBox.UseVisualStyleBackColor = true;
+            this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = false;
             // 
             // taskScriptLabel
             // 
@@ -279,6 +286,17 @@
             this.taskScriptTextBox.ReadOnly = true;
             this.taskScriptTextBox.Size = new System.Drawing.Size(503, 20);
             this.taskScriptTextBox.TabIndex = 1;
+            // 
+            // taskScriptNewScriptButton
+            // 
+            this.taskScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.taskScriptNewScriptButton.Location = new System.Drawing.Point(723, 19);
+            this.taskScriptNewScriptButton.Name = "taskScriptNewScriptButton";
+            this.taskScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
+            this.taskScriptNewScriptButton.TabIndex = 2;
+            this.taskScriptNewScriptButton.Text = "New Script ...";
+            this.taskScriptNewScriptButton.UseVisualStyleBackColor = true;
+            this.taskScriptNewScriptButton.Click += new System.EventHandler(this.taskScriptNewScriptButton_Click);
             // 
             // browseScriptButton
             // 
@@ -313,6 +331,8 @@
             // 
             this.revitSessionGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.revitSessionGroupBox.Controls.Add(this.timeOutNumericUpDown);
+            this.revitSessionGroupBox.Controls.Add(this.perFileProcessingTimeOutCheckBox);
             this.revitSessionGroupBox.Controls.Add(this.useSameRevitSessionRadioButton);
             this.revitSessionGroupBox.Controls.Add(this.useSeparateRevitSessionRadioButton);
             this.revitSessionGroupBox.Location = new System.Drawing.Point(472, 68);
@@ -321,6 +341,23 @@
             this.revitSessionGroupBox.TabIndex = 6;
             this.revitSessionGroupBox.TabStop = false;
             this.revitSessionGroupBox.Text = "Revit Session";
+            // 
+            // timeOutNumericUpDown
+            // 
+            this.timeOutNumericUpDown.Location = new System.Drawing.Point(230, 65);
+            this.timeOutNumericUpDown.Name = "timeOutNumericUpDown";
+            this.timeOutNumericUpDown.Size = new System.Drawing.Size(46, 20);
+            this.timeOutNumericUpDown.TabIndex = 3;
+            // 
+            // perFileProcessingTimeOutCheckBox
+            // 
+            this.perFileProcessingTimeOutCheckBox.AutoSize = true;
+            this.perFileProcessingTimeOutCheckBox.Location = new System.Drawing.Point(6, 67);
+            this.perFileProcessingTimeOutCheckBox.Name = "perFileProcessingTimeOutCheckBox";
+            this.perFileProcessingTimeOutCheckBox.Size = new System.Drawing.Size(218, 17);
+            this.perFileProcessingTimeOutCheckBox.TabIndex = 2;
+            this.perFileProcessingTimeOutCheckBox.Text = "Per-File processing Time-out (in minutes):";
+            this.perFileProcessingTimeOutCheckBox.UseVisualStyleBackColor = true;
             // 
             // useSameRevitSessionRadioButton
             // 
@@ -475,6 +512,7 @@
             this.preAndPostProcessingGroupBox.TabIndex = 3;
             this.preAndPostProcessingGroupBox.TabStop = false;
             this.preAndPostProcessingGroupBox.Text = "Pre/Post-Processing";
+            this.preAndPostProcessingGroupBox.Visible = false;
             // 
             // executePostProcessingScriptCheckBox
             // 
@@ -507,6 +545,28 @@
             this.postProcessingScriptTextBox.ReadOnly = true;
             this.postProcessingScriptTextBox.Size = new System.Drawing.Size(420, 20);
             this.postProcessingScriptTextBox.TabIndex = 4;
+            // 
+            // postProcessingScriptNewScriptButton
+            // 
+            this.postProcessingScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.postProcessingScriptNewScriptButton.Location = new System.Drawing.Point(723, 46);
+            this.postProcessingScriptNewScriptButton.Name = "postProcessingScriptNewScriptButton";
+            this.postProcessingScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
+            this.postProcessingScriptNewScriptButton.TabIndex = 2;
+            this.postProcessingScriptNewScriptButton.Text = "New Script ...";
+            this.postProcessingScriptNewScriptButton.UseVisualStyleBackColor = true;
+            this.postProcessingScriptNewScriptButton.Click += new System.EventHandler(this.postProcessingScriptNewScriptButton_Click);
+            // 
+            // preProcessingScriptNewScriptButton
+            // 
+            this.preProcessingScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.preProcessingScriptNewScriptButton.Location = new System.Drawing.Point(723, 17);
+            this.preProcessingScriptNewScriptButton.Name = "preProcessingScriptNewScriptButton";
+            this.preProcessingScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
+            this.preProcessingScriptNewScriptButton.TabIndex = 2;
+            this.preProcessingScriptNewScriptButton.Text = "New Script ...";
+            this.preProcessingScriptNewScriptButton.UseVisualStyleBackColor = true;
+            this.preProcessingScriptNewScriptButton.Click += new System.EventHandler(this.preProcessingScriptNewScriptButton_Click);
             // 
             // postProcessingScriptBrowseButton
             // 
@@ -542,8 +602,9 @@
             // 
             // alwaysOnTopCheckbox
             // 
+            this.alwaysOnTopCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.alwaysOnTopCheckbox.AutoSize = true;
-            this.alwaysOnTopCheckbox.Location = new System.Drawing.Point(18, 547);
+            this.alwaysOnTopCheckbox.Location = new System.Drawing.Point(531, 547);
             this.alwaysOnTopCheckbox.Name = "alwaysOnTopCheckbox";
             this.alwaysOnTopCheckbox.Size = new System.Drawing.Size(92, 17);
             this.alwaysOnTopCheckbox.TabIndex = 1;
@@ -559,7 +620,7 @@
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(137, 23);
             this.startButton.TabIndex = 2;
-            this.startButton.Text = "Start Batch Task";
+            this.startButton.Text = "Start Processing";
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 
@@ -586,7 +647,7 @@
             this.batchRvtOutputGroupBox.Size = new System.Drawing.Size(835, 178);
             this.batchRvtOutputGroupBox.TabIndex = 4;
             this.batchRvtOutputGroupBox.TabStop = false;
-            this.batchRvtOutputGroupBox.Text = "Batch Processor Progress";
+            this.batchRvtOutputGroupBox.Text = "Progress";
             // 
             // batchRvtOutputTextBox
             // 
@@ -606,7 +667,7 @@
             // 
             // importSettingsButton
             // 
-            this.importSettingsButton.Location = new System.Drawing.Point(116, 543);
+            this.importSettingsButton.Location = new System.Drawing.Point(12, 543);
             this.importSettingsButton.Name = "importSettingsButton";
             this.importSettingsButton.Size = new System.Drawing.Size(110, 23);
             this.importSettingsButton.TabIndex = 5;
@@ -616,7 +677,7 @@
             // 
             // exportSettingsButton
             // 
-            this.exportSettingsButton.Location = new System.Drawing.Point(232, 543);
+            this.exportSettingsButton.Location = new System.Drawing.Point(128, 543);
             this.exportSettingsButton.Name = "exportSettingsButton";
             this.exportSettingsButton.Size = new System.Drawing.Size(110, 23);
             this.exportSettingsButton.TabIndex = 5;
@@ -624,38 +685,16 @@
             this.exportSettingsButton.UseVisualStyleBackColor = true;
             this.exportSettingsButton.Click += new System.EventHandler(this.exportSettingsButton_Click);
             // 
-            // taskScriptNewScriptButton
+            // showAdvancedSettingsCheckBox
             // 
-            this.taskScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.taskScriptNewScriptButton.Location = new System.Drawing.Point(723, 19);
-            this.taskScriptNewScriptButton.Name = "taskScriptNewScriptButton";
-            this.taskScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
-            this.taskScriptNewScriptButton.TabIndex = 2;
-            this.taskScriptNewScriptButton.Text = "New Script ...";
-            this.taskScriptNewScriptButton.UseVisualStyleBackColor = true;
-            this.taskScriptNewScriptButton.Click += new System.EventHandler(this.taskScriptNewScriptButton_Click);
-            // 
-            // preProcessingScriptNewScriptButton
-            // 
-            this.preProcessingScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.preProcessingScriptNewScriptButton.Location = new System.Drawing.Point(723, 17);
-            this.preProcessingScriptNewScriptButton.Name = "preProcessingScriptNewScriptButton";
-            this.preProcessingScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
-            this.preProcessingScriptNewScriptButton.TabIndex = 2;
-            this.preProcessingScriptNewScriptButton.Text = "New Script ...";
-            this.preProcessingScriptNewScriptButton.UseVisualStyleBackColor = true;
-            this.preProcessingScriptNewScriptButton.Click += new System.EventHandler(this.preProcessingScriptNewScriptButton_Click);
-            // 
-            // postProcessingScriptNewScriptButton
-            // 
-            this.postProcessingScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.postProcessingScriptNewScriptButton.Location = new System.Drawing.Point(723, 46);
-            this.postProcessingScriptNewScriptButton.Name = "postProcessingScriptNewScriptButton";
-            this.postProcessingScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
-            this.postProcessingScriptNewScriptButton.TabIndex = 2;
-            this.postProcessingScriptNewScriptButton.Text = "New Script ...";
-            this.postProcessingScriptNewScriptButton.UseVisualStyleBackColor = true;
-            this.postProcessingScriptNewScriptButton.Click += new System.EventHandler(this.postProcessingScriptNewScriptButton_Click);
+            this.showAdvancedSettingsCheckBox.AutoSize = true;
+            this.showAdvancedSettingsCheckBox.Location = new System.Drawing.Point(244, 547);
+            this.showAdvancedSettingsCheckBox.Name = "showAdvancedSettingsCheckBox";
+            this.showAdvancedSettingsCheckBox.Size = new System.Drawing.Size(146, 17);
+            this.showAdvancedSettingsCheckBox.TabIndex = 1;
+            this.showAdvancedSettingsCheckBox.Text = "Show Advanced Settings";
+            this.showAdvancedSettingsCheckBox.UseVisualStyleBackColor = true;
+            this.showAdvancedSettingsCheckBox.CheckedChanged += new System.EventHandler(this.showAdvancedSettingsCheckBox_CheckedChanged);
             // 
             // BatchRvtGuiForm
             // 
@@ -667,6 +706,7 @@
             this.Controls.Add(this.batchRvtOutputGroupBox);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.startButton);
+            this.Controls.Add(this.showAdvancedSettingsCheckBox);
             this.Controls.Add(this.alwaysOnTopCheckbox);
             this.Controls.Add(this.settingsGroupBox);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -687,6 +727,7 @@
             this.batchRevitFileProcessingGroupBox.PerformLayout();
             this.revitSessionGroupBox.ResumeLayout(false);
             this.revitSessionGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.timeOutNumericUpDown)).EndInit();
             this.centralFileProcessingGroupBox.ResumeLayout(false);
             this.centralFileProcessingGroupBox.PerformLayout();
             this.revitFileProcessingGroupBox.ResumeLayout(false);
@@ -751,6 +792,9 @@
         private System.Windows.Forms.Button taskScriptNewScriptButton;
         private System.Windows.Forms.Button preProcessingScriptNewScriptButton;
         private System.Windows.Forms.Button postProcessingScriptNewScriptButton;
+        private System.Windows.Forms.CheckBox perFileProcessingTimeOutCheckBox;
+        private System.Windows.Forms.CheckBox showAdvancedSettingsCheckBox;
+        private System.Windows.Forms.NumericUpDown timeOutNumericUpDown;
     }
 }
 

@@ -65,7 +65,7 @@ namespace BatchRvtGUI
 
         private const int RUNNING_INITIAL_WIDTH = 875;
         private const int RUNNING_INITIAL_HEIGHT = 800;
-        private const int RUNNING_MINIMUM_HEIGHT = 700;
+        private const int RUNNING_MINIMUM_HEIGHT = 800;
         private const int RUNNING_MINIMUM_WIDTH = 875;
 
         private readonly System.Drawing.Size RUNNING_INITIAL_SIZE = new System.Drawing.Size(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
@@ -238,6 +238,17 @@ namespace BatchRvtGUI
                                     );
                             }
                         ),
+
+                    // Show Advanced setting
+                    new UIConfigItem(
+                            () => {
+                                this.showAdvancedSettingsCheckBox.Checked = this.Settings.ShowAdvancedSettings.GetValue();
+                                UpdateAdvancedSettings();
+                            },
+                            () => {
+                                this.Settings.ShowAdvancedSettings.SetValue(this.showAdvancedSettingsCheckBox.Checked);
+                            }
+                        ),
                 };
 
             return iuConfigItems;
@@ -281,6 +292,12 @@ namespace BatchRvtGUI
             bool isLoaded = LoadSettings();
 
             // TODO: show error message if load failed!!
+
+            // TODO: implement time-out setting in the UI and remove these lines that disable those controls!
+            this.perFileProcessingTimeOutCheckBox.Enabled = false;
+            this.perFileProcessingTimeOutCheckBox.Visible = false;
+            this.timeOutNumericUpDown.Enabled = false;
+            this.timeOutNumericUpDown.Visible = false;
         }
 
         private bool LoadSettings(string filePath = null)
@@ -990,6 +1007,49 @@ namespace BatchRvtGUI
             }
 
             return success;
+        }
+
+        private void showAdvancedSettingsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateAdvancedSettings();
+        }
+
+        private void UpdateAdvancedSettings()
+        {
+            var isChecked = this.showAdvancedSettingsCheckBox.Checked;
+            this.singleRevitTaskProcessingGroupBox.Visible = isChecked;
+            this.dataExportGroupBox.Visible = isChecked;
+            this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = isChecked;
+            this.preAndPostProcessingGroupBox.Visible = isChecked;
+
+            // TODO: this stuff is messy... refactor it !! Perhaps use FlowLayouyPanel or TableLayoutPanel to better manage the layout changes.
+
+            this.taskScriptGroupBox.Size = new System.Drawing.Size(this.taskScriptGroupBox.Size.Width, isChecked ? 76 : 76 - 24);
+            this.batchRevitFileProcessingGroupBox.Location = new System.Drawing.Point(this.batchRevitFileProcessingGroupBox.Location.X, isChecked ? 180 : 180 - 103);
+
+            int advancedSettingsHiddenSizeReductionAmount = 273;
+            this.settingsGroupBox.Size = new System.Drawing.Size(this.settingsGroupBox.Size.Width, isChecked ? 525 : 525 - advancedSettingsHiddenSizeReductionAmount);
+            // Lower area buttons.
+            int advancedSettingsLowerAreaButtonYLocation = 543;
+            this.importSettingsButton.Location = new System.Drawing.Point(this.importSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
+            this.exportSettingsButton.Location = new System.Drawing.Point(this.exportSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
+            this.exportSettingsButton.Location = new System.Drawing.Point(this.exportSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
+            this.startButton.Location = new System.Drawing.Point(this.startButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
+            this.closeButton.Location = new System.Drawing.Point(this.closeButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
+
+            // Lower area checkboxes.
+            int advancedSettingsLowerAreaCheckBoxesYLocation = 547;
+            this.showAdvancedSettingsCheckBox.Location = new System.Drawing.Point(this.showAdvancedSettingsCheckBox.Location.X, isChecked ? advancedSettingsLowerAreaCheckBoxesYLocation : advancedSettingsLowerAreaCheckBoxesYLocation - advancedSettingsHiddenSizeReductionAmount);
+            this.alwaysOnTopCheckbox.Location = new System.Drawing.Point(this.alwaysOnTopCheckbox.Location.X, isChecked ? advancedSettingsLowerAreaCheckBoxesYLocation : advancedSettingsLowerAreaCheckBoxesYLocation - advancedSettingsHiddenSizeReductionAmount);
+
+            int minimumWindowHeight = this.isBatchRvtRunning ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
+            this.MinimumSize = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, isChecked ? minimumWindowHeight : minimumWindowHeight - advancedSettingsHiddenSizeReductionAmount);
+            if (!this.isBatchRvtRunning)
+            {
+                this.Size = new System.Drawing.Size(this.Size.Width, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
+                this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
+            }
+            this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, isChecked ? 572 : 572 - advancedSettingsHiddenSizeReductionAmount);
         }
     }
 }
