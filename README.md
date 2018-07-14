@@ -32,7 +32,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!
 - Ability to import and export settings. This feature combined with the simple [command-line interface](#command-line-interface) allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.
 
-![Screenshot of the UI](BatchRvt_Screenshot.png)
+![Screenshot of the UI](BatchRvt_Screenshot.1.3.0.png)
 
 ## Who's this for?
 
