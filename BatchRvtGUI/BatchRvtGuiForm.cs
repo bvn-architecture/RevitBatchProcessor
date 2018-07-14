@@ -279,7 +279,7 @@ namespace BatchRvtGUI
         {
             this.Text = WINDOW_TITLE;
 
-            this.TopMost = true;
+            this.TopMost = false;
             this.alwaysOnTopCheckbox.Checked = this.TopMost;
             this.batchRvtOutputGroupBox.Visible = false;
 
