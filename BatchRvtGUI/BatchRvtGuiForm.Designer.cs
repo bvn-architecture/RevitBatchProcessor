@@ -338,7 +338,7 @@
             this.revitSessionGroupBox.Controls.Add(this.useSeparateRevitSessionRadioButton);
             this.revitSessionGroupBox.Location = new System.Drawing.Point(472, 68);
             this.revitSessionGroupBox.Name = "revitSessionGroupBox";
-            this.revitSessionGroupBox.Size = new System.Drawing.Size(345, 120);
+            this.revitSessionGroupBox.Size = new System.Drawing.Size(345, 97);
             this.revitSessionGroupBox.TabIndex = 6;
             this.revitSessionGroupBox.TabStop = false;
             this.revitSessionGroupBox.Text = "Revit Session";
@@ -461,7 +461,7 @@
             this.revitFileProcessingGroupBox.Controls.Add(this.useFileRevitVersionRadioButton);
             this.revitFileProcessingGroupBox.Location = new System.Drawing.Point(157, 68);
             this.revitFileProcessingGroupBox.Name = "revitFileProcessingGroupBox";
-            this.revitFileProcessingGroupBox.Size = new System.Drawing.Size(309, 120);
+            this.revitFileProcessingGroupBox.Size = new System.Drawing.Size(309, 97);
             this.revitFileProcessingGroupBox.TabIndex = 5;
             this.revitFileProcessingGroupBox.TabStop = false;
             this.revitFileProcessingGroupBox.Text = "Revit File Processing";
