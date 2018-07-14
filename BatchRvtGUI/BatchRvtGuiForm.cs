@@ -54,7 +54,7 @@ namespace BatchRvtGUI
         private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
         private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
 
-        private const int SETUP_HEIGHT = 614;
+        private const int SETUP_HEIGHT = 642;
         private const int SETUP_INITIAL_WIDTH = 875;
         private const int SETUP_MINIMUM_WIDTH = 875;
         private const int SETUP_MAXIMUM_WIDTH = 1600;
@@ -309,6 +309,10 @@ namespace BatchRvtGUI
             bool isLoaded = LoadSettings();
 
             // TODO: show error message if load failed!!
+
+            // TODO: enable control when the 'discard worksets' option is functional.
+            this.discardWorksetsCheckBox.Checked = false;
+            this.discardWorksetsCheckBox.Enabled = false;
         }
 
         private bool LoadSettings(string filePath = null)
@@ -1060,9 +1064,9 @@ namespace BatchRvtGUI
             this.batchRevitFileProcessingGroupBox.Location = new System.Drawing.Point(this.batchRevitFileProcessingGroupBox.Location.X, isChecked ? 180 : 180 - 103);
 
             int advancedSettingsHiddenSizeReductionAmount = 273;
-            this.settingsGroupBox.Size = new System.Drawing.Size(this.settingsGroupBox.Size.Width, isChecked ? 525 : 525 - advancedSettingsHiddenSizeReductionAmount);
+            this.settingsGroupBox.Size = new System.Drawing.Size(this.settingsGroupBox.Size.Width, isChecked ? 553 : 553 - advancedSettingsHiddenSizeReductionAmount);
             // Lower area buttons.
-            int advancedSettingsLowerAreaButtonYLocation = 543;
+            int advancedSettingsLowerAreaButtonYLocation = 571;
             this.importSettingsButton.Location = new System.Drawing.Point(this.importSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
             this.exportSettingsButton.Location = new System.Drawing.Point(this.exportSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
             this.exportSettingsButton.Location = new System.Drawing.Point(this.exportSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
@@ -1070,7 +1074,7 @@ namespace BatchRvtGUI
             this.closeButton.Location = new System.Drawing.Point(this.closeButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
 
             // Lower area checkboxes.
-            int advancedSettingsLowerAreaCheckBoxesYLocation = 547;
+            int advancedSettingsLowerAreaCheckBoxesYLocation = 575;
             this.showAdvancedSettingsCheckBox.Location = new System.Drawing.Point(this.showAdvancedSettingsCheckBox.Location.X, isChecked ? advancedSettingsLowerAreaCheckBoxesYLocation : advancedSettingsLowerAreaCheckBoxesYLocation - advancedSettingsHiddenSizeReductionAmount);
             this.alwaysOnTopCheckbox.Location = new System.Drawing.Point(this.alwaysOnTopCheckbox.Location.X, isChecked ? advancedSettingsLowerAreaCheckBoxesYLocation : advancedSettingsLowerAreaCheckBoxesYLocation - advancedSettingsHiddenSizeReductionAmount);
 
@@ -1082,7 +1086,12 @@ namespace BatchRvtGUI
                 this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
             }
 
-            this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, isChecked ? 572 : 572 - advancedSettingsHiddenSizeReductionAmount);
+            var previousLocationY = this.batchRvtOutputGroupBox.Location.Y;
+            this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, isChecked ? 600 : 600 - advancedSettingsHiddenSizeReductionAmount);
+            if (previousLocationY != this.batchRvtOutputGroupBox.Location.Y)
+            {
+                this.batchRvtOutputGroupBox.Size -= new System.Drawing.Size(0, this.batchRvtOutputGroupBox.Location.Y - previousLocationY);
+            }
         }
 
         private void timeOutNumericUpDown_ValueChanged(object sender, EventArgs e)
