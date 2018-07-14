@@ -64,8 +64,8 @@ namespace BatchRvtGUI
         private readonly System.Drawing.Size SETUP_MAXIMUM_SIZE = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, SETUP_HEIGHT);
 
         private const int RUNNING_INITIAL_WIDTH = 875;
-        private const int RUNNING_INITIAL_HEIGHT = 800;
-        private const int RUNNING_MINIMUM_HEIGHT = 800;
+        private const int RUNNING_INITIAL_HEIGHT = 875;
+        private const int RUNNING_MINIMUM_HEIGHT = 875;
         private const int RUNNING_MINIMUM_WIDTH = 875;
 
         private readonly System.Drawing.Size RUNNING_INITIAL_SIZE = new System.Drawing.Size(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
@@ -515,6 +515,8 @@ namespace BatchRvtGUI
                 this.MaximumSize = RUNNING_MAXIMUM_SIZE;
                 this.Size = RUNNING_INITIAL_SIZE;
                 this.MaximizeBox = true;
+
+                UpdateAdvancedSettings();
 
                 AdjustWindowSizeForDisplaySetting();
                 
@@ -1079,18 +1081,15 @@ namespace BatchRvtGUI
 
             int minimumWindowHeight = this.isBatchRvtRunning ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
             this.MinimumSize = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, isChecked ? minimumWindowHeight : minimumWindowHeight - advancedSettingsHiddenSizeReductionAmount);
+
             if (!this.isBatchRvtRunning)
             {
                 this.Size = new System.Drawing.Size(this.Size.Width, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
                 this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
             }
 
-            var previousLocationY = this.batchRvtOutputGroupBox.Location.Y;
             this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, isChecked ? 600 : 600 - advancedSettingsHiddenSizeReductionAmount);
-            if (previousLocationY != this.batchRvtOutputGroupBox.Location.Y)
-            {
-                this.batchRvtOutputGroupBox.Size -= new System.Drawing.Size(0, this.batchRvtOutputGroupBox.Location.Y - previousLocationY);
-            }
+            this.batchRvtOutputGroupBox.Size = new System.Drawing.Size(this.batchRvtOutputGroupBox.Size.Width, this.ClientSize.Height - 12 - this.batchRvtOutputGroupBox.Location.Y);
         }
 
         private void timeOutNumericUpDown_ValueChanged(object sender, EventArgs e)

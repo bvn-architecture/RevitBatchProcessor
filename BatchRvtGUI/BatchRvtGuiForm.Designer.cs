@@ -659,7 +659,7 @@
             this.batchRvtOutputGroupBox.Controls.Add(this.batchRvtOutputTextBox);
             this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, 600);
             this.batchRvtOutputGroupBox.Name = "batchRvtOutputGroupBox";
-            this.batchRvtOutputGroupBox.Size = new System.Drawing.Size(835, 197);
+            this.batchRvtOutputGroupBox.Size = new System.Drawing.Size(835, 225);
             this.batchRvtOutputGroupBox.TabIndex = 4;
             this.batchRvtOutputGroupBox.TabStop = false;
             this.batchRvtOutputGroupBox.Text = "Progress";
@@ -675,7 +675,7 @@
             this.batchRvtOutputTextBox.Name = "batchRvtOutputTextBox";
             this.batchRvtOutputTextBox.ReadOnly = true;
             this.batchRvtOutputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.batchRvtOutputTextBox.Size = new System.Drawing.Size(823, 172);
+            this.batchRvtOutputTextBox.Size = new System.Drawing.Size(823, 200);
             this.batchRvtOutputTextBox.TabIndex = 0;
             this.batchRvtOutputTextBox.TabStop = false;
             this.batchRvtOutputTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.batchRvtOutputTextBox_KeyDown);
@@ -715,7 +715,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(859, 809);
+            this.ClientSize = new System.Drawing.Size(859, 837);
             this.Controls.Add(this.exportSettingsButton);
             this.Controls.Add(this.importSettingsButton);
             this.Controls.Add(this.batchRvtOutputGroupBox);
