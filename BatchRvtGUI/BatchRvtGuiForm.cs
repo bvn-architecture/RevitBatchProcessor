@@ -281,6 +281,7 @@ namespace BatchRvtGUI
 
             this.TopMost = true;
             this.alwaysOnTopCheckbox.Checked = this.TopMost;
+            this.batchRvtOutputGroupBox.Visible = false;
 
             this.MinimumSize = SETUP_MINIMUM_SIZE;
             this.MaximumSize = SETUP_MAXIMUM_SIZE;
@@ -497,6 +498,7 @@ namespace BatchRvtGUI
                 this.importSettingsButton.Enabled = false;
                 this.startButton.Enabled = false;
                 this.startButton.Text = "Running...";
+                this.batchRvtOutputGroupBox.Visible = true;
                 this.MinimumSize = RUNNING_MINIMUM_SIZE;
                 this.MaximumSize = RUNNING_MAXIMUM_SIZE;
                 this.Size = RUNNING_INITIAL_SIZE;
@@ -1049,6 +1051,7 @@ namespace BatchRvtGUI
                 this.Size = new System.Drawing.Size(this.Size.Width, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
                 this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
             }
+
             this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, isChecked ? 572 : 572 - advancedSettingsHiddenSizeReductionAmount);
         }
     }
