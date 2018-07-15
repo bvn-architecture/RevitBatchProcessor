@@ -21,6 +21,8 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Testing your own Revit API scripts and Revit addins against a variety of Revit models and families in an automated manner.
 - Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!
 
+![Screenshot of the UI](BatchRvt_Screenshot.1.3.0.png)
+
 ## Features
 
 - Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2018. (Of course the required version of Revit must be installed!)
@@ -32,9 +34,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!
 - Ability to import and export settings. This feature combined with the simple [command-line interface](#command-line-interface) allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.
 
-![Screenshot of the UI](BatchRvt_Screenshot.1.3.0.png)
-
-## Who's this for?
+## Unlimited Power
 
 > "With great power come great responsibility"
 [-- Spiderman](https://quoteinvestigator.com/2015/07/23/great-power/)
