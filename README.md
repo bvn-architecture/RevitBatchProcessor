@@ -87,6 +87,51 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Daniel Rumery
 
+# Usage
+
+The ***two ingredients*** you will need in order to use the Revit Batch Processor ("RBP") are:
+- An **Excel (.xlsx) file** or **Text (.txt) file** that contains a list of Revit file paths. Each file path must be fully qualified (no partial paths).
+  For an Excel file this means the first column of each row contains a file path. For a Text file this means each line contains a file path.
+  
+  For example:
+  ```
+  P:\15\ProjectABC\MainModel.rvt
+  P:\16\ProjectXYZ\ModelA.rvt
+  P:\16\ProjectXYZ\ModelB.rvt
+  P:\16\ProjectXYZ\ConsultantModel.rvt
+  ```
+
+- A **Dynamo (.dyn)** or **Python (.py)** task script. This script will be executed once for each file in the list.
+  For Dynamo scripts, **any workspace (.dyn) file should work** as a task script without modification. *(Indeed, if you find a script that works in Dynamo but not in RBP, submit an Issue to the RBP github page!)*
+
+  For Python scripts (\*.py) they should contain at minimum the following code:
+  ```python
+  '''Output "Hello Revit world!" to the console / log.'''
+
+  # This section is common to all Python task scripts. 
+  import clr
+  import System
+
+  clr.AddReference("RevitAPI")
+  clr.AddReference("RevitAPIUI")
+  from Autodesk.Revit.DB import *
+
+  import revit_script_util
+  from revit_script_util import Output
+
+  sessionId = revit_script_util.GetSessionId()
+  uiapp = revit_script_util.GetUIApplication()
+
+  doc = revit_script_util.GetScriptDocument()
+  revitFilePath = revit_script_util.GetRevitFilePath()
+
+  # The code above is boilerplate, everything below is all yours.
+  # You can use almost any part of the Revit API here!
+
+  Output()
+  Output("Hello Revit world!")
+  ```
+
 # Command-line Interface
 
 Revit Batch Processor can be run from the command-line (bypassing the GUI). First configure and export the required processing settings from the GUI application. Once this is done you can simply run the command line utility **BatchRvt.exe** passing the exported settings file path as an argument:
@@ -100,10 +145,6 @@ Optionally you can also specify the location for the log file:
 ```
 %LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --log_folder "C:\MyBatchTasks\Logs" --settings_file "C:\MyBatchTasks\BatchRvt.Settings.json"
 ```
-
-# Manual
-
-Detailed instructions to come!
 
 # Contribute
 
