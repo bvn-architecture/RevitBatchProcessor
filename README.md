@@ -93,7 +93,10 @@ Daniel Rumery
 
 The ***two ingredients*** you will need in order to use the Revit Batch Processor ("RBP") are:
 - An **Excel (.xlsx) file** or **Text (.txt) file** that contains a list of Revit file paths. Each file path must be fully qualified (no partial paths).
-  For an Excel file this means the first column of each row contains a file path. For a Text file this means each line contains a file path.
+  
+  For an Excel file this means the first column of each row contains a file path.
+
+  For a Text file this means each line contains a file path.
   
   For example:
   ```
@@ -104,6 +107,7 @@ The ***two ingredients*** you will need in order to use the Revit Batch Processo
   ```
 
 - A **Dynamo (.dyn)** or **Python (.py)** task script. This script will be executed once for each file in the list.
+
   For Dynamo scripts, **any workspace (.dyn) file should work** as a task script without modification. *(Indeed, if you find a script that works in Dynamo but not in RBP, [submit an Issue](https://github.com/bvn-architecture/RevitBatchProcessor/issues/new) to the RBP github page!)*
 
   For Python scripts (\*.py) they should contain at minimum the following code:
