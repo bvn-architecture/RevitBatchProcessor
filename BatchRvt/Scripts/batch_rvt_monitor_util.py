@@ -174,7 +174,7 @@ def RunScriptedRevitSession(
               output()
               output("WARNING: Timed-out waiting for Revit task / file to be processed. Forcibly terminating the Revit process...")
               TerminateHostRevitProcess(hostRevitProcess, output)
-          elif time_util.GetSecondsElapsedSinceUtc(progressRecordChangedTimeUtc[0]) > (processingTimeOutInMinutes * REVIT_PROCESS_BEGIN_PROCESSING_TIMEOUT_IN_SECONDS):
+          elif time_util.GetSecondsElapsedSinceUtc(progressRecordChangedTimeUtc[0]) > REVIT_PROCESS_BEGIN_PROCESSING_TIMEOUT_IN_SECONDS:
             output()
             output("WARNING: Timed-out waiting for Revit script host to begin task / file processing. Forcibly terminating the Revit process...")
             TerminateHostRevitProcess(hostRevitProcess, output)
