@@ -72,7 +72,7 @@ namespace BatchRvtUtil
                 string sessionId = null
             )
         {
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDirectory = GetBatchRvtFolderPath();
 
             var batchRvtOptions = new Dictionary<string, string>() {
                     { CommandSettings.SETTINGS_FILE_PATH_OPTION, settingsFilePath },
