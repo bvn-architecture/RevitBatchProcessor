@@ -147,7 +147,7 @@ namespace BatchRvtUtil
 
         public static string GetBatchRvtFolderPath()
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            return Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
         }
 
         public static string GetBatchRvtScriptsFolderPath()
