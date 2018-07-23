@@ -32,6 +32,8 @@ namespace BatchRvtUtil
         public const string BATCHRVTGUI_SETTINGS_FILENAME = "BatchRvtGui.Settings" + SETTINGS_FILE_EXTENSION;
         public const string BATCHRVT_SETTINGS_FILENAME = "BatchRvt.Settings" + SETTINGS_FILE_EXTENSION;
 
+        private const string APP_DOMAIN_DATA_PROPERTY_NAME = "BATCH_RVT_SETTINGS_OBJECT";
+
         private readonly PersistentSettings persistentSettings;
 
         // General Task Script settings
@@ -114,6 +116,56 @@ namespace BatchRvtUtil
         public void Store(JObject jobject)
         {
             this.persistentSettings.Store(jobject);
+        }
+
+        public static bool IsAppDomainDataAvailable()
+        {
+            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME) as JObject;
+
+            return (jobject != null);
+        }
+
+        public bool LoadFromAppDomainData()
+        {
+            bool success = false;
+
+            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME) as JObject;
+
+            if (jobject != null)
+            {
+                try
+                {
+                   this.Load(jobject);
+                    success = true;
+                }
+                catch (Exception e)
+                {
+                    success = false;
+                }
+            }
+
+            return success;
+        }
+
+        public bool SaveToAppDomainData()
+        {
+            bool success = false;
+
+            var jobject = new JObject();
+
+            try
+            {
+                this.Store(jobject);
+                AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME, jobject);
+
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
+            }
+
+            return success;
         }
 
         public bool LoadFromFile(string filePath = null)

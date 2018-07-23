@@ -29,6 +29,8 @@ namespace BatchRvtUtil
         public const string LOG_FOLDER_PATH_OPTION = "log_folder";
         public const string SESSION_ID_OPTION = "session_id";
 
+        private const string APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH = "BATCH_RVT_LOG_FOLDER_PATH";
+
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
             new Dictionary<string, Func<string, object>>() {
                 { SETTINGS_FILE_PATH_OPTION, ParseExistingFilePathOptionValue },
@@ -123,6 +125,13 @@ namespace BatchRvtUtil
                     optionAndValue => optionAndValue.Option,
                     optionAndValue => optionAndValue.Parser(CommandLineUtil.GetCommandLineOption(optionAndValue.Option))
                 );
+        }
+
+        public static string GetLogFolderPathFromAppDomainData()
+        {
+            var logFolderPath = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH) as string;
+
+            return logFolderPath;
         }
     }
 }
