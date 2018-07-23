@@ -49,7 +49,8 @@ namespace BatchRvtCommand
                 InitConsole();
             }
 
-            ExecuteMonitorScript();
+            var batchRvtFolderPath = GetExecutableFolderPath();
+            ExecuteMonitorScript(batchRvtFolderPath);
 
             return;
         }
@@ -79,14 +80,13 @@ namespace BatchRvtCommand
             return;
         }
 
-        private static void ExecuteMonitorScript()
+        private static void ExecuteMonitorScript(string batchRvtFolderPath)
         {
-            var batchRvtPluginFolderPath = GetExecutableFolderPath();
             var engine = ScriptUtil.CreatePythonEngine();
 
             var mainModuleScope = ScriptUtil.CreateMainModule(engine);
 
-            var scriptsFolderPath = Path.Combine(batchRvtPluginFolderPath, ScriptsFolderName);
+            var scriptsFolderPath = Path.Combine(batchRvtFolderPath, ScriptsFolderName);
 
             var monitorScriptFilePath = Path.Combine(
                     scriptsFolderPath,
@@ -97,7 +97,7 @@ namespace BatchRvtCommand
                     engine,
                     new[] {
                         scriptsFolderPath,
-                        batchRvtPluginFolderPath
+                        batchRvtFolderPath
                     }
                 );
 
