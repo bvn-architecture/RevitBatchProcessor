@@ -40,14 +40,6 @@ import batch_rvt_config
 import batch_rvt_util
 from batch_rvt_util import RevitVersion, ScriptDataUtil, BatchRvt
 
-SCRIPTS_FOLDER_NAME = "Scripts"
-
-def GetBatchRvtFolderPath():
-  return AppDomain.CurrentDomain.BaseDirectory
-
-def GetBatchRvtScriptsFolderPath():
-  return Path.Combine(GetBatchRvtFolderPath(), SCRIPTS_FOLDER_NAME)
-
 def HasSupportedRevitFilePath(supportedRevitFileInfo):
   fullFilePath = supportedRevitFileInfo.GetRevitFileInfo().GetFullPath()
   return True
@@ -211,7 +203,7 @@ def RunSingleRevitTask(batchRvtConfig):
     scriptData.ProgressNumber.SetValue(1)
     scriptData.ProgressMax.SetValue(1)
 
-    batchRvtScriptsFolderPath = GetBatchRvtScriptsFolderPath()
+    batchRvtScriptsFolderPath = BatchRvt.GetBatchRvtScriptsFolderPath()
 
     batch_rvt_monitor_util.RunScriptedRevitSession(
         revitVersion,
@@ -321,7 +313,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
         scriptData.ProgressMax.SetValue(totalFilesCount)
         scriptDatas.append(scriptData)
 
-      batchRvtScriptsFolderPath = GetBatchRvtScriptsFolderPath()
+      batchRvtScriptsFolderPath = BatchRvt.GetBatchRvtScriptsFolderPath()
 
       while scriptDatas.Any():
         nextProgressNumber = batch_rvt_monitor_util.RunScriptedRevitSession(
