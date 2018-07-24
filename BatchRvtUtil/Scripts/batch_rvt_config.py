@@ -22,6 +22,7 @@ import clr
 import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
+from System import AppDomain
 from System.IO import File, Directory
 
 import time_util
@@ -327,6 +328,9 @@ def ConfigureBatchRvt(output):
 
   # NOTE: use of output function must occur after the log file initialization
   batchRvtConfig.LogFilePath = InitializeLogging(batchRvtConfig.LogFolderPath, batchRvtConfig.SessionStartTime)
+
+  # NOTE: useful for debugging / troubleshooting.
+  AppDomain.CurrentDomain.SetData("RUNTIME_BATCH_RVT_CONFIG", batchRvtConfig)
 
   output()
   output("Session ID: " + batchRvtConfig.SessionId)
