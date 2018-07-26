@@ -218,6 +218,65 @@ namespace BatchRvtUtil
             return success;
         }
 
+        public string ToJsonString()
+        {
+            var jobject = new JObject();
+            this.Store(jobject);
+            return jobject.ToString();
+        }
+
+        public static BatchRvtSettings FromJsonString(string batchRvtSettingsJson)
+        {
+            BatchRvtSettings batchRvtSettings = null;
+
+            try
+            {
+                var jobject = JsonUtil.DeserializeFromJson(batchRvtSettingsJson);
+                batchRvtSettings = new BatchRvtSettings();
+                batchRvtSettings.Load(jobject);
+            }
+            catch (Exception e)
+            {
+                batchRvtSettings = null;
+            }
+
+            return batchRvtSettings;
+        }
+
+        public static BatchRvtSettings Create(
+                string taskScriptFilePath,
+                string revitFileListFilePath,
+                BatchRvt.CentralFileOpenOption centralFileOpenOption,
+                bool deleteLocalAfter,
+                bool discardWorksetsOnDetach,
+                BatchRvt.RevitSessionOption revitSessionOption,
+                BatchRvt.RevitFileProcessingOption revitFileVersionOption,
+                RevitVersion.SupportedRevitVersion taskRevitVersion
+            )
+        {
+            var batchRvtSettings = new BatchRvtSettings();
+
+            // General Task Script settings
+            batchRvtSettings.TaskScriptFilePath.SetValue(taskScriptFilePath);
+
+            // Revit File List settings
+            batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListFilePath);
+
+            // Central File Processing settings
+            batchRvtSettings.CentralFileOpenOption.SetValue(centralFileOpenOption);
+            batchRvtSettings.DeleteLocalAfter.SetValue(deleteLocalAfter);
+            batchRvtSettings.DiscardWorksetsOnDetach.SetValue(discardWorksetsOnDetach);
+
+            // Revit Session settings
+            batchRvtSettings.RevitSessionOption.SetValue(revitSessionOption);
+
+            // Batch Revit File Processing settings
+            batchRvtSettings.RevitFileProcessingOption.SetValue(revitFileVersionOption);
+            batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(taskRevitVersion);
+
+            return batchRvtSettings;
+        }
+
         public static string GetDefaultSettingsFilePath()
         {
             return Path.Combine(
