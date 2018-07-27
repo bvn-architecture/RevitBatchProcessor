@@ -288,8 +288,14 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
 
 def GetBatchRvtSettings(batchRvtConfig, output):
   aborted = False
-  batchRvtSettings = None
-  if not File.Exists(batchRvtConfig.SettingsFilePath):
+  if BatchRvtSettings.IsAppDomainDataAvailable():
+    batchRvtSettings = BatchRvtSettings()
+    isSettingsLoaded = batchRvtSettings.LoadFromAppDomainData()
+    if not isSettingsLoaded:
+      output()
+      output("ERROR: Could not load settings from the AppDomain data!")
+      aborted = True
+  elif not File.Exists(batchRvtConfig.SettingsFilePath):
     output()
     output("ERROR: No settings file specified or settings file not found.")
     aborted = True
@@ -310,7 +316,11 @@ def ConfigureBatchRvt(output):
   options = CommandSettings.GetCommandLineOptions()
   
   batchRvtConfig.SettingsFilePath = options[CommandSettings.SETTINGS_FILE_PATH_OPTION]
-  batchRvtConfig.LogFolderPath = options[CommandSettings.LOG_FOLDER_PATH_OPTION]
+  logFolderPathFromAppDomainData = CommandSettings.GetLogFolderPathFromAppDomainData()
+  if logFolderPathFromAppDomainData is not None:
+    batchRvtConfig.LogFolderPath = logFolderPathFromAppDomainData
+  else:
+    batchRvtConfig.LogFolderPath = options[CommandSettings.LOG_FOLDER_PATH_OPTION]
   batchRvtConfig.SessionId = options[CommandSettings.SESSION_ID_OPTION]
   
   batchRvtConfig.SessionId, batchRvtConfig.SessionStartTime = ParseSessionIdAndStartTime(batchRvtConfig.SessionId)

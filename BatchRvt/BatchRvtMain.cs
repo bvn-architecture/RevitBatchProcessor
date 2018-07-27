@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Windows.Forms;
-using BatchRvt.ScriptHost;
 using System.Runtime.InteropServices;
 
 namespace BatchRvtCommand
@@ -30,9 +29,6 @@ namespace BatchRvtCommand
     public class BatchRvtMain
     {
         private const string BatchRvtConsoleTitle = "Batch Revit File Processor";
-
-        private const string ScriptsFolderName = "Scripts";
-        private const string MonitorScriptFilename = "batch_rvt.py";
 
         private const int WindowWidth = 160;
         private const int WindowHeight = 60;
@@ -50,7 +46,7 @@ namespace BatchRvtCommand
             }
 
             var batchRvtFolderPath = GetExecutableFolderPath();
-            ExecuteMonitorScript(batchRvtFolderPath);
+            BatchRvtUtil.BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
 
             return;
         }
@@ -76,43 +72,6 @@ namespace BatchRvtCommand
             {
                 // Can occur when output has been redirected via the command-line.
             }
-
-            return;
-        }
-
-        private static void ExecuteMonitorScript(string batchRvtFolderPath)
-        {
-            var engine = ScriptUtil.CreatePythonEngine();
-
-            var mainModuleScope = ScriptUtil.CreateMainModule(engine);
-
-            var scriptsFolderPath = Path.Combine(batchRvtFolderPath, ScriptsFolderName);
-
-            var monitorScriptFilePath = Path.Combine(
-                    scriptsFolderPath,
-                    MonitorScriptFilename
-                );
-
-            ScriptUtil.AddSearchPaths(
-                    engine,
-                    new[] {
-                        scriptsFolderPath,
-                        batchRvtFolderPath
-                    }
-                );
-
-            ScriptUtil.AddBuiltinVariables(
-                    engine,
-                    new Dictionary<string, object> {
-                        { "__scope__", mainModuleScope }
-                    }
-                );
-
-            ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
-
-            var scriptSource = ScriptUtil.CreateScriptSourceFromFile(engine, monitorScriptFilePath);
-
-            scriptSource.Execute(mainModuleScope);
 
             return;
         }

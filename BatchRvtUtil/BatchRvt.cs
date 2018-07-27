@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.IO;
 using System.Globalization;
+using BatchRvt.ScriptHost;
 
 namespace BatchRvtUtil
 {
@@ -37,6 +38,8 @@ namespace BatchRvtUtil
         public enum RevitFileProcessingOption { UseFileRevitVersionIfAvailable = 0, UseSpecificRevitVersion = 1 }
 
         private const string SCRIPT_DATA_FOLDER_NAME = "BatchRvt";
+
+        private const string MONITOR_SCRIPT_FILE_NAME = "batch_rvt.py";
 
         private static readonly Dictionary<RevitVersion.SupportedRevitVersion, string> BATCHRVT_ADDIN_FILENAMES =
             new Dictionary<RevitVersion.SupportedRevitVersion, string>()
@@ -98,6 +101,43 @@ namespace BatchRvtUtil
             var batchRvtProcess = Process.Start(psi);
 
             return batchRvtProcess;
+        }
+
+        public static void ExecuteMonitorScript(string batchRvtFolderPath)
+        {
+            var engine = ScriptUtil.CreatePythonEngine();
+
+            var mainModuleScope = ScriptUtil.CreateMainModule(engine);
+
+            var scriptsFolderPath = Path.Combine(batchRvtFolderPath, SCRIPTS_FOLDER_NAME);
+
+            var monitorScriptFilePath = Path.Combine(
+                    scriptsFolderPath,
+                    MONITOR_SCRIPT_FILE_NAME
+                );
+
+            ScriptUtil.AddSearchPaths(
+                    engine,
+                    new[] {
+                        scriptsFolderPath,
+                        batchRvtFolderPath
+                    }
+                );
+
+            ScriptUtil.AddBuiltinVariables(
+                    engine,
+                    new Dictionary<string, object> {
+                        { "__scope__", mainModuleScope }
+                    }
+                );
+
+            ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
+
+            var scriptSource = ScriptUtil.CreateScriptSourceFromFile(engine, monitorScriptFilePath);
+
+            scriptSource.Execute(mainModuleScope);
+
+            return;
         }
 
         public static string GetDataFolderPath()
