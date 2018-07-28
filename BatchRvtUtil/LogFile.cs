@@ -188,5 +188,43 @@ namespace BatchRvtUtil
         {
             return SessionId;
         }
+
+        private static string ReadLineAsPlainText(string logLine, bool useUniversalTime)
+        {
+            var plainTextLine = logLine;
+
+            var jobject = JsonUtil.DeserializeFromJson(logLine);
+
+            if (jobject != null)
+            {
+                var dateString = jobject["date"][useUniversalTime ? "utc" : "local"];
+                var timeString = jobject["time"][useUniversalTime ? "utc" : "local"];
+                var message = jobject["message"]["message"];
+
+                plainTextLine = dateString + " " + timeString + " : " + message;
+            }
+
+            return plainTextLine;
+        }
+
+        public static IEnumerable<string> ReadLinesAsPlainText(string logFilePath, bool useUniversalTime = false)
+        {
+            IEnumerable<string> lines = null;
+
+            try
+            {
+                lines = (
+                        File.ReadAllLines(logFilePath)
+                        .Select(line => ReadLineAsPlainText(line, useUniversalTime))
+                        .ToList()
+                    );
+            }
+            catch (Exception e)
+            {
+                lines = null;
+            }
+
+            return lines;
+        }
     }
 }
