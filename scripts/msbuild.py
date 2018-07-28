@@ -15,7 +15,8 @@ import get_process_output
 
 IO_TIME_OUT_IN_MS = 5 * 60 * 10000 # 5 minutes
 
-VC_FOLDER_PATH = r"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC"
+#VC_FOLDER_PATH = r"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC"
+VC_FOLDER_PATH = r"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build"
 VC_VARS_ALL_FILENAME = "vcvarsall.bat"
 MSBUILD_FILENAME = "msbuild.exe"
 
