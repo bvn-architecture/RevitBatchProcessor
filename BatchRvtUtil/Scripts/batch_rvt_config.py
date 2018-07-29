@@ -94,25 +94,31 @@ class BatchRvtConfig:
   def ReadRevitFileList(self, output):
     revitFileList = None
     if self.RevitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing:
-      output()
-      output("Reading Revit File list:")
-      output()
-      output("\t" + (self.RevitFileListFilePath if not str.IsNullOrWhiteSpace(self.RevitFileListFilePath) else "Not specified!"))
-      if not File.Exists(self.RevitFileListFilePath):
+      if BatchRvtSettings.IsAppDomainRevitFileListAvailable():
         output()
-        output("ERROR: No Revit file list specified or file not found.")
-      elif revit_file_list.HasExcelFileExtension(self.RevitFileListFilePath) and not revit_file_list.IsExcelInstalled():
-        output()
-        output("ERROR: Could not read from the Excel Revit File list. An Excel installation was not detected!")
+        output("Reading Revit File list from object input.")
+        revitFileList = list(revitFilePath for revitFilePath in BatchRvtSettings.GetAppDomainRevitFileList())
       else:
-        revitFileList = revit_file_list.GetRevitFileList(self.RevitFileListFilePath)
-        if revitFileList is None:
+        output()
+        output("Reading Revit File list:")
+        output()
+        output("\t" + (self.RevitFileListFilePath if not str.IsNullOrWhiteSpace(self.RevitFileListFilePath) else "Not specified!"))
+        if not File.Exists(self.RevitFileListFilePath):
           output()
-          output("ERROR: Could not read the Revit File list.")
-        elif len(revitFileList) == 0:
+          output("ERROR: No Revit file list specified or file not found.")
+        elif revit_file_list.HasExcelFileExtension(self.RevitFileListFilePath) and not revit_file_list.IsExcelInstalled():
           output()
-          output("ERROR: Revit File list is empty.")
-          revitFileList = None
+          output("ERROR: Could not read from the Excel Revit File list. An Excel installation was not detected!")
+        else:
+          revitFileList = revit_file_list.GetRevitFileList(self.RevitFileListFilePath)
+  
+      if revitFileList is None:
+        output()
+        output("ERROR: Could not read the Revit File list.")
+      elif len(revitFileList) == 0:
+        output()
+        output("ERROR: Revit File list is empty.")
+        revitFileList = None
     return revitFileList
 
 def ParseSessionIdAndStartTime(sessionId):

@@ -32,7 +32,8 @@ namespace BatchRvtUtil
         public const string BATCHRVTGUI_SETTINGS_FILENAME = "BatchRvtGui.Settings" + SETTINGS_FILE_EXTENSION;
         public const string BATCHRVT_SETTINGS_FILENAME = "BatchRvt.Settings" + SETTINGS_FILE_EXTENSION;
 
-        private const string APP_DOMAIN_DATA_PROPERTY_NAME = "BATCH_RVT_SETTINGS_OBJECT";
+        private const string APP_DOMAIN_DATA__BATCH_RVT_SETTINGS = "BATCH_RVT_SETTINGS_OBJECT";
+        private const string APP_DOMAIN_DATA__REVIT_FILE_LIST = "REVIT_FILE_LIST";
 
         private readonly PersistentSettings persistentSettings;
 
@@ -120,16 +121,35 @@ namespace BatchRvtUtil
 
         public static bool IsAppDomainDataAvailable()
         {
-            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME) as JObject;
+            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__BATCH_RVT_SETTINGS) as JObject;
 
             return (jobject != null);
+        }
+
+        public static bool IsAppDomainRevitFileListAvailable()
+        {
+            var revitFileList = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__REVIT_FILE_LIST) as IEnumerable<string>;
+
+            return (revitFileList != null);
+        }
+
+        public static bool SetAppDomainRevitFileList(IEnumerable<string> revitFileList)
+        {
+            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__REVIT_FILE_LIST, revitFileList.ToList());
+
+            return true;
+        }
+
+        public static IEnumerable<string> GetAppDomainRevitFileList()
+        {
+            return AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__REVIT_FILE_LIST) as IEnumerable<string>;
         }
 
         public bool LoadFromAppDomainData()
         {
             bool success = false;
 
-            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME) as JObject;
+            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__BATCH_RVT_SETTINGS) as JObject;
 
             if (jobject != null)
             {
@@ -156,7 +176,7 @@ namespace BatchRvtUtil
             try
             {
                 this.Store(jobject);
-                AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME, jobject);
+                AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__BATCH_RVT_SETTINGS, jobject);
 
                 success = true;
             }
