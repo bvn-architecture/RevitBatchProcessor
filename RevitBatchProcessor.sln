@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvt", "BatchRvt\BatchRvt.csproj", "{C877620C-DE32-455C-BF21-8F3E73E9DF68}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2018", "BatchR
 	ProjectSection(ProjectDependencies) = postProject
 		{673D1FB5-CFB2-4BDF-9609-C43979DD7197} = {673D1FB5-CFB2-4BDF-9609-C43979DD7197}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRevitDynamo", "BatchRevitDynamo\BatchRevitDynamo.csproj", "{B2FED296-9EA0-41DD-BB2F-951D481F527B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{B546AD64-E309-4498-A839-4A7FC50C14AB}.Debug|x64.Build.0 = Debug|x64
 		{B546AD64-E309-4498-A839-4A7FC50C14AB}.Release|x64.ActiveCfg = Release|x64
 		{B546AD64-E309-4498-A839-4A7FC50C14AB}.Release|x64.Build.0 = Release|x64
+		{B2FED296-9EA0-41DD-BB2F-951D481F527B}.Debug|x64.ActiveCfg = Debug|x64
+		{B2FED296-9EA0-41DD-BB2F-951D481F527B}.Debug|x64.Build.0 = Debug|x64
+		{B2FED296-9EA0-41DD-BB2F-951D481F527B}.Release|x64.ActiveCfg = Release|x64
+		{B2FED296-9EA0-41DD-BB2F-951D481F527B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
