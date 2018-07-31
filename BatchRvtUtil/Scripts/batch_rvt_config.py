@@ -335,8 +335,7 @@ def ConfigureBatchRvt(output):
   # NOTE: use of output function must occur after the log file initialization
   batchRvtConfig.LogFilePath = InitializeLogging(batchRvtConfig.LogFolderPath, batchRvtConfig.SessionStartTime)
 
-  # NOTE: useful for debugging / troubleshooting.
-  AppDomain.CurrentDomain.SetData("RUNTIME_BATCH_RVT_CONFIG", batchRvtConfig)
+  BatchRvt.SetAppDomainDataLogFilePath(batchRvtConfig.LogFilePath)
 
   output()
   output("Session ID: " + batchRvtConfig.SessionId)
