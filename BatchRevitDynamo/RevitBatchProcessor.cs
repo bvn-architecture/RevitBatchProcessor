@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Diagnostics;
 using BatchRvtUtil;
 
 namespace BatchRevitDynamo
@@ -28,24 +29,98 @@ namespace BatchRevitDynamo
     public static class RevitBatchProcessor
     {
         /// <summary>
-        /// Runs a Revit Batch Processing task.
+        /// Runs a Revit Batch Processing task. The Revit file list is provided as a list of strings.
         /// </summary>
+        /// <param name="toggleToExecute"></param>
         /// <param name="taskScriptFilePath"></param>
-        /// <param name="revitFileListFilePath"></param>
+        /// <param name="revitFileList"></param>
         /// <param name="useRevitVersion"></param>
-        /// <param name="revitSessionOption"></param>
         /// <param name="centralFileOpenOption"></param>
-        /// <param name="deleteLocalAfter"></param>
         /// <param name="discardWorksetsOnDetach"></param>
-        /// <returns>Full path to the generated log file.</returns>
-        public static string RunTask(
+        /// <param name="deleteLocalAfter"></param>
+        /// <param name="openLogFileWhenDone"></param>
+        /// <returns></returns>
+        public static string RunTaskOnList(
                 bool toggleToExecute, // TODO: reconsider if this is needed here.
                 string taskScriptFilePath,
-                string revitFileListFilePath,
+                IEnumerable<string> revitFileList,
                 UseRevitVersion useRevitVersion,
                 CentralFileOpenOption centralFileOpenOption,
                 bool discardWorksetsOnDetach,
-                bool deleteLocalAfter
+                bool deleteLocalAfter,
+                bool openLogFileWhenDone
+            )
+        {
+            return RunTaskInternal(
+                    toggleToExecute,
+                    taskScriptFilePath,
+                    revitFileList, // Input is a list of Revit file paths.
+                    useRevitVersion,
+                    centralFileOpenOption,
+                    discardWorksetsOnDetach,
+                    deleteLocalAfter,
+                    openLogFileWhenDone
+                );
+        }
+
+        /// <summary>
+        /// Runs a Revit Batch Processing task. The Revit file list is provided by the specified Excel or text file path.
+        /// </summary>
+        /// <param name="toggleToExecute"></param>
+        /// <param name="taskScriptFilePath"></param>
+        /// <param name="revitFileListFilePath"></param>
+        /// <param name="useRevitVersion"></param>
+        /// <param name="centralFileOpenOption"></param>
+        /// <param name="discardWorksetsOnDetach"></param>
+        /// <param name="deleteLocalAfter"></param>
+        /// <param name="openLogFileWhenDone"></param>
+        /// <returns></returns>
+        public static string RunTaskOnListFromFile(
+                bool toggleToExecute, // TODO: reconsider if this is needed here.
+                string taskScriptFilePath,
+                string revitFileListFilePath, // Input is a file path to a list of Revit file paths.
+                UseRevitVersion useRevitVersion,
+                CentralFileOpenOption centralFileOpenOption,
+                bool discardWorksetsOnDetach,
+                bool deleteLocalAfter,
+                bool openLogFileWhenDone
+            )
+        {
+            return RunTaskInternal(
+                    toggleToExecute,
+                    taskScriptFilePath,
+                    revitFileListFilePath,
+                    useRevitVersion,
+                    centralFileOpenOption,
+                    discardWorksetsOnDetach,
+                    deleteLocalAfter,
+                    openLogFileWhenDone
+                );
+        }
+
+        // <summary>
+        // Runs a Revit Batch Processing task.
+        // </summary>
+        // <param name="toggleToExecute"></param>
+        // <param name="taskScriptFilePath"></param>
+        // <param name="revitFileListOrListFilePath"></param>
+        // <param name="useRevitVersion"></param>
+        // <param name="centralFileOpenOption"></param>
+        // <param name="discardWorksetsOnDetach"></param>
+        // <param name="deleteLocalAfter"></param>
+        // <param name="openLogFileWhenDone"></param>
+        // <returns>Full path to the generated log file.</returns>
+
+
+        private static string RunTaskInternal(
+                bool toggleToExecute, // TODO: reconsider if this is needed here.
+                string taskScriptFilePath,
+                object revitFileListInput,
+                UseRevitVersion useRevitVersion,
+                CentralFileOpenOption centralFileOpenOption,
+                bool discardWorksetsOnDetach,
+                bool deleteLocalAfter,
+                bool openLogFileWhenDone
             )
         {
             var batchRvtFolderPath = BatchRvt.GetBatchRvtFolderPath();
@@ -72,6 +147,14 @@ namespace BatchRevitDynamo
                     BatchRvt.CentralFileOpenOption.Detach
                 );
 
+            var revitFileListFilePath = revitFileListInput as string;
+            var revitFileList = revitFileListInput as IEnumerable<string>;
+
+            if (revitFileListFilePath == null && revitFileList == null)
+            {
+                throw new ArgumentNullException("Revit file list parameter cannot be null.");
+            }
+
             var batchRvtSettings = BatchRvtSettings.Create(
                     taskScriptFilePath,
                     revitFileListFilePath,
@@ -84,6 +167,11 @@ namespace BatchRevitDynamo
                 );
 
             batchRvtSettings.SaveToAppDomainData();
+
+            if (revitFileList != null)
+            {
+                BatchRvtSettings.SetAppDomainRevitFileList(revitFileList);
+            }
 
             BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
 
@@ -102,6 +190,11 @@ namespace BatchRevitDynamo
                     );
 
                 logFilePath = plainTextLogFilePath;
+
+                if (openLogFileWhenDone)
+                {
+                    Process.Start(logFilePath);
+                }
             }
             
             return logFilePath;
