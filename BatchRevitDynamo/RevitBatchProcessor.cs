@@ -40,7 +40,7 @@ namespace BatchRevitDynamo
         /// <param name="deleteLocalAfter"></param>
         /// <param name="openLogFileWhenDone"></param>
         /// <returns></returns>
-        public static string RunTaskOnList(
+        public static string RunTask(
                 bool toggleToExecute, // TODO: reconsider if this is needed here.
                 string taskScriptFilePath,
                 IEnumerable<string> revitFileList,
@@ -97,20 +97,6 @@ namespace BatchRevitDynamo
                     openLogFileWhenDone
                 );
         }
-
-        // <summary>
-        // Runs a Revit Batch Processing task.
-        // </summary>
-        // <param name="toggleToExecute"></param>
-        // <param name="taskScriptFilePath"></param>
-        // <param name="revitFileListOrListFilePath"></param>
-        // <param name="useRevitVersion"></param>
-        // <param name="centralFileOpenOption"></param>
-        // <param name="discardWorksetsOnDetach"></param>
-        // <param name="deleteLocalAfter"></param>
-        // <param name="openLogFileWhenDone"></param>
-        // <returns>Full path to the generated log file.</returns>
-
 
         private static string RunTaskInternal(
                 bool toggleToExecute, // TODO: reconsider if this is needed here.
