@@ -271,13 +271,16 @@ namespace BatchRvtUtil
                 bool discardWorksetsOnDetach,
                 BatchRvt.RevitSessionOption revitSessionOption,
                 BatchRvt.RevitFileProcessingOption revitFileVersionOption,
-                RevitVersion.SupportedRevitVersion taskRevitVersion
+                RevitVersion.SupportedRevitVersion taskRevitVersion,
+                int fileProcessingTimeOutInMinutes,
+                bool fallbackToMinimumAvailableRevitVersion
             )
         {
             var batchRvtSettings = new BatchRvtSettings();
 
             // General Task Script settings
             batchRvtSettings.TaskScriptFilePath.SetValue(taskScriptFilePath);
+            batchRvtSettings.ProcessingTimeOutInMinutes.SetValue(fileProcessingTimeOutInMinutes);
 
             // Revit File List settings
             batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListFilePath);
@@ -292,6 +295,7 @@ namespace BatchRvtUtil
 
             // Batch Revit File Processing settings
             batchRvtSettings.RevitFileProcessingOption.SetValue(revitFileVersionOption);
+            batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(fallbackToMinimumAvailableRevitVersion);
             batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(taskRevitVersion);
 
             return batchRvtSettings;

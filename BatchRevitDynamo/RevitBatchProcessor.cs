@@ -59,12 +59,59 @@ namespace BatchRevitDynamo
                     centralFileOpenOption,
                     discardWorksetsOnDetach,
                     deleteLocalAfter,
-                    openLogFileWhenDone
+                    openLogFileWhenDone,
+                    logFolderPath: null,
+                    fileProcessingTimeOutInMinutes: 0,
+                    fallbackToMinimumAvailableRevitVersion: false
                 );
         }
 
         /// <summary>
-        /// Runs a Revit Batch Processing task. The Revit file list is provided by the specified Excel or text file path.
+        /// Runs a Revit Batch Processing task, with advanced options available. The Revit file list is provided as a list of strings.
+        /// </summary>
+        /// <param name="toggleToExecute"></param>
+        /// <param name="taskScriptFilePath"></param>
+        /// <param name="revitFileList"></param>
+        /// <param name="useRevitVersion"></param>
+        /// <param name="centralFileOpenOption"></param>
+        /// <param name="discardWorksetsOnDetach"></param>
+        /// <param name="deleteLocalAfter"></param>
+        /// <param name="openLogFileWhenDone"></param>
+        /// <param name="logFolderPath"></param>
+        /// <param name="fileProcessingTimeOutInMinutes"></param>
+        /// <param name="fallbackToMinimumAvailableRevitVersion"></param>
+        /// <returns></returns>
+        public static string RunTaskAdvanced(
+                bool toggleToExecute, // TODO: reconsider if this is needed here.
+                string taskScriptFilePath,
+                IEnumerable<string> revitFileList,
+                UseRevitVersion useRevitVersion,
+                CentralFileOpenOption centralFileOpenOption,
+                bool discardWorksetsOnDetach,
+                bool deleteLocalAfter,
+                bool openLogFileWhenDone,
+                string logFolderPath,
+                int fileProcessingTimeOutInMinutes,
+                bool fallbackToMinimumAvailableRevitVersion
+            )
+        {
+            return RunTaskInternal(
+                    toggleToExecute,
+                    taskScriptFilePath,
+                    revitFileList, // Input is a list of Revit file paths.
+                    useRevitVersion,
+                    centralFileOpenOption,
+                    discardWorksetsOnDetach,
+                    deleteLocalAfter,
+                    openLogFileWhenDone,
+                    logFolderPath,
+                    fileProcessingTimeOutInMinutes,
+                    fallbackToMinimumAvailableRevitVersion
+                );
+        }
+
+        /// <summary>
+        /// Runs a Revit Batch Processing task, with advanced options available. The Revit file list is provided by the specified Excel or text file path.
         /// </summary>
         /// <param name="toggleToExecute"></param>
         /// <param name="taskScriptFilePath"></param>
@@ -74,6 +121,10 @@ namespace BatchRevitDynamo
         /// <param name="discardWorksetsOnDetach"></param>
         /// <param name="deleteLocalAfter"></param>
         /// <param name="openLogFileWhenDone"></param>
+        /// <param name="logFolderPath"></param>
+        /// <param name="fileProcessingTimeOutInMinutes"></param>
+        /// <param name="fallbackToMinimumAvailableRevitVersion"></param>
+        /// 
         /// <returns></returns>
         public static string RunTaskOnListFromFile(
                 bool toggleToExecute, // TODO: reconsider if this is needed here.
@@ -83,7 +134,10 @@ namespace BatchRevitDynamo
                 CentralFileOpenOption centralFileOpenOption,
                 bool discardWorksetsOnDetach,
                 bool deleteLocalAfter,
-                bool openLogFileWhenDone
+                bool openLogFileWhenDone,
+                string logFolderPath,
+                int fileProcessingTimeOutInMinutes,
+                bool fallbackToMinimumAvailableRevitVersion
             )
         {
             return RunTaskInternal(
@@ -94,7 +148,10 @@ namespace BatchRevitDynamo
                     centralFileOpenOption,
                     discardWorksetsOnDetach,
                     deleteLocalAfter,
-                    openLogFileWhenDone
+                    openLogFileWhenDone,
+                    logFolderPath,
+                    fileProcessingTimeOutInMinutes,
+                    fallbackToMinimumAvailableRevitVersion
                 );
         }
 
@@ -106,7 +163,10 @@ namespace BatchRevitDynamo
                 CentralFileOpenOption centralFileOpenOption,
                 bool discardWorksetsOnDetach,
                 bool deleteLocalAfter,
-                bool openLogFileWhenDone
+                bool openLogFileWhenDone,
+                string logFolderPath,
+                int fileProcessingTimeOutInMinutes,
+                bool fallbackToMinimumAvailableRevitVersion
             )
         {
             var batchRvtFolderPath = BatchRvt.GetBatchRvtFolderPath();
@@ -149,7 +209,9 @@ namespace BatchRevitDynamo
                     discardWorksetsOnDetach,
                     BatchRvt.RevitSessionOption.UseSeparateSessionPerFile,
                     batchRvtRevitFileProcessingOption,
-                    taskRevitVersion
+                    taskRevitVersion,
+                    fileProcessingTimeOutInMinutes,
+                    fallbackToMinimumAvailableRevitVersion
                 );
 
             batchRvtSettings.SaveToAppDomainData();
@@ -157,6 +219,11 @@ namespace BatchRevitDynamo
             if (revitFileList != null)
             {
                 BatchRvtSettings.SetAppDomainRevitFileList(revitFileList);
+            }
+
+            if (!string.IsNullOrWhiteSpace(logFolderPath))
+            {
+                CommandSettings.SetLogFolderPathFromAppDomainData(logFolderPath);
             }
 
             BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
