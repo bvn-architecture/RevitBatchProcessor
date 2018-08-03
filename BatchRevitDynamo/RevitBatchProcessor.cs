@@ -111,11 +111,13 @@ namespace BatchRevitDynamo
         /// <summary>
         /// Runs a Revit Batch Processing task, with settings provided by the specified settings file.
         /// </summary>
+        /// <param name="toggleToExecute"></param>
         /// <param name="settingsFilePath"></param>
         /// <param name="logFolderPath"></param>
         /// <param name="openLogFileWhenDone"></param>
         /// <returns></returns>
         public static string RunTaskFromSettingsFile(
+                bool toggleToExecute, // TODO: reconsider if this is needed here.
                 string settingsFilePath,
                 string logFolderPath,
                 bool openLogFileWhenDone
