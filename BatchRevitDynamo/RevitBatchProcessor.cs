@@ -52,7 +52,6 @@ namespace BatchRevitDynamo
             )
         {
             return RunTaskInternal(
-                    toggleToExecute,
                     taskScriptFilePath,
                     revitFileList, // Input is a list of Revit file paths.
                     useRevitVersion,
@@ -96,7 +95,6 @@ namespace BatchRevitDynamo
             )
         {
             return RunTaskInternal(
-                    toggleToExecute,
                     taskScriptFilePath,
                     revitFileList, // Input is a list of Revit file paths.
                     useRevitVersion,
@@ -108,6 +106,31 @@ namespace BatchRevitDynamo
                     fileProcessingTimeOutInMinutes,
                     fallbackToMinimumAvailableRevitVersion
                 );
+        }
+
+        /// <summary>
+        /// Runs a Revit Batch Processing task, with settings provided by the specified settings file.
+        /// </summary>
+        /// <param name="settingsFilePath"></param>
+        /// <param name="logFolderPath"></param>
+        /// <param name="openLogFileWhenDone"></param>
+        /// <returns></returns>
+        public static string RunTaskFromSettingsFile(
+                string settingsFilePath,
+                string logFolderPath,
+                bool openLogFileWhenDone
+            )
+        {
+            var batchRvtSettings = new BatchRvtSettings();
+
+            var settingsLoaded = batchRvtSettings.LoadFromFile(settingsFilePath);
+
+            if (!settingsLoaded)
+            {
+                throw new InvalidOperationException("Failed to load settings from the file.");
+            }
+
+            return RunTaskInternal(null, batchRvtSettings, logFolderPath, openLogFileWhenDone);
         }
 
         /// <summary>
@@ -141,7 +164,6 @@ namespace BatchRevitDynamo
             )
         {
             return RunTaskInternal(
-                    toggleToExecute,
                     taskScriptFilePath,
                     revitFileListFilePath,
                     useRevitVersion,
@@ -156,7 +178,6 @@ namespace BatchRevitDynamo
         }
 
         private static string RunTaskInternal(
-                bool toggleToExecute, // TODO: reconsider if this is needed here.
                 string taskScriptFilePath,
                 object revitFileListInput,
                 UseRevitVersion useRevitVersion,
@@ -169,8 +190,6 @@ namespace BatchRevitDynamo
                 bool fallbackToMinimumAvailableRevitVersion
             )
         {
-            var batchRvtFolderPath = BatchRvt.GetBatchRvtFolderPath();
-
             var batchRvtRevitFileProcessingOption = (
                     useRevitVersion == UseRevitVersion.RevitFileVersion ?
                     BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable :
@@ -192,17 +211,9 @@ namespace BatchRevitDynamo
                     BatchRvt.CentralFileOpenOption.Detach
                 );
 
-            var revitFileListFilePath = revitFileListInput as string;
-            var revitFileList = revitFileListInput as IEnumerable<string>;
-
-            if (revitFileListFilePath == null && revitFileList == null)
-            {
-                throw new ArgumentNullException("Revit file list parameter cannot be null.");
-            }
-
             var batchRvtSettings = BatchRvtSettings.Create(
                     taskScriptFilePath,
-                    revitFileListFilePath,
+                    (revitFileListInput as string) ?? string.Empty,
                     batchRvtCentralFileOpenOption,
                     deleteLocalAfter,
                     discardWorksetsOnDetach,
@@ -212,6 +223,35 @@ namespace BatchRevitDynamo
                     fileProcessingTimeOutInMinutes,
                     fallbackToMinimumAvailableRevitVersion
                 );
+
+            return RunTaskInternal(revitFileListInput, batchRvtSettings, logFolderPath, openLogFileWhenDone);
+        }
+
+        private static string RunTaskInternal(
+                object revitFileListInput,
+                BatchRvtSettings batchRvtSettings,
+                string logFolderPath,
+                bool openLogFileWhenDone
+            )
+        {
+            var revitFileListFilePath = revitFileListInput as string;
+            var revitFileList = revitFileListInput as IEnumerable<string>;
+
+            if (
+                    string.IsNullOrWhiteSpace(revitFileListFilePath)
+                    &&
+                    string.IsNullOrWhiteSpace(batchRvtSettings.RevitFileListFilePath.GetValue())
+                    &&
+                    revitFileList == null
+                )
+            {
+                throw new ArgumentNullException("Revit file list parameter cannot be null.");
+            }
+
+            if (revitFileListFilePath != null)
+            {
+                batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListFilePath);
+            }
 
             batchRvtSettings.SaveToAppDomainData();
 
@@ -224,6 +264,8 @@ namespace BatchRevitDynamo
             {
                 CommandSettings.SetAppDomainDataLogFolderPath(logFolderPath);
             }
+
+            var batchRvtFolderPath = BatchRvt.GetBatchRvtFolderPath();
 
             BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
 
@@ -248,7 +290,7 @@ namespace BatchRevitDynamo
                     Process.Start(logFilePath);
                 }
             }
-            
+
             return logFilePath;
         }
     }
