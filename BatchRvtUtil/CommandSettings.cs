@@ -127,14 +127,14 @@ namespace BatchRvtUtil
                 );
         }
 
-        public static string GetLogFolderPathFromAppDomainData()
+        public static string GetAppDomainDataLogFolderPath()
         {
             var logFolderPath = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH) as string;
 
             return logFolderPath;
         }
 
-        public static bool SetLogFolderPathFromAppDomainData(string logFolderPath)
+        public static bool SetAppDomainDataLogFolderPath(string logFolderPath)
         {
             AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH, logFolderPath);
 

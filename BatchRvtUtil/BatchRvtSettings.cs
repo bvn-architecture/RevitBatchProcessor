@@ -133,7 +133,7 @@ namespace BatchRvtUtil
             return (revitFileList != null);
         }
 
-        public static bool SetAppDomainRevitFileList(IEnumerable<string> revitFileList)
+        public static bool SetAppDomainDataRevitFileList(IEnumerable<string> revitFileList)
         {
             AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__REVIT_FILE_LIST, revitFileList.ToList());
 

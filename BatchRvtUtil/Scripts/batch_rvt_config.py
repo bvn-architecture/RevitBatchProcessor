@@ -323,7 +323,7 @@ def ConfigureBatchRvt(output):
   options = CommandSettings.GetCommandLineOptions()
   
   batchRvtConfig.SettingsFilePath = options[CommandSettings.SETTINGS_FILE_PATH_OPTION]
-  logFolderPathFromAppDomainData = CommandSettings.GetLogFolderPathFromAppDomainData()
+  logFolderPathFromAppDomainData = CommandSettings.GetAppDomainDataLogFolderPath()
   if logFolderPathFromAppDomainData is not None:
     batchRvtConfig.LogFolderPath = logFolderPathFromAppDomainData
   else:

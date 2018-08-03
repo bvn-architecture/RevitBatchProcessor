@@ -171,20 +171,19 @@ namespace BatchRevitDynamo
         {
             var batchRvtFolderPath = BatchRvt.GetBatchRvtFolderPath();
 
-            var taskRevitVersion = (
-                    useRevitVersion == UseRevitVersion.Revit2016 ? 
-                    RevitVersion.SupportedRevitVersion.Revit2016 :
-                    useRevitVersion == UseRevitVersion.Revit2017 ?
-                    RevitVersion.SupportedRevitVersion.Revit2017 :
-                    useRevitVersion == UseRevitVersion.Revit2018 ?
-                    RevitVersion.SupportedRevitVersion.Revit2018 :
-                    RevitVersion.SupportedRevitVersion.Revit2018 // NOTE: can be any version since UseRevitVersion is set to RevitFileVersion.
-                );
-
             var batchRvtRevitFileProcessingOption = (
                     useRevitVersion == UseRevitVersion.RevitFileVersion ?
                     BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable :
                     BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion
+                );
+
+            // NOTE: can be any version if useRevitVersion is set to RevitFileVersion.
+            var taskRevitVersion = (
+                    useRevitVersion == UseRevitVersion.Revit2016 ?
+                    RevitVersion.SupportedRevitVersion.Revit2016 :
+                    useRevitVersion == UseRevitVersion.Revit2017 ?
+                    RevitVersion.SupportedRevitVersion.Revit2017 :
+                    RevitVersion.SupportedRevitVersion.Revit2018
                 );
 
             var batchRvtCentralFileOpenOption = (
@@ -218,12 +217,12 @@ namespace BatchRevitDynamo
 
             if (revitFileList != null)
             {
-                BatchRvtSettings.SetAppDomainRevitFileList(revitFileList);
+                BatchRvtSettings.SetAppDomainDataRevitFileList(revitFileList);
             }
 
             if (!string.IsNullOrWhiteSpace(logFolderPath))
             {
-                CommandSettings.SetLogFolderPathFromAppDomainData(logFolderPath);
+                CommandSettings.SetAppDomainDataLogFolderPath(logFolderPath);
             }
 
             BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
