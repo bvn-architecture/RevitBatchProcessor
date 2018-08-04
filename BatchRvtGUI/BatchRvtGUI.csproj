@@ -110,6 +110,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BatchRevitDynamo\BatchRevitDynamo.csproj">
+      <Project>{b2fed296-9ea0-41dd-bb2f-951d481f527b}</Project>
+      <Name>BatchRevitDynamo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BatchRvtUtil\BatchRvtUtil.csproj">
       <Project>{b880dd15-184b-4ce2-86fc-08bac05e0271}</Project>
       <Name>BatchRvtUtil</Name>
