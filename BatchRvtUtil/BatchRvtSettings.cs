@@ -266,6 +266,7 @@ namespace BatchRvtUtil
         public static BatchRvtSettings Create(
                 string taskScriptFilePath,
                 string revitFileListFilePath,
+                BatchRvt.RevitProcessingOption revitProcessingOption,
                 BatchRvt.CentralFileOpenOption centralFileOpenOption,
                 bool deleteLocalAfter,
                 bool discardWorksetsOnDetach,
@@ -281,6 +282,9 @@ namespace BatchRvtUtil
             // General Task Script settings
             batchRvtSettings.TaskScriptFilePath.SetValue(taskScriptFilePath);
             batchRvtSettings.ProcessingTimeOutInMinutes.SetValue(fileProcessingTimeOutInMinutes);
+
+            // Revit Processing settings
+            batchRvtSettings.RevitProcessingOption.SetValue(revitProcessingOption);
 
             // Revit File List settings
             batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListFilePath);

@@ -54,6 +54,7 @@ namespace BatchRevitDynamo
             return RunTaskInternal(
                     taskScriptFilePath,
                     revitFileList, // Input is a list of Revit file paths.
+                    BatchRvt.RevitProcessingOption.BatchRevitFileProcessing,
                     useRevitVersion,
                     centralFileOpenOption,
                     discardWorksetsOnDetach,
@@ -61,6 +62,41 @@ namespace BatchRevitDynamo
                     openLogFileWhenDone,
                     logFolderPath: null,
                     fileProcessingTimeOutInMinutes: 0,
+                    fallbackToMinimumAvailableRevitVersion: false
+                );
+        }
+
+        /// <summary>
+        /// Runs a single (non-batch) Revit task. Any file processing is left up to the task script to manage!
+        /// </summary>
+        /// <param name="toggleToExecute"></param>
+        /// <param name="taskScriptFilePath"></param>
+        /// <param name="useRevitVersion"></param>
+        /// <param name="openLogFileWhenDone"></param>
+        /// <returns></returns>
+        public static string RunSingleTask(
+                bool toggleToExecute, // TODO: reconsider if this is needed here.
+                string taskScriptFilePath,
+                UseRevitVersion useRevitVersion,
+                bool openLogFileWhenDone
+            )
+        {
+            if (useRevitVersion == UseRevitVersion.RevitFileVersion)
+            {
+                throw new ArgumentException("useRevitVersion argument must specify a specific Revit version!");
+            }
+
+            return RunTaskInternal(
+                    taskScriptFilePath,
+                    null, // Revit File list is N/A for single task processing
+                    BatchRvt.RevitProcessingOption.SingleRevitTaskProcessing,
+                    useRevitVersion,
+                    CentralFileOpenOption.Detach,  // N/A for single task processing
+                    discardWorksetsOnDetach: true, // N/A for single task processing
+                    deleteLocalAfter: true, // N/A for single task processing
+                    openLogFileWhenDone: openLogFileWhenDone,
+                    logFolderPath: null,
+                    fileProcessingTimeOutInMinutes: 0, // N/A for single task processing
                     fallbackToMinimumAvailableRevitVersion: false
                 );
         }
@@ -97,6 +133,7 @@ namespace BatchRevitDynamo
             return RunTaskInternal(
                     taskScriptFilePath,
                     revitFileList, // Input is a list of Revit file paths.
+                    BatchRvt.RevitProcessingOption.BatchRevitFileProcessing,
                     useRevitVersion,
                     centralFileOpenOption,
                     discardWorksetsOnDetach,
@@ -168,6 +205,7 @@ namespace BatchRevitDynamo
             return RunTaskInternal(
                     taskScriptFilePath,
                     revitFileListFilePath,
+                    BatchRvt.RevitProcessingOption.BatchRevitFileProcessing,
                     useRevitVersion,
                     centralFileOpenOption,
                     discardWorksetsOnDetach,
@@ -182,6 +220,7 @@ namespace BatchRevitDynamo
         private static string RunTaskInternal(
                 string taskScriptFilePath,
                 object revitFileListInput,
+                BatchRvt.RevitProcessingOption revitProcessingOption,
                 UseRevitVersion useRevitVersion,
                 CentralFileOpenOption centralFileOpenOption,
                 bool discardWorksetsOnDetach,
@@ -216,6 +255,7 @@ namespace BatchRevitDynamo
             var batchRvtSettings = BatchRvtSettings.Create(
                     taskScriptFilePath,
                     (revitFileListInput as string) ?? string.Empty,
+                    revitProcessingOption,
                     batchRvtCentralFileOpenOption,
                     deleteLocalAfter,
                     discardWorksetsOnDetach,
@@ -240,6 +280,8 @@ namespace BatchRevitDynamo
             var revitFileList = revitFileListInput as IEnumerable<string>;
 
             if (
+                    batchRvtSettings.RevitProcessingOption.GetValue() == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing
+                    &&
                     string.IsNullOrWhiteSpace(revitFileListFilePath)
                     &&
                     string.IsNullOrWhiteSpace(batchRvtSettings.RevitFileListFilePath.GetValue())
