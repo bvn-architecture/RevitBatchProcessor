@@ -151,7 +151,7 @@ namespace BatchRevitDynamo
         /// <param name="fallbackToMinimumAvailableRevitVersion"></param>
         /// 
         /// <returns></returns>
-        public static string RunTaskOnListFromFile(
+        public static string RunTaskOnListFile(
                 bool toggleToExecute, // TODO: reconsider if this is needed here.
                 string taskScriptFilePath,
                 string revitFileListFilePath, // Input is a file path to a list of Revit file paths.
