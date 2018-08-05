@@ -297,6 +297,9 @@ namespace BatchRvtUtil
             // Revit Session settings
             batchRvtSettings.RevitSessionOption.SetValue(revitSessionOption);
 
+            // Single Revit Task Processing settings
+            batchRvtSettings.SingleRevitTaskRevitVersion.SetValue(taskRevitVersion);
+
             // Batch Revit File Processing settings
             batchRvtSettings.RevitFileProcessingOption.SetValue(revitFileVersionOption);
             batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(fallbackToMinimumAvailableRevitVersion);
