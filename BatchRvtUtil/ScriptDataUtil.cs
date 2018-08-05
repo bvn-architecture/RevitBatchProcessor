@@ -126,6 +126,31 @@ namespace BatchRvtUtil
 
                 return success;
             }
+
+            public string ToJsonString()
+            {
+                var jobject = new JObject();
+                this.Store(jobject);
+                return jobject.ToString();
+            }
+
+            public static ScriptData FromJsonString(string scriptDataJson)
+            {
+                ScriptData scriptData = null;
+
+                try
+                {
+                    var jobject = JsonUtil.DeserializeFromJson(scriptDataJson);
+                    scriptData = new ScriptData();
+                    scriptData.Load(jobject);
+                }
+                catch (Exception e)
+                {
+                    scriptData = null;
+                }
+
+                return scriptData;
+            }
         }
 
         public static IEnumerable<ScriptData> LoadManyFromFile(string filePath)
