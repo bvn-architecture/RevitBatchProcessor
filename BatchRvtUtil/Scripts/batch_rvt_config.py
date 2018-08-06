@@ -274,22 +274,23 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
         output()
         output("\t" + batchRvtConfig.PostProcessingScriptFilePath)
     
-    centralFileProcessingDescription = (
-        "Create New Local" if (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.CreateNewLocal)
-        else "Detach from Central"
-      )
-    output()
-    output("Central File Processing mode:")
-    output()
-    output("\t" + centralFileProcessingDescription)
-    if (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.CreateNewLocal):
-      if (batchRvtConfig.DeleteLocalAfter):
-        output()
-        output("\t" + "Local File will be deleted after processing.")
-    elif (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.Detach):
-      if (batchRvtConfig.DiscardWorksetsOnDetach):
-        output()
-        output("\t" + "Worksets will be discarded upon detach.")
+    if batchRvtConfig.RevitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing:
+      centralFileProcessingDescription = (
+          "Create New Local" if (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.CreateNewLocal)
+          else "Detach from Central"
+        )
+      output()
+      output("Central File Processing mode:")
+      output()
+      output("\t" + centralFileProcessingDescription)
+      if (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.CreateNewLocal):
+        if (batchRvtConfig.DeleteLocalAfter):
+          output()
+          output("\t" + "Local File will be deleted after processing.")
+      elif (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.Detach):
+        if (batchRvtConfig.DiscardWorksetsOnDetach):
+          output()
+          output("\t" + "Worksets will be discarded upon detach.")
 
   return aborted
 
