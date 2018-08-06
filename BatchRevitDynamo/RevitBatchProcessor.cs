@@ -239,6 +239,8 @@ namespace BatchRevitDynamo
 
             // NOTE: can be any version if useRevitVersion is set to RevitFileVersion.
             var taskRevitVersion = (
+                    useRevitVersion == UseRevitVersion.Revit2015 ?
+                    RevitVersion.SupportedRevitVersion.Revit2015 :
                     useRevitVersion == UseRevitVersion.Revit2016 ?
                     RevitVersion.SupportedRevitVersion.Revit2016 :
                     useRevitVersion == UseRevitVersion.Revit2017 ?
@@ -339,8 +341,8 @@ namespace BatchRevitDynamo
         }
     }
 
-    // NOTE: Dynamo does not support Revit versions earlier than 2016.
-    public enum UseRevitVersion { RevitFileVersion = 0, Revit2016 = 1, Revit2017 = 2, Revit2018 = 3 }
+    // NOTE: Dynamo scripts are not supported in Revit versions earlier than 2016.
+    public enum UseRevitVersion { RevitFileVersion = 0, Revit2015 = 1, Revit2016 = 2, Revit2017 = 3, Revit2018 = 4 }
     public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1 }
     public enum CentralFileOpenOption { Detach = 0, CreateNewLocal = 1 }
 }
