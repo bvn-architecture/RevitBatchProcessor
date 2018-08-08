@@ -183,6 +183,17 @@ def ExecutePostProcessingScript(batchRvtConfig, output):
 def RunSingleRevitTask(batchRvtConfig):
   aborted = False
 
+  revitVersion = batchRvtConfig.SingleRevitTaskRevitVersion
+  Output()
+  Output("Revit Version:")
+  Output()
+  Output("\t" + RevitVersion.GetRevitVersionText(revitVersion))
+
+  if revitVersion not in RevitVersion.GetInstalledRevitVersions():
+    Output()
+    Output("ERROR: The specified Revit version is not installed or the addin is not installed for it.")
+    aborted = True
+
   if not aborted:
     if batchRvtConfig.ExecutePreProcessingScript:
       aborted = ExecutePreProcessingScript(batchRvtConfig, Output)
@@ -191,7 +202,6 @@ def RunSingleRevitTask(batchRvtConfig):
     Output()
     Output("Starting single task operation...")
 
-    revitVersion = batchRvtConfig.SingleRevitTaskRevitVersion
     Output()
     Output("Starting Revit " + RevitVersion.GetRevitVersionText(revitVersion) + " session...")
 
