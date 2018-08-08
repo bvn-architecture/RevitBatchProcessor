@@ -31,12 +31,17 @@ PYTHON_SCRIPT_FILE_EXTENSION = ".py"
 DYNAMO_SCRIPT_FILE_EXTENSION = ".dyn"
 
 SESSION_ID_CONTAINER = [None]
+TASK_DATA_CONTAINER = [None]
 EXPORT_FOLDER_PATH_CONTAINER = [None]
 SESSION_DATA_FOLDER_PATH_CONTAINER = [None]
 REVIT_FILE_LIST_FILE_PATH_CONTAINER = [None]
 
 def SetSessionId(batchRvtConfig):
   SESSION_ID_CONTAINER[0] = batchRvtConfig.SessionId
+  return
+
+def SetTaskData(batchRvtConfig):
+  TASK_DATA_CONTAINER[0] = batchRvtConfig.TaskData
   return
 
 def SetExportFolderPath(batchRvtConfig):
@@ -54,6 +59,10 @@ def SetRevitFileListFilePath(batchRvtConfig):
 def GetSessionId():
   sessionId = SESSION_ID_CONTAINER[0]
   return sessionId
+
+def GetTaskData():
+  taskData = TASK_DATA_CONTAINER[0]
+  return taskData
 
 def GetExportFolderPath():
   exportFolderPath = EXPORT_FOLDER_PATH_CONTAINER[0]

@@ -142,6 +142,7 @@ def GetSupportedRevitFiles(batchRvtConfig):
 
 def InitializeScriptUtil(batchRvtConfig):
   script_util.SetSessionId(batchRvtConfig)
+  script_util.SetTaskData(batchRvtConfig)
   script_util.SetExportFolderPath(batchRvtConfig)
   script_util.SetSessionDataFolderPath(batchRvtConfig)
   script_util.SetRevitFileListFilePath(batchRvtConfig)
@@ -196,6 +197,7 @@ def RunSingleRevitTask(batchRvtConfig):
 
     scriptData = ScriptDataUtil.ScriptData()
     scriptData.SessionId.SetValue(batchRvtConfig.SessionId)
+    scriptData.TaskData.SetValue(batchRvtConfig.TaskData)
     scriptData.EnableDataExport.SetValue(batchRvtConfig.EnableDataExport)
     scriptData.SessionDataFolderPath.SetValue(batchRvtConfig.SessionDataFolderPath)
     scriptData.ShowMessageBoxOnTaskScriptError.SetValue(batchRvtConfig.ShowMessageBoxOnTaskError)
@@ -300,6 +302,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
         scriptData = ScriptDataUtil.ScriptData()
         scriptData.SessionId.SetValue(batchRvtConfig.SessionId)
         scriptData.RevitFilePath.SetValue(revitFilePath)
+        scriptData.TaskData.SetValue(batchRvtConfig.TaskData)
         scriptData.OpenInUI.SetValue(batchRvtConfig.OpenInUI)
         scriptData.EnableDataExport.SetValue(batchRvtConfig.EnableDataExport)
         scriptData.SessionDataFolderPath.SetValue(batchRvtConfig.SessionDataFolderPath)

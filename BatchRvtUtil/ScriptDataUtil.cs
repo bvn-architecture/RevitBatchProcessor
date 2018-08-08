@@ -38,6 +38,7 @@ namespace BatchRvtUtil
             public readonly StringSetting SessionId = new StringSetting("sessionId");
             public readonly StringSetting RevitFilePath = new StringSetting("revitFilePath");
             public readonly BooleanSetting EnableDataExport = new BooleanSetting("enableDataExport");
+            public readonly StringSetting TaskData = new StringSetting("taskData");
             public readonly StringSetting SessionDataFolderPath = new StringSetting("sessionDataFolderPath");
             public readonly StringSetting DataExportFolderPath = new StringSetting("dataExportFolderPath");
             public readonly BooleanSetting ShowMessageBoxOnTaskScriptError = new BooleanSetting("showMessageBoxOnTaskError");

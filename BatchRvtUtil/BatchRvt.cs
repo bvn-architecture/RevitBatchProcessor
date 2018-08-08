@@ -71,7 +71,8 @@ namespace BatchRvtUtil
         public static Process StartBatchRvt(
                 string settingsFilePath,
                 string logFolderPath = null,
-                string sessionId = null
+                string sessionId = null,
+                string taskData = null
             )
         {
             var baseDirectory = GetBatchRvtFolderPath();
@@ -88,6 +89,11 @@ namespace BatchRvtUtil
             if (!string.IsNullOrWhiteSpace(sessionId))
             {
                 batchRvtOptions[CommandSettings.SESSION_ID_OPTION] = sessionId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(taskData))
+            {
+                batchRvtOptions[CommandSettings.TASK_DATA_OPTION] = taskData;
             }
 
             var psi = new ProcessStartInfo(Path.Combine(baseDirectory, "BatchRvt.exe"));

@@ -28,6 +28,7 @@ namespace BatchRvtUtil
         public const string SETTINGS_FILE_PATH_OPTION = "settings_file";
         public const string LOG_FOLDER_PATH_OPTION = "log_folder";
         public const string SESSION_ID_OPTION = "session_id";
+        public const string TASK_DATA_OPTION = "task_data";
 
         private const string APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH = "BATCH_RVT_LOG_FOLDER_PATH";
 
@@ -35,7 +36,8 @@ namespace BatchRvtUtil
             new Dictionary<string, Func<string, object>>() {
                 { SETTINGS_FILE_PATH_OPTION, ParseExistingFilePathOptionValue },
                 { LOG_FOLDER_PATH_OPTION, ParseExistingFolderPathOptionValue },
-                { SESSION_ID_OPTION, ParseTextOptionValue }
+                { SESSION_ID_OPTION, ParseTextOptionValue },
+                { TASK_DATA_OPTION, ParseTextOptionValue },
             };
 
         public static string ParseTextOptionValue(string textOptionValue)
