@@ -2,7 +2,7 @@
 set InnoSetupFolderPathA="C:\Program Files (x86)\Inno Setup 5"
 
 if EXIST %InnoSetupFolderPathA% (
-  set IronPythonFolderPath=%InnoSetupFolderPathA%
+  set InnoSetupFolderPath=%InnoSetupFolderPathA%
 ) else (
   echo.
   echo ERROR: could not locate an Inno Setup 5 installation folder!
@@ -11,4 +11,4 @@ if EXIST %InnoSetupFolderPathA% (
 
 set InnoSetupCompileOptions=
 
-%IronPythonFolderPath%\ISCC.exe %InnoSetupCompileOptions% %*
+%InnoSetupFolderPath%\ISCC.exe %InnoSetupCompileOptions% %*
