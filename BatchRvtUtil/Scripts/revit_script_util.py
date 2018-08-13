@@ -22,7 +22,7 @@ import clr
 import System
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import ModelPathUtils
-from Autodesk.Revit.Exceptions import OperationCanceledException, CorruptModelException, InvalidOperationException
+from Autodesk.Revit.Exceptions import OperationCanceledException, CorruptModelException, InvalidOperationException, ArgumentException
 
 import exception_util
 import path_util
@@ -207,22 +207,29 @@ def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets
   return result
 
 def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
-  app = uiapp.Application
-  result = None
-  output()
-  output("Opening local instance of central file: " + centralFilePath)
-  output()
-  output("New local file: " + localFilePath)
-  # TODO: decide if worksets should be closed or open (currently the script closes them)
-  if openInUI:
-    uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, True)
-    doc = uidoc.Document
-  else:
-    doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, True)
   try:
-    result = documentAction(doc)
-  finally:
-    SafeCloseWithoutSave(doc, openInUI, "Closed local file: " + localFilePath, output)
+    app = uiapp.Application
+    result = None
+    output()
+    output("Opening local instance of central file: " + centralFilePath)
+    output()
+    output("New local file: " + localFilePath)
+    # TODO: decide if worksets should be closed or open (currently the script closes them)
+    if openInUI:
+      uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, True)
+      doc = uidoc.Document
+    else:
+      doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, True)
+    try:
+      result = documentAction(doc)
+    finally:
+      SafeCloseWithoutSave(doc, openInUI, "Closed local file: " + localFilePath, output)
+  except ArgumentException, e:
+    if e.Message == "The model is a local file.\r\nParameter name: sourcePath":
+      output()
+      output("ERROR: The model is a local file. Cannot create another local file from it!")
+    else:
+      raise
   return result
 
 def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
