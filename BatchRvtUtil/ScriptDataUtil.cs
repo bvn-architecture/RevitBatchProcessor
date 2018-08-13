@@ -58,12 +58,12 @@ namespace BatchRvtUtil
                         {
                             this.SessionId,
                             this.RevitFilePath,
-                            this.ShowMessageBoxOnTaskScriptError,
                             this.EnableDataExport,
                             this.TaskScriptFilePath,
                             this.TaskData,
                             this.SessionDataFolderPath,
                             this.DataExportFolderPath,
+                            this.ShowMessageBoxOnTaskScriptError,
                             this.RevitProcessingOption,
                             this.CentralFileOpenOption,
                             this.DeleteLocalAfter,
