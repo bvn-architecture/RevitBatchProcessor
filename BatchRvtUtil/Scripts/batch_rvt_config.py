@@ -334,7 +334,11 @@ def ConfigureBatchRvt(output):
   
   batchRvtConfig.SessionId, batchRvtConfig.SessionStartTime = ParseSessionIdAndStartTime(batchRvtConfig.SessionId)
 
-  batchRvtConfig.TaskData = options[CommandSettings.TASK_DATA_OPTION]
+  taskDataFromAppDomainData = CommandSettings.GetAppDomainDataTaskData()
+  if taskDataFromAppDomainData is not None:
+    batchRvtConfig.TaskData = taskDataFromAppDomainData
+  else:
+    batchRvtConfig.TaskData = options[CommandSettings.TASK_DATA_OPTION]
 
   # NOTE: use of output function must occur after the log file initialization
   batchRvtConfig.LogFilePath = InitializeLogging(batchRvtConfig.LogFolderPath, batchRvtConfig.SessionStartTime)

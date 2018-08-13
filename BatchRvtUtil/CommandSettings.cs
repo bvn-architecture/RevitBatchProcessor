@@ -31,6 +31,7 @@ namespace BatchRvtUtil
         public const string TASK_DATA_OPTION = "task_data";
 
         private const string APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH = "BATCH_RVT_LOG_FOLDER_PATH";
+        private const string APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA = "BATCH_RVT_TASK_DATA";
 
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
             new Dictionary<string, Func<string, object>>() {
@@ -139,6 +140,20 @@ namespace BatchRvtUtil
         public static bool SetAppDomainDataLogFolderPath(string logFolderPath)
         {
             AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH, logFolderPath);
+
+            return true;
+        }
+
+        public static string GetAppDomainDataTaskData()
+        {
+            var taskData = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA) as string;
+
+            return taskData;
+        }
+
+        public static bool SetAppDomainDataTaskData(string taskData)
+        {
+            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA, taskData);
 
             return true;
         }
