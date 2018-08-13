@@ -100,6 +100,9 @@ def GetDataExportFolderPath():
 def GetSessionId():
   return SCRIPT_DATA_CONTAINER[0].SessionId.GetValue()
 
+def GetTaskScriptFilePath():
+  return SCRIPT_DATA_CONTAINER[0].TaskScriptFilePath.GetValue()
+
 def GetTaskData():
   return SCRIPT_DATA_CONTAINER[0].TaskData.GetValue()
 

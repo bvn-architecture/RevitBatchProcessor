@@ -207,6 +207,7 @@ def RunSingleRevitTask(batchRvtConfig):
 
     scriptData = ScriptDataUtil.ScriptData()
     scriptData.SessionId.SetValue(batchRvtConfig.SessionId)
+    scriptData.TaskScriptFilePath.SetValue(batchRvtConfig.ScriptFilePath)
     scriptData.TaskData.SetValue(batchRvtConfig.TaskData)
     scriptData.EnableDataExport.SetValue(batchRvtConfig.EnableDataExport)
     scriptData.SessionDataFolderPath.SetValue(batchRvtConfig.SessionDataFolderPath)
@@ -311,6 +312,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
         revitFilePath = supportedRevitFileInfo.GetRevitFileInfo().GetFullPath()
         scriptData = ScriptDataUtil.ScriptData()
         scriptData.SessionId.SetValue(batchRvtConfig.SessionId)
+        scriptData.TaskScriptFilePath.SetValue(batchRvtConfig.ScriptFilePath)
         scriptData.RevitFilePath.SetValue(revitFilePath)
         scriptData.TaskData.SetValue(batchRvtConfig.TaskData)
         scriptData.OpenInUI.SetValue(batchRvtConfig.OpenInUI)
