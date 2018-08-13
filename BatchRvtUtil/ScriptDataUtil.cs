@@ -59,6 +59,7 @@ namespace BatchRvtUtil
                             this.RevitFilePath,
                             this.ShowMessageBoxOnTaskScriptError,
                             this.EnableDataExport,
+                            this.TaskData,
                             this.SessionDataFolderPath,
                             this.DataExportFolderPath,
                             this.RevitProcessingOption,
