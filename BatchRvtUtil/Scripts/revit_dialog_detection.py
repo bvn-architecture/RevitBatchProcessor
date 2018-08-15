@@ -172,6 +172,7 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
         output()
         output("\tDialog box title: '" + enabledDialog.WindowText + "'")
 
+        buttons = buttons if len(buttons) > 0 else win32Buttons
         for button in buttons:
           buttonText = ui_automation_util.GetButtonText(button)
           output()
