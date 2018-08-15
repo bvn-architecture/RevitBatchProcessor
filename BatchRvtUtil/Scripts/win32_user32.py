@@ -29,6 +29,8 @@ USER32_MODULE_NAME = "user32.dll"
 
 GW_OWNER = 4
 GA_PARENT = 1
+BOOL_TRUE = 1
+BOOL_FALSE = 0
 
 Win32_FindWindowEx = win32_pinvoke.GetWinApiFunctionAnsi("FindWindowEx", USER32_MODULE_NAME, System.IntPtr, System.IntPtr, System.IntPtr, System.String, System.String)
 Win32_GetWindowText = win32_pinvoke.GetWinApiFunctionAnsi("GetWindowText", USER32_MODULE_NAME, System.Int32, System.IntPtr, StringBuilder, System.Int32)
@@ -50,6 +52,7 @@ Win32_SetFocus = win32_pinvoke.GetWinApiFunction("SetFocus", USER32_MODULE_NAME,
 Win32_PostMessage = win32_pinvoke.GetWinApiFunction("PostMessage", USER32_MODULE_NAME, System.Int32, System.IntPtr, System.Int32, System.IntPtr, System.IntPtr)
 Win32_IsWindowVisible = win32_pinvoke.GetWinApiFunction("IsWindowVisible", USER32_MODULE_NAME, System.Int32, System.IntPtr)
 Win32_GetDesktopWindow = win32_pinvoke.GetWinApiFunction("GetDesktopWindow", USER32_MODULE_NAME, System.IntPtr)
+Win32_EnableWindow = win32_pinvoke.GetWinApiFunction("EnableWindow", USER32_MODULE_NAME, System.Int32, System.IntPtr, System.Int32)
 
 def FindWindows(parentHwnd, className, windowTitle):
   hwnd = System.IntPtr.Zero
@@ -85,7 +88,19 @@ def GetParentWindow(hwnd):
   return Win32_GetAncestor(hwnd, GA_PARENT)
 
 def IsWindowEnabled(hwnd):
-  return Win32_IsWindowEnabled(hwnd) != 0
+  return Win32_IsWindowEnabled(hwnd) != BOOL_FALSE
+
+def EnableWindow(hwnd, enable):
+  result = Win32_EnableWindow(hwnd, BOOL_TRUE if enable else BOOL_FALSE)
+  # NOTE on return value:
+  #   If the window was previously disabled, the return value is non-zero.
+  #   If the window was not previously disabled, the return value is zero.
+  return result != BOOL_FALSE
+
+def SendCloseMessage(hwnd):
+  WM_CLOSE = 0x0010
+  result = Win32_SendMessage(hwnd, WM_CLOSE, System.IntPtr.Zero, System.IntPtr.Zero)
+  return result
 
 def SendButtonClickMessage(hwnd):
   BM_CLICK = 0x00F5
