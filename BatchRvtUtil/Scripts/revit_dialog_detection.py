@@ -30,6 +30,7 @@ CHANGES_NOT_SAVED_TITLE = "Changes Not Saved"
 CLOSE_PROJECT_WITHOUT_SAVING_TITLE = "Close Project Without Saving"
 SAVE_FILE_WINDOW_TITLE = "Save File"
 EDITABLE_ELEMENTS_TITLE = "Editable Elements"
+AUTODESK_CUSTOMER_INVOLVEMENT_PROGRAM_TITLE = "Autodesk Customer Involvement Program"
 
 DIRECTUI_CLASS_NAME = "DirectUIHWND"
 CTRLNOTIFYSINK_CLASS_NAME = "CtrlNotifySink"
@@ -166,6 +167,14 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
               output()
               output(staticControlText)
         SendButtonClick(win32Buttons, output)
+      elif enabledDialog.WindowText == "Autodesk Customer Involvement Program" and len(buttons) == 0 and len(win32Buttons) > 0:
+        output()
+        output("'" + enabledDialog.WindowText + "' dialog box detected.")
+        output()
+        output("Sending close message...")
+        win32_user32.SendCloseMessage(enabledDialog.Hwnd)
+        output()
+        output("...sent.")
       else:
         output()
         output("Revit dialog box detected!")
