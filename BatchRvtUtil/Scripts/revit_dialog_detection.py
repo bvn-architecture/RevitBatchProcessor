@@ -167,7 +167,7 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output):
               output()
               output(staticControlText)
         SendButtonClick(win32Buttons, output)
-      elif enabledDialog.WindowText == "Autodesk Customer Involvement Program" and len(buttons) == 0 and len(win32Buttons) > 0:
+      elif enabledDialog.WindowText == AUTODESK_CUSTOMER_INVOLVEMENT_PROGRAM_TITLE and len(buttons) == 0 and len(win32Buttons) > 0:
         output()
         output("'" + enabledDialog.WindowText + "' dialog box detected.")
         output()
