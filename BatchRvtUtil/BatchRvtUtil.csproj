@@ -97,6 +97,9 @@
     <Content Include="Scripts\batch_rvt_util.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\test_mode_util.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\client_util.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
