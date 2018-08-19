@@ -25,7 +25,10 @@ clr.AddReference("Newtonsoft.Json")
 
 import Newtonsoft.Json as JSON
 from Newtonsoft.Json import JsonConvert, Formatting
-from Newtonsoft.Json.Linq import JObject, JArray
+from Newtonsoft.Json.Linq import JObject, JArray, JValue
+
+def GetValueFromJValue(jvalue):
+  return JValue.Value.GetValue(jvalue)
 
 def ToJObject(pythonObject):
   return JObject.FromObject(pythonObject)
