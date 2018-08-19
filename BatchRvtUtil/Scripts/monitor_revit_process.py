@@ -22,9 +22,12 @@ import clr
 import System
 
 import monitor_process
+import test_mode_util
 
 MONITOR_INTERVAL_IN_SECONDS = 0.25
 UNRESPONSIVE_THRESHHOLD_IN_SECONDS = 10
+
+REVIT_BUSY_HANDLER_PREFIX = "[ REVIT BUSY MONITOR ]"
 
 def OnBeginUnresponsive(output):
   output()
@@ -47,13 +50,15 @@ def MonitorHostRevitProcess(hostRevitProcess, monitoringAction, output):
   output("Monitoring host Revit process (PID: " + str(hostRevitProcess.Id) + ")")
   output()
 
+  busyOutput = test_mode_util.PrefixedOutputForTestMode(output, REVIT_BUSY_HANDLER_PREFIX)
+
   monitor_process.MonitorProcess(
       hostRevitProcess,
       monitoringAction,
       MONITOR_INTERVAL_IN_SECONDS,
       UNRESPONSIVE_THRESHHOLD_IN_SECONDS,
-      lambda: OnBeginUnresponsive(output),
-      lambda unresponsiveTimeInSeconds: OnEndUnresponsive(unresponsiveTimeInSeconds, output)
+      lambda: OnBeginUnresponsive(busyOutput),
+      lambda unresponsiveTimeInSeconds: OnEndUnresponsive(unresponsiveTimeInSeconds, busyOutput)
     )
   
   output()
