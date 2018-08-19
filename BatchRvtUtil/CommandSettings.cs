@@ -29,9 +29,11 @@ namespace BatchRvtUtil
         public const string LOG_FOLDER_PATH_OPTION = "log_folder";
         public const string SESSION_ID_OPTION = "session_id";
         public const string TASK_DATA_OPTION = "task_data";
+        public const string TEST_MODE_FOLDER_PATH_OPTION = "test_mode_folder_path";
 
         private const string APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH = "BATCH_RVT_LOG_FOLDER_PATH";
         private const string APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA = "BATCH_RVT_TASK_DATA";
+        private const string APP_DOMAIN_DATA_PROPERTY_NAME___TEST_MODE_FOLDER_PATH = "BATCH_RVT_TEST_MODE_FOLDER_PATH";
 
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
             new Dictionary<string, Func<string, object>>() {
@@ -39,6 +41,7 @@ namespace BatchRvtUtil
                 { LOG_FOLDER_PATH_OPTION, ParseExistingFolderPathOptionValue },
                 { SESSION_ID_OPTION, ParseTextOptionValue },
                 { TASK_DATA_OPTION, ParseTextOptionValue },
+                { TEST_MODE_FOLDER_PATH_OPTION, ParseTextOptionValue }
             };
 
         public static string ParseTextOptionValue(string textOptionValue)
@@ -154,6 +157,20 @@ namespace BatchRvtUtil
         public static bool SetAppDomainDataTaskData(string taskData)
         {
             AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA, taskData);
+
+            return true;
+        }
+
+        public static string GetAppDomainDataTestModeFolderPath()
+        {
+            var testModeFolderPath = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME___TEST_MODE_FOLDER_PATH) as string;
+
+            return testModeFolderPath;
+        }
+
+        public static bool SetAppDomainDataTestModeFolderPath(string testModeFolderPath)
+        {
+            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___TEST_MODE_FOLDER_PATH, testModeFolderPath);
 
             return true;
         }

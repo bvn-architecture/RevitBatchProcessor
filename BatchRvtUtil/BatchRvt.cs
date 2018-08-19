@@ -72,7 +72,8 @@ namespace BatchRvtUtil
                 string settingsFilePath,
                 string logFolderPath = null,
                 string sessionId = null,
-                string taskData = null
+                string taskData = null,
+                string testModeFolderPath = null
             )
         {
             var baseDirectory = GetBatchRvtFolderPath();
@@ -94,6 +95,11 @@ namespace BatchRvtUtil
             if (!string.IsNullOrWhiteSpace(taskData))
             {
                 batchRvtOptions[CommandSettings.TASK_DATA_OPTION] = taskData;
+            }
+
+            if (!string.IsNullOrWhiteSpace(testModeFolderPath))
+            {
+                batchRvtOptions[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION] = testModeFolderPath;
             }
 
             var psi = new ProcessStartInfo(Path.Combine(baseDirectory, "BatchRvt.exe"));
@@ -163,9 +169,9 @@ namespace BatchRvtUtil
             return Path.Combine(GetBatchRvtFolderPath(), SCRIPTS_FOLDER_NAME);
         }
 
-        public static bool SetAppDomainDataLogFilePath(string logFolderPath)
+        public static bool SetAppDomainDataLogFilePath(string logFilePath)
         {
-            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__BATCH_RVT_LOG_FILE_PATH, logFolderPath);
+            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__BATCH_RVT_LOG_FILE_PATH, logFilePath);
 
             return true;
         }

@@ -27,7 +27,7 @@ SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_DATA_FILE_
 PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__PROGRESS_NUMBER"
 SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_OUTPUT_PIPE_HANDLE_STRING"
 BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__PROCESS_UNIQUE_ID"
-
+BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__TEST_MODE_FOLDER_PATH"
 
 def GetEnvironmentVariable(environmentVariables, variableName):
   return environmentVariables.Item[variableName]
@@ -83,6 +83,14 @@ def SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId):
     )
   return
 
+def SetTestModeFolderPath(environmentVariables, testModeFolderPath):
+  SetEnvironmentVariable(
+      environmentVariables,
+      BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME,
+      testModeFolderPath
+    )
+  return
+
 def GetBatchRvtScriptsFolderPath(environmentVariables):
   return GetEnvironmentVariable(
       environmentVariables,
@@ -120,6 +128,12 @@ def GetBatchRvtProcessUniqueId(environmentVariables):
         BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME
       )
 
+def GetTestModeFolderPath(environmentVariables):
+  return GetEnvironmentVariable(
+      environmentVariables,
+      BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME
+    )
+
 def InitEnvironmentVariables(
     environmentVariables,
     batchRvtScriptsFolderPath,
@@ -127,7 +141,8 @@ def InitEnvironmentVariables(
     scriptDataFilePath,
     progressNumber,
     scriptOutputPipeHandleString,
-    batchRvtProcessUniqueId
+    batchRvtProcessUniqueId,
+    testModeFolderPath
   ):
   SetBatchRvtScriptsFolderPath(environmentVariables, batchRvtScriptsFolderPath)
   SetScriptFilePath(environmentVariables, scriptFilePath)
@@ -135,5 +150,6 @@ def InitEnvironmentVariables(
   SetProgressNumber(environmentVariables, progressNumber)
   SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandleString)
   SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId)
+  SetTestModeFolderPath(environmentVariables, testModeFolderPath)
   return
 

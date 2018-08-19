@@ -107,6 +107,7 @@ def RunScriptedRevitSession(
     scriptDatas,
     progressNumber,
     processingTimeOutInMinutes,
+    testModeFolderPath,
     output
   ):
   scriptDataFilePath = ScriptDataUtil.GetUniqueScriptDataFilePath()
@@ -131,7 +132,8 @@ def RunScriptedRevitSession(
             scriptFilePath,
             scriptDataFilePath,
             progressNumber,
-            scriptOutputPipeHandleString
+            scriptOutputPipeHandleString,
+            testModeFolderPath
           )
         return hostRevitProcess
 

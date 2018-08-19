@@ -25,6 +25,7 @@ clr.ImportExtensions(System.Linq)
 from System import AppDomain
 from System.IO import File, Directory
 
+import test_mode_util
 import time_util
 import path_util
 import logging_util
@@ -48,6 +49,7 @@ class BatchRvtConfig:
     self.SessionId = None
     self.SessionStartTime = None
     self.TaskData = None
+    self.TestModeFolderPath = None
     self.SessionDataFolderPath = None
 
     # General Task Script settings
@@ -344,6 +346,13 @@ def ConfigureBatchRvt(output):
   batchRvtConfig.LogFilePath = InitializeLogging(batchRvtConfig.LogFolderPath, batchRvtConfig.SessionStartTime)
 
   BatchRvt.SetAppDomainDataLogFilePath(batchRvtConfig.LogFilePath)
+
+  testModeFolderPath = CommandSettings.GetAppDomainDataTestModeFolderPath()
+  if testModeFolderPath is not None:
+    batchRvtConfig.TestModeFolderPath = testModeFolderPath
+  else:
+    batchRvtConfig.TestModeFolderPath = options[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION]
+  test_mode_util.InitializeTestMode(batchRvtConfig.TestModeFolderPath)
 
   output()
   output("Session ID: " + batchRvtConfig.SessionId)

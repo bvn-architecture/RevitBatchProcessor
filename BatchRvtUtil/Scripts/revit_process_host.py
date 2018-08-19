@@ -56,7 +56,8 @@ def StartHostRevitProcess(
     scriptFilePath,
     scriptDataFilePath,
     progressNumber,
-    scriptOutputPipeHandleString
+    scriptOutputPipeHandleString,
+    testModeFolderPath
   ):
   batchRvtProcessUniqueId = GetUniqueIdForProcess(Process.GetCurrentProcess())
   def initEnvironmentVariables(environmentVariables):
@@ -67,7 +68,8 @@ def StartHostRevitProcess(
         scriptDataFilePath,
         progressNumber,
         scriptOutputPipeHandleString,
-        batchRvtProcessUniqueId
+        batchRvtProcessUniqueId,
+        testModeFolderPath
       )
     return
   return revit_process.StartRevitProcess(revitVersion, initEnvironmentVariables)
