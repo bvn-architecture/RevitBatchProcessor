@@ -98,3 +98,12 @@ def ExportSessionId(sessionId):
     return
   WithTestModeData(action)
   return
+
+def GetSessionId(testModeData):
+  return json_util.GetValueFromJValue(testModeData[TEST_MODE_DATA__SESSION_ID])
+
+def GetRevitProcessIds(testModeData):
+  return [
+      json_util.GetValueFromJValue(revitProcessId)
+      for revitProcessId in testModeData[TEST_MODE_DATA__REVIT_PROCESS_IDS]
+    ]
