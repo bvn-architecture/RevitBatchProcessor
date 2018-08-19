@@ -348,10 +348,14 @@ def ConfigureBatchRvt(output):
   BatchRvt.SetAppDomainDataLogFilePath(batchRvtConfig.LogFilePath)
 
   testModeFolderPath = CommandSettings.GetAppDomainDataTestModeFolderPath()
-  if testModeFolderPath is not None:
-    batchRvtConfig.TestModeFolderPath = testModeFolderPath
-  else:
-    batchRvtConfig.TestModeFolderPath = options[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION]
+  if str.IsNullOrWhiteSpace(testModeFolderPath):
+    testModeFolderPath = options[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION]
+
+  batchRvtConfig.TestModeFolderPath = (
+      path_util.GetFullPath(testModeFolderPath)
+      if not str.IsNullOrWhiteSpace(testModeFolderPath)
+      else None
+    )
   test_mode_util.InitializeTestMode(batchRvtConfig.TestModeFolderPath)
   test_mode_util.ExportSessionId(batchRvtConfig.SessionId)
 
