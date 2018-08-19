@@ -36,6 +36,9 @@ def InitializeTestMode(testModeFolderPath):
     Directory.CreateDirectory(testModeFolderPath)
     TEST_MODE_FOLDER_PATH[0] = testModeFolderPath
     IS_TEST_MODE[0] = True
+  else:
+    IS_TEST_MODE[0] = False
+    TEST_MODE_FOLDER_PATH[0] = None
   return IS_TEST_MODE[0]
 
 def IsTestMode():
