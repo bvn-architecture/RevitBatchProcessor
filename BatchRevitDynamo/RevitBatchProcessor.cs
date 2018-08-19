@@ -229,7 +229,8 @@ namespace BatchRevitDynamo
                 string logFolderPath,
                 int fileProcessingTimeOutInMinutes,
                 bool fallbackToMinimumAvailableRevitVersion,
-                string taskData = null
+                string taskData = null,
+                string testModeFolderPath = null
             )
         {
             var batchRvtRevitFileProcessingOption = (
@@ -269,7 +270,7 @@ namespace BatchRevitDynamo
                     fallbackToMinimumAvailableRevitVersion
                 );
 
-            return RunTaskInternal(revitFileListInput, batchRvtSettings, logFolderPath, openLogFileWhenDone, taskData);
+            return RunTaskInternal(revitFileListInput, batchRvtSettings, logFolderPath, openLogFileWhenDone, taskData, testModeFolderPath);
         }
 
         private static string RunTaskInternal(
@@ -277,7 +278,8 @@ namespace BatchRevitDynamo
                 BatchRvtSettings batchRvtSettings,
                 string logFolderPath,
                 bool openLogFileWhenDone,
-                string taskData = null
+                string taskData = null,
+                string testModeFolderPath = null
             )
         {
             var revitFileListFilePath = revitFileListInput as string;
@@ -316,6 +318,11 @@ namespace BatchRevitDynamo
             if (!string.IsNullOrWhiteSpace(taskData))
             {
                 CommandSettings.SetAppDomainDataTaskData(taskData);
+            }
+
+            if (!string.IsNullOrWhiteSpace(testModeFolderPath))
+            {
+                CommandSettings.SetAppDomainDataTestModeFolderPath(testModeFolderPath);
             }
 
             var batchRvtFolderPath = BatchRvt.GetBatchRvtFolderPath();
