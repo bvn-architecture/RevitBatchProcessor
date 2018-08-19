@@ -22,7 +22,10 @@ import clr
 import System
 from System.Text import StringBuilder
 
+import test_mode_util
 import exceptions
+
+EXCEPTION_MESSAGE_HANDLER_PREFIX = "[ EXCEPTION MESSAGE ]"
 
 def GetInterpretedFrameInfo(clsExceptionData):
   interpretedFrameInfo = None
@@ -46,7 +49,8 @@ def GetClrException(exception):
       None
     )
 
-def LogOutputErrorDetails(exception, output, verbose=True):
+def LogOutputErrorDetails(exception, output_, verbose=True):
+  output = test_mode_util.PrefixedOutputForTestMode(output_, EXCEPTION_MESSAGE_HANDLER_PREFIX)
   exceptionMessage = (
       str(exception.message) if isinstance(exception, exceptions.Exception)
       else

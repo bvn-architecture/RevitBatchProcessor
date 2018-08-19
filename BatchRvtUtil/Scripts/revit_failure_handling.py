@@ -30,7 +30,10 @@ clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 from Autodesk.Revit.DB.Events import FailuresProcessingEventArgs
 
+import test_mode_util
 import exception_util
+
+REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX = "[ REVIT WARNINGS HANDLER ]"
 
 def ElementIdsToSemicolonDelimitedText(elementIds):
   return str.Join("; ", [str(elementId.IntegerValue) for elementId in elementIds])
@@ -156,7 +159,8 @@ def FailuresProcessingEventHandler(sender, args, output):
   args.SetProcessingResult(result)
   return
 
-def WithFailuresProcessingHandler(app, action, output):
+def WithFailuresProcessingHandler(app, action, output_):
+  output = test_mode_util.PrefixedOutputForTestMode(output_, REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX)
   result = None
   failuresProcessingEventHandler = (
       EventHandler[FailuresProcessingEventArgs](

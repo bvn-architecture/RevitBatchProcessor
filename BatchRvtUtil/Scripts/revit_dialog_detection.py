@@ -24,6 +24,9 @@ import System
 import win32_user32
 import ui_automation_util
 import script_host_error
+import test_mode_util
+
+REVIT_DIALOG_MESSAGE_HANDLER_PREFIX = "[ REVIT DIALOG BOX HANDLER ]"
 
 MODEL_UPGRADE_WINDOW_TITLE = "Model Upgrade"
 CHANGES_NOT_SAVED_TITLE = "Changes Not Saved"
@@ -114,7 +117,8 @@ def DismissRevitDialogBox(title, buttons, targetButtonText, output):
     output("...sent.")
   return
 
-def DismissCheekyRevitDialogBoxes(revitProcessId, output):
+def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
+  output = test_mode_util.PrefixedOutputForTestMode(output_, REVIT_DIALOG_MESSAGE_HANDLER_PREFIX)
   enabledDialogs = ui_automation_util.GetEnabledDialogsInfo(revitProcessId)
   if len(enabledDialogs) > 0:
     for enabledDialog in enabledDialogs:
