@@ -20,10 +20,16 @@
 
 import clr
 import System
-from System.IO import Directory
+from System.IO import Directory, Path, File
+from System.Diagnostics import Process
+
+import json_util
 
 IS_TEST_MODE = [False]
 TEST_MODE_FOLDER_PATH = [None]
+
+TEST_MODE_DATA__SESSION_ID = "sessionId"
+TEST_MODE_DATA__REVIT_PROCESS_IDS = "revitProcessIds"
 
 def InitializeTestMode(testModeFolderPath):
   if not str.IsNullOrWhiteSpace(testModeFolderPath):
@@ -46,3 +52,46 @@ def PrefixedOutputForTestMode(output_, prefixForTestMode):
   else:
     output = output_
   return output
+
+def GetTestModeDataFilePath():
+  return Path.Combine(GetTestModeFolderPath(), "test_mode_data.json")
+
+def GetTestModeData():
+  testModeData = None
+  if IsTestMode():
+    testModeDataFilePath = GetTestModeDataFilePath()
+    if File.Exists(testModeDataFilePath):
+      testModeData = json_util.DeserializeToJObject(File.ReadAllText(testModeDataFilePath))
+    else:
+      testModeData = json_util.JObject()
+      testModeData[TEST_MODE_DATA__SESSION_ID] = None
+      testModeData[TEST_MODE_DATA__REVIT_PROCESS_IDS] = json_util.JArray()
+  return testModeData
+
+def SaveTestModeData(testModeData):
+  testModeData = json_util.SerializeObject(testModeData, prettyPrint=True)
+  testModeDataFilePath = GetTestModeDataFilePath()
+  File.WriteAllText(testModeDataFilePath, testModeData)
+  return
+
+def WithTestModeData(testModeDataAction):
+  if IsTestMode():
+    testModeData = GetTestModeData()
+    testModeDataAction(testModeData)
+    SaveTestModeData(testModeData)
+  return
+
+def ExportRevitProcessId(revitProcessId):
+  def action(testModeData):
+    revitProcessIds = testModeData[TEST_MODE_DATA__REVIT_PROCESS_IDS]
+    revitProcessIds.Add(revitProcessId)
+    return
+  WithTestModeData(action)
+  return
+
+def ExportSessionId(sessionId):
+  def action(testModeData):
+    testModeData[TEST_MODE_DATA__SESSION_ID] = sessionId
+    return
+  WithTestModeData(action)
+  return

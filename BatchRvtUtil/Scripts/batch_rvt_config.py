@@ -353,6 +353,7 @@ def ConfigureBatchRvt(output):
   else:
     batchRvtConfig.TestModeFolderPath = options[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION]
   test_mode_util.InitializeTestMode(batchRvtConfig.TestModeFolderPath)
+  test_mode_util.ExportSessionId(batchRvtConfig.SessionId)
 
   output()
   output("Session ID: " + batchRvtConfig.SessionId)
