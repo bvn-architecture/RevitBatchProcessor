@@ -37,6 +37,6 @@ def InTransaction(transaction, action):
     transaction.RollBack()
     transaction.Dispose()
     raise
-  result = transaction.Commit()
+  transaction.Commit()
   transaction.Dispose()
   return result
