@@ -7,12 +7,14 @@ from System.Xml import XmlDocument
 
 from System.IO import File, Path, IOException
 
+import revit_dynamo_error
+
 try:
   clr.AddReference("DynamoRevitDS")
 except IOException, e:
-  raise Exception("Could not load the Dynamo module! There must be EXACTLY ONE VERSION of Dynamo installed!")
-from Dynamo.Applications import DynamoRevit, DynamoRevitCommandData
+  raise Exception(revit_dynamo_error.DYNAMO_REVIT_MODULE_NOT_FOUND_ERROR_MESSAGE)
 
+from Dynamo.Applications import DynamoRevit, DynamoRevitCommandData
 
 DYNAMO_RUNTYPE_AUTOMATIC = "Automatic"
 DYNAMO_RUNTYPE_MANUAL = "Manual"

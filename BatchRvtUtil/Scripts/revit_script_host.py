@@ -44,6 +44,8 @@ import exception_util
 import revit_session
 import stream_io_util
 import script_util
+import revit_dynamo
+import revit_dynamo_error
 import revit_process_host
 from batch_rvt_util import BatchRvt, RevitVersion
 from revit_script_util import ScriptDataUtil
@@ -175,17 +177,30 @@ def RunBatchTaskScript(scriptFilePath):
 
       def processDocument(doc):
         revit_script_util.SetScriptDocument(doc)
+        
         def executeTaskScript():
+          success = False
           output()
           output("Task script operation started.")
           if path_util.HasFileExtension(scriptFilePath, script_util.DYNAMO_SCRIPT_FILE_EXTENSION):
-            import revit_dynamo_util
-            revit_dynamo_util.ExecuteDynamoScript(uiapp, scriptFilePath, False)
+            if revit_dynamo.IsDynamoRevitModuleLoaded():
+              revit_dynamo.ExecuteDynamoScript(uiapp, scriptFilePath, showUI=False)
+              success = True
+            else:
+              success = False
+              output()
+              output(revit_dynamo_error.DYNAMO_REVIT_MODULE_NOT_FOUND_ERROR_MESSAGE)
           else:
             script_util.ExecuteScript(scriptFilePath)
-          output()
-          output("Task script operation completed.")
+            success = True
+          if success:
+            output()
+            output("Task script operation completed.")
+          else:
+            output()
+            output("ERROR: An error occurred while executing the task script! Operation aborted.")
           return
+
         result = script_host_error.WithErrorHandling(
             executeTaskScript,
             "ERROR: An error occurred while executing the task script! Operation aborted.",

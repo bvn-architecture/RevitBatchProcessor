@@ -97,6 +97,12 @@
     <Content Include="Scripts\batch_rvt_util.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\revit_dynamo.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\revit_dynamo_error.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\test_mode_util.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
