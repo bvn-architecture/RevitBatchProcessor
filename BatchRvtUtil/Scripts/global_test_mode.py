@@ -34,9 +34,10 @@ def IsGlobalTestMode():
 def InitializeGlobalTestMode(testModeFolderPath):
   if IsGlobalTestMode():
     raise Exception("ERROR: Global test mode is already initialized!")
-  globalTestMode = test_mode_util.TestMode(testModeFolderPath)
-  globalTestMode.CreateTestModeFolder()
-  GLOBAL_TEST_MODE[0] = globalTestMode
+  if not str.IsNullOrWhiteSpace(testModeFolderPath):
+    globalTestMode = test_mode_util.TestMode(testModeFolderPath)
+    globalTestMode.CreateTestModeFolder()
+    GLOBAL_TEST_MODE[0] = globalTestMode
   return
 
 def ExportSessionId(sessionId):
