@@ -20,8 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Diagnostics;
 using BatchRvtUtil;
 
 namespace BatchRevitDynamo
@@ -51,18 +49,16 @@ namespace BatchRevitDynamo
                 bool openLogFileWhenDone
             )
         {
-            return RunTaskInternal(
+            return BatchRvtTasks.RunTask(
                     taskScriptFilePath,
                     revitFileList, // Input is a list of Revit file paths.
-                    BatchRvt.RevitProcessingOption.BatchRevitFileProcessing,
-                    useRevitVersion,
-                    centralFileOpenOption,
+                    (BatchRvtTasks.UseRevitVersion)useRevitVersion,
+                    (BatchRvt.CentralFileOpenOption)centralFileOpenOption,
                     discardWorksetsOnDetach,
                     deleteLocalAfter,
                     openLogFileWhenDone,
-                    logFolderPath: null,
-                    fileProcessingTimeOutInMinutes: 0,
-                    fallbackToMinimumAvailableRevitVersion: false
+                    taskData: null,
+                    testModeFolderPath: null
                 );
         }
 
@@ -81,23 +77,12 @@ namespace BatchRevitDynamo
                 bool openLogFileWhenDone
             )
         {
-            if (useRevitVersion == UseRevitVersion.RevitFileVersion)
-            {
-                throw new ArgumentException("useRevitVersion argument must specify a specific Revit version!");
-            }
-
-            return RunTaskInternal(
+            return BatchRvtTasks.RunSingleTask(
                     taskScriptFilePath,
-                    null, // Revit File list is N/A for single task processing
-                    BatchRvt.RevitProcessingOption.SingleRevitTaskProcessing,
-                    useRevitVersion,
-                    CentralFileOpenOption.Detach,  // N/A for single task processing
-                    discardWorksetsOnDetach: true, // N/A for single task processing
-                    deleteLocalAfter: true, // N/A for single task processing
-                    openLogFileWhenDone: openLogFileWhenDone,
-                    logFolderPath: null,
-                    fileProcessingTimeOutInMinutes: 0, // N/A for single task processing
-                    fallbackToMinimumAvailableRevitVersion: false
+                    (BatchRvtTasks.UseRevitVersion)useRevitVersion,
+                    openLogFileWhenDone,
+                    taskData: null,
+                    testModeFolderPath: null
                 );
         }
 
@@ -130,18 +115,19 @@ namespace BatchRevitDynamo
                 bool fallbackToMinimumAvailableRevitVersion
             )
         {
-            return RunTaskInternal(
+            return BatchRvtTasks.RunTaskAdvanced(
                     taskScriptFilePath,
-                    revitFileList, // Input is a list of Revit file paths.
-                    BatchRvt.RevitProcessingOption.BatchRevitFileProcessing,
-                    useRevitVersion,
-                    centralFileOpenOption,
+                    revitFileList,
+                    (BatchRvtTasks.UseRevitVersion)useRevitVersion,
+                    (BatchRvt.CentralFileOpenOption)centralFileOpenOption,
                     discardWorksetsOnDetach,
                     deleteLocalAfter,
                     openLogFileWhenDone,
                     logFolderPath,
                     fileProcessingTimeOutInMinutes,
-                    fallbackToMinimumAvailableRevitVersion
+                    fallbackToMinimumAvailableRevitVersion,
+                    taskData: null,
+                    testModeFolderPath: null
                 );
         }
 
@@ -160,16 +146,11 @@ namespace BatchRevitDynamo
                 bool openLogFileWhenDone
             )
         {
-            var batchRvtSettings = new BatchRvtSettings();
-
-            var settingsLoaded = batchRvtSettings.LoadFromFile(settingsFilePath);
-
-            if (!settingsLoaded)
-            {
-                throw new InvalidOperationException("Failed to load settings from the file.");
-            }
-
-            return RunTaskInternal(null, batchRvtSettings, logFolderPath, openLogFileWhenDone);
+            return BatchRvtTasks.RunTaskFromSettingsFile(
+                    settingsFilePath,
+                    logFolderPath,
+                    openLogFileWhenDone
+                );
         }
 
         /// <summary>
@@ -202,161 +183,26 @@ namespace BatchRevitDynamo
                 bool fallbackToMinimumAvailableRevitVersion
             )
         {
-            return RunTaskInternal(
+            return BatchRvtTasks.RunTask(
                     taskScriptFilePath,
                     revitFileListFilePath,
                     BatchRvt.RevitProcessingOption.BatchRevitFileProcessing,
-                    useRevitVersion,
-                    centralFileOpenOption,
+                    (BatchRvtTasks.UseRevitVersion)useRevitVersion,
+                    (BatchRvt.CentralFileOpenOption)centralFileOpenOption,
                     discardWorksetsOnDetach,
                     deleteLocalAfter,
                     openLogFileWhenDone,
                     logFolderPath,
                     fileProcessingTimeOutInMinutes,
-                    fallbackToMinimumAvailableRevitVersion
+                    fallbackToMinimumAvailableRevitVersion,
+                    taskData: null,
+                    testModeFolderPath: null
                 );
         }
 
-        private static string RunTaskInternal(
-                string taskScriptFilePath,
-                object revitFileListInput,
-                BatchRvt.RevitProcessingOption revitProcessingOption,
-                UseRevitVersion useRevitVersion,
-                CentralFileOpenOption centralFileOpenOption,
-                bool discardWorksetsOnDetach,
-                bool deleteLocalAfter,
-                bool openLogFileWhenDone,
-                string logFolderPath,
-                int fileProcessingTimeOutInMinutes,
-                bool fallbackToMinimumAvailableRevitVersion,
-                string taskData = null,
-                string testModeFolderPath = null
-            )
-        {
-            var batchRvtRevitFileProcessingOption = (
-                    useRevitVersion == UseRevitVersion.RevitFileVersion ?
-                    BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable :
-                    BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion
-                );
-
-            // NOTE: can be any version if useRevitVersion is set to RevitFileVersion.
-            var taskRevitVersion = (
-                    useRevitVersion == UseRevitVersion.Revit2015 ?
-                    RevitVersion.SupportedRevitVersion.Revit2015 :
-                    useRevitVersion == UseRevitVersion.Revit2016 ?
-                    RevitVersion.SupportedRevitVersion.Revit2016 :
-                    useRevitVersion == UseRevitVersion.Revit2017 ?
-                    RevitVersion.SupportedRevitVersion.Revit2017 :
-                    RevitVersion.SupportedRevitVersion.Revit2018
-                );
-
-            var batchRvtCentralFileOpenOption = (
-                    centralFileOpenOption == CentralFileOpenOption.CreateNewLocal ?
-                    BatchRvt.CentralFileOpenOption.CreateNewLocal :
-                    BatchRvt.CentralFileOpenOption.Detach
-                );
-
-            var batchRvtSettings = BatchRvtSettings.Create(
-                    taskScriptFilePath,
-                    (revitFileListInput as string) ?? string.Empty,
-                    revitProcessingOption,
-                    batchRvtCentralFileOpenOption,
-                    deleteLocalAfter,
-                    discardWorksetsOnDetach,
-                    BatchRvt.RevitSessionOption.UseSeparateSessionPerFile,
-                    batchRvtRevitFileProcessingOption,
-                    taskRevitVersion,
-                    fileProcessingTimeOutInMinutes,
-                    fallbackToMinimumAvailableRevitVersion
-                );
-
-            return RunTaskInternal(revitFileListInput, batchRvtSettings, logFolderPath, openLogFileWhenDone, taskData, testModeFolderPath);
-        }
-
-        private static string RunTaskInternal(
-                object revitFileListInput,
-                BatchRvtSettings batchRvtSettings,
-                string logFolderPath,
-                bool openLogFileWhenDone,
-                string taskData = null,
-                string testModeFolderPath = null
-            )
-        {
-            var revitFileListFilePath = revitFileListInput as string;
-            var revitFileList = revitFileListInput as IEnumerable<string>;
-
-            if (
-                    batchRvtSettings.RevitProcessingOption.GetValue() == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing
-                    &&
-                    string.IsNullOrWhiteSpace(revitFileListFilePath)
-                    &&
-                    string.IsNullOrWhiteSpace(batchRvtSettings.RevitFileListFilePath.GetValue())
-                    &&
-                    revitFileList == null
-                )
-            {
-                throw new ArgumentNullException("Revit file list parameter cannot be null.");
-            }
-
-            if (revitFileListFilePath != null)
-            {
-                batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListFilePath);
-            }
-
-            batchRvtSettings.SaveToAppDomainData();
-
-            if (revitFileList != null)
-            {
-                BatchRvtSettings.SetAppDomainDataRevitFileList(revitFileList);
-            }
-
-            if (!string.IsNullOrWhiteSpace(logFolderPath))
-            {
-                CommandSettings.SetAppDomainDataLogFolderPath(logFolderPath);
-            }
-
-            if (!string.IsNullOrWhiteSpace(taskData))
-            {
-                CommandSettings.SetAppDomainDataTaskData(taskData);
-            }
-
-            if (!string.IsNullOrWhiteSpace(testModeFolderPath))
-            {
-                CommandSettings.SetAppDomainDataTestModeFolderPath(testModeFolderPath);
-            }
-
-            var batchRvtFolderPath = BatchRvt.GetBatchRvtFolderPath();
-
-            BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
-
-            var logFilePath = BatchRvt.GetAppDomainDataLogFilePath();
-
-            if (!string.IsNullOrWhiteSpace(logFilePath))
-            {
-                var plainTextLogFilePath = Path.Combine(
-                        Path.GetDirectoryName(logFilePath),
-                        Path.GetFileNameWithoutExtension(logFilePath) + ".txt"
-                    );
-
-                File.WriteAllLines(
-                        plainTextLogFilePath,
-                        LogFile.ReadLinesAsPlainText(logFilePath)
-                    );
-
-                logFilePath = plainTextLogFilePath;
-
-                if (openLogFileWhenDone)
-                {
-                    Process.Start(logFilePath);
-                }
-            }
-
-            return logFilePath;
-        }
+        // NOTE: Dynamo scripts are not supported in Revit versions earlier than 2016.
+        public enum UseRevitVersion { RevitFileVersion = 0, Revit2015 = 1, Revit2016 = 2, Revit2017 = 3, Revit2018 = 4 }
+        public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1 }
+        public enum CentralFileOpenOption { Detach = 0, CreateNewLocal = 1 }
     }
-
-    // NOTE: Dynamo scripts are not supported in Revit versions earlier than 2016.
-    public enum UseRevitVersion { RevitFileVersion = 0, Revit2015 = 1, Revit2016 = 2, Revit2017 = 3, Revit2018 = 4 }
-    public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1 }
-    public enum CentralFileOpenOption { Detach = 0, CreateNewLocal = 1 }
 }

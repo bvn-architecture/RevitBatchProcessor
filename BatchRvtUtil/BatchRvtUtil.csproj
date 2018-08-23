@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="BatchRvtSettings.cs" />
     <Compile Include="BatchRvt.cs" />
+    <Compile Include="BatchRvtTasks.cs" />
     <Compile Include="CommandLineUtil.cs" />
     <Compile Include="CommandSettings.cs" />
     <Compile Include="ExcelUtil.cs" />
