@@ -31,10 +31,6 @@ namespace BatchRvtUtil
         public const string TASK_DATA_OPTION = "task_data";
         public const string TEST_MODE_FOLDER_PATH_OPTION = "test_mode_folder_path";
 
-        private const string APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH = "BATCH_RVT_LOG_FOLDER_PATH";
-        private const string APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA = "BATCH_RVT_TASK_DATA";
-        private const string APP_DOMAIN_DATA_PROPERTY_NAME___TEST_MODE_FOLDER_PATH = "BATCH_RVT_TEST_MODE_FOLDER_PATH";
-
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
             new Dictionary<string, Func<string, object>>() {
                 { SETTINGS_FILE_PATH_OPTION, ParseExistingFilePathOptionValue },
@@ -133,46 +129,21 @@ namespace BatchRvtUtil
                 );
         }
 
-        public static string GetAppDomainDataLogFolderPath()
+        public class Data
         {
-            var logFolderPath = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH) as string;
+            // Command line options
+            public string SettingsFilePath = null;
+            public string LogFolderPath = null;
+            public string SessionId = null;
+            public string TaskData = null;
+            public string TestModeFolderPath = null;
 
-            return logFolderPath;
-        }
+            // Programmatic options
+            public BatchRvtSettings Settings = null;
+            public IEnumerable<string> RevitFileList = null;
 
-        public static bool SetAppDomainDataLogFolderPath(string logFolderPath)
-        {
-            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___LOG_FOLDER_PATH, logFolderPath);
-
-            return true;
-        }
-
-        public static string GetAppDomainDataTaskData()
-        {
-            var taskData = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA) as string;
-
-            return taskData;
-        }
-
-        public static bool SetAppDomainDataTaskData(string taskData)
-        {
-            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___TASK_DATA, taskData);
-
-            return true;
-        }
-
-        public static string GetAppDomainDataTestModeFolderPath()
-        {
-            var testModeFolderPath = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA_PROPERTY_NAME___TEST_MODE_FOLDER_PATH) as string;
-
-            return testModeFolderPath;
-        }
-
-        public static bool SetAppDomainDataTestModeFolderPath(string testModeFolderPath)
-        {
-            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA_PROPERTY_NAME___TEST_MODE_FOLDER_PATH, testModeFolderPath);
-
-            return true;
+            // BatchRvt itself will set this to the path of the generated log file.
+            public string GeneratedLogFilePath = null;
         }
     }
 }

@@ -50,8 +50,6 @@ namespace BatchRvtUtil
                 { RevitVersion.SupportedRevitVersion.Revit2018, "BatchRvtAddin2018.addin" },
             };
 
-        private const string APP_DOMAIN_DATA__BATCH_RVT_LOG_FILE_PATH = "BATCH_RVT_LOG_FILE_PATH";
-
         private static string ConstructCommandLineArguments(IEnumerable<KeyValuePair<string, string>> arguments)
         {
             return string.Join(" ", arguments.Select(arg => "--" + arg.Key + " " + arg.Value));
@@ -117,7 +115,10 @@ namespace BatchRvtUtil
             return batchRvtProcess;
         }
 
-        public static void ExecuteMonitorScript(string batchRvtFolderPath)
+        public static void ExecuteMonitorScript(
+                string batchRvtFolderPath,
+                CommandSettings.Data commandSettingsData = null
+            )
         {
             var engine = ScriptUtil.CreatePythonEngine();
 
@@ -141,7 +142,8 @@ namespace BatchRvtUtil
             ScriptUtil.AddBuiltinVariables(
                     engine,
                     new Dictionary<string, object> {
-                        { "__scope__", mainModuleScope }
+                        { "__scope__", mainModuleScope },
+                        { "__command_settings_data__", commandSettingsData }
                     }
                 );
 
@@ -167,18 +169,6 @@ namespace BatchRvtUtil
         public static string GetBatchRvtScriptsFolderPath()
         {
             return Path.Combine(GetBatchRvtFolderPath(), SCRIPTS_FOLDER_NAME);
-        }
-
-        public static bool SetAppDomainDataLogFilePath(string logFilePath)
-        {
-            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__BATCH_RVT_LOG_FILE_PATH, logFilePath);
-
-            return true;
-        }
-
-        public static string GetAppDomainDataLogFilePath()
-        {
-            return AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__BATCH_RVT_LOG_FILE_PATH) as string;
         }
 
         public static bool IsBatchRvtAddinInstalled(RevitVersion.SupportedRevitVersion revitVersion)

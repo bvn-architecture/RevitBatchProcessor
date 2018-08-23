@@ -22,10 +22,9 @@ import clr
 import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
-from System import AppDomain
 from System.IO import File, Directory
 
-import test_mode_util
+import global_test_mode
 import time_util
 import path_util
 import logging_util
@@ -59,6 +58,7 @@ class BatchRvtConfig:
 
     # Revit File List settings
     self.RevitFileListFilePath = None
+    self.RevitFileList = None
 
     # Data Export settings
     self.EnableDataExport = None
@@ -97,10 +97,10 @@ class BatchRvtConfig:
   def ReadRevitFileList(self, output):
     revitFileList = None
     if self.RevitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing:
-      if BatchRvtSettings.IsAppDomainRevitFileListAvailable():
+      if self.RevitFileList is not None:
         output()
         output("Reading Revit File list from object input.")
-        revitFileList = list(revitFilePath for revitFilePath in BatchRvtSettings.GetAppDomainRevitFileList())
+        revitFileList = self.RevitFileList
       else:
         output()
         output("Reading Revit File list:")
@@ -114,7 +114,8 @@ class BatchRvtConfig:
           output("ERROR: Could not read from the Excel Revit File list. An Excel installation was not detected!")
         else:
           revitFileList = revit_file_list.GetRevitFileList(self.RevitFileListFilePath)
-  
+          self.RevitFileList = revitFileList  
+
       if revitFileList is None:
         output()
         output("ERROR: Could not read the Revit File list.")
@@ -297,58 +298,58 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
 
   return aborted
 
-def GetBatchRvtSettings(batchRvtConfig, output):
+def GetBatchRvtSettings(settingsFilePath, output):
   aborted = False
-  if BatchRvtSettings.IsAppDomainDataAvailable():
-    batchRvtSettings = BatchRvtSettings()
-    isSettingsLoaded = batchRvtSettings.LoadFromAppDomainData()
-    if not isSettingsLoaded:
-      output()
-      output("ERROR: Could not load settings from the AppDomain data!")
-      aborted = True
-  elif not File.Exists(batchRvtConfig.SettingsFilePath):
+  batchRvtSettings = None
+  if not File.Exists(settingsFilePath):
     output()
     output("ERROR: No settings file specified or settings file not found.")
     aborted = True
   else:
     batchRvtSettings = BatchRvtSettings()
-    isSettingsLoaded = batchRvtSettings.LoadFromFile(batchRvtConfig.SettingsFilePath)
+    isSettingsLoaded = batchRvtSettings.LoadFromFile(settingsFilePath)
     if not isSettingsLoaded:
       output()
       output("ERROR: Could not load settings from the settings file!")
       aborted = True
   return batchRvtSettings if not aborted else None
 
-def ConfigureBatchRvt(output):
+def ConfigureBatchRvt(commandSettingsData, output):
   aborted = False
   
   batchRvtConfig = BatchRvtConfig()
   
   options = CommandSettings.GetCommandLineOptions()
   
-  batchRvtConfig.SettingsFilePath = options[CommandSettings.SETTINGS_FILE_PATH_OPTION]
-  logFolderPathFromAppDomainData = CommandSettings.GetAppDomainDataLogFolderPath()
-  if logFolderPathFromAppDomainData is not None:
-    batchRvtConfig.LogFolderPath = logFolderPathFromAppDomainData
+  if commandSettingsData is not None:
+    batchRvtConfig.SettingsFilePath = commandSettingsData.SettingsFilePath
+  else:
+    batchRvtConfig.SettingsFilePath = options[CommandSettings.SETTINGS_FILE_PATH_OPTION]
+
+  if commandSettingsData is not None:
+    batchRvtConfig.LogFolderPath = commandSettingsData.LogFolderPath
   else:
     batchRvtConfig.LogFolderPath = options[CommandSettings.LOG_FOLDER_PATH_OPTION]
+
   batchRvtConfig.SessionId = options[CommandSettings.SESSION_ID_OPTION]
-  
+
   batchRvtConfig.SessionId, batchRvtConfig.SessionStartTime = ParseSessionIdAndStartTime(batchRvtConfig.SessionId)
 
-  taskDataFromAppDomainData = CommandSettings.GetAppDomainDataTaskData()
-  if taskDataFromAppDomainData is not None:
-    batchRvtConfig.TaskData = taskDataFromAppDomainData
+  if commandSettingsData is not None:
+    batchRvtConfig.TaskData = commandSettingsData.TaskData
   else:
     batchRvtConfig.TaskData = options[CommandSettings.TASK_DATA_OPTION]
 
   # NOTE: use of output function must occur after the log file initialization
   batchRvtConfig.LogFilePath = InitializeLogging(batchRvtConfig.LogFolderPath, batchRvtConfig.SessionStartTime)
 
-  BatchRvt.SetAppDomainDataLogFilePath(batchRvtConfig.LogFilePath)
+  if commandSettingsData is not None:
+    commandSettingsData.GeneratedLogFilePath = batchRvtConfig.LogFilePath
 
-  testModeFolderPath = CommandSettings.GetAppDomainDataTestModeFolderPath()
-  if str.IsNullOrWhiteSpace(testModeFolderPath):
+  testModeFolderPath = None
+  if commandSettingsData is not None:
+    testModeFolderPath = commandSettingsData.TestModeFolderPath
+  else:
     testModeFolderPath = options[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION]
 
   batchRvtConfig.TestModeFolderPath = (
@@ -356,8 +357,14 @@ def ConfigureBatchRvt(output):
       if not str.IsNullOrWhiteSpace(testModeFolderPath)
       else None
     )
-  test_mode_util.InitializeTestMode(batchRvtConfig.TestModeFolderPath)
-  test_mode_util.ExportSessionId(batchRvtConfig.SessionId)
+  global_test_mode.InitializeGlobalTestMode(batchRvtConfig.TestModeFolderPath)
+
+  if commandSettingsData is not None:
+    if commandSettingsData.RevitFileList is not None:
+      # NOTE: list is constructed here because although the source object is an IEnumerable<string> it may not be a list.
+      batchRvtConfig.RevitFileList = list(revitFilePath for revitFilePath in commandSettingsData.RevitFileList)
+
+  global_test_mode.ExportSessionId(batchRvtConfig.SessionId)
 
   output()
   output("Session ID: " + batchRvtConfig.SessionId)
@@ -375,9 +382,12 @@ def ConfigureBatchRvt(output):
     aborted = True
 
   if not aborted:
-    batchRvtSettings = GetBatchRvtSettings(batchRvtConfig, output)
-    if batchRvtSettings is None:
-      aborted = True
+    if commandSettingsData is not None and commandSettingsData.Settings is not None:
+      batchRvtSettings = commandSettingsData.Settings
+    else:
+      batchRvtSettings = GetBatchRvtSettings(batchRvtConfig.SettingsFilePath, output)
+      if batchRvtSettings is None:
+        aborted = True
 
   if not aborted:
     aborted = ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output)

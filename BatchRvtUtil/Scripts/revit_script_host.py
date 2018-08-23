@@ -28,7 +28,7 @@ clr.AddReference("System.Windows.Forms")
 from System.Windows.Forms import Application
 from System.IO import File
 
-import test_mode_util
+import global_test_mode
 import thread_util
 import script_environment
 import client_util
@@ -351,7 +351,7 @@ def Main():
   progressNumber = script_environment.GetProgressNumber(environmentVariables)
   batchRvtProcessUniqueId = script_environment.GetBatchRvtProcessUniqueId(environmentVariables)
   testModeFolderPath = script_environment.GetTestModeFolderPath(environmentVariables)
-  test_mode_util.InitializeTestMode(testModeFolderPath)
+  global_test_mode.InitializeGlobalTestMode(testModeFolderPath)
 
   if outputPipeHandleString is not None and scriptFilePath is not None:
 

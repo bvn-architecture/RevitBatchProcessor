@@ -32,9 +32,6 @@ namespace BatchRvtUtil
         public const string BATCHRVTGUI_SETTINGS_FILENAME = "BatchRvtGui.Settings" + SETTINGS_FILE_EXTENSION;
         public const string BATCHRVT_SETTINGS_FILENAME = "BatchRvt.Settings" + SETTINGS_FILE_EXTENSION;
 
-        private const string APP_DOMAIN_DATA__BATCH_RVT_SETTINGS = "BATCH_RVT_SETTINGS_OBJECT";
-        private const string APP_DOMAIN_DATA__REVIT_FILE_LIST = "REVIT_FILE_LIST";
-
         private readonly PersistentSettings persistentSettings;
 
         // General Task Script settings
@@ -119,65 +116,30 @@ namespace BatchRvtUtil
             this.persistentSettings.Store(jobject);
         }
 
-        public static bool IsAppDomainDataAvailable()
-        {
-            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__BATCH_RVT_SETTINGS) as JObject;
-
-            return (jobject != null);
-        }
-
-        public static bool IsAppDomainRevitFileListAvailable()
-        {
-            var revitFileList = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__REVIT_FILE_LIST) as IEnumerable<string>;
-
-            return (revitFileList != null);
-        }
-
-        public static bool SetAppDomainDataRevitFileList(IEnumerable<string> revitFileList)
-        {
-            AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__REVIT_FILE_LIST, revitFileList.ToList());
-
-            return true;
-        }
-
-        public static IEnumerable<string> GetAppDomainRevitFileList()
-        {
-            return AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__REVIT_FILE_LIST) as IEnumerable<string>;
-        }
-
-        public bool LoadFromAppDomainData()
+        public bool TryLoad(JObject jobject)
         {
             bool success = false;
 
-            var jobject = AppDomain.CurrentDomain.GetData(APP_DOMAIN_DATA__BATCH_RVT_SETTINGS) as JObject;
-
-            if (jobject != null)
+            try
             {
-                try
-                {
-                   this.Load(jobject);
-                    success = true;
-                }
-                catch (Exception e)
-                {
-                    success = false;
-                }
+                this.Load(jobject);
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
             }
 
             return success;
         }
 
-        public bool SaveToAppDomainData()
+        public bool TryStore(JObject jobject)
         {
             bool success = false;
-
-            var jobject = new JObject();
 
             try
             {
                 this.Store(jobject);
-                AppDomain.CurrentDomain.SetData(APP_DOMAIN_DATA__BATCH_RVT_SETTINGS, jobject);
-
                 success = true;
             }
             catch (Exception e)

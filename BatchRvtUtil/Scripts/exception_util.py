@@ -22,7 +22,7 @@ import clr
 import System
 from System.Text import StringBuilder
 
-import test_mode_util
+import global_test_mode
 import exceptions
 
 EXCEPTION_MESSAGE_HANDLER_PREFIX = "[ EXCEPTION MESSAGE ]"
@@ -50,7 +50,7 @@ def GetClrException(exception):
     )
 
 def LogOutputErrorDetails(exception, output_, verbose=True):
-  output = test_mode_util.PrefixedOutputForTestMode(output_, EXCEPTION_MESSAGE_HANDLER_PREFIX)
+  output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, EXCEPTION_MESSAGE_HANDLER_PREFIX)
   exceptionMessage = (
       str(exception.message) if isinstance(exception, exceptions.Exception)
       else

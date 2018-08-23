@@ -30,7 +30,7 @@ clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 from Autodesk.Revit.DB.Events import FailuresProcessingEventArgs
 
-import test_mode_util
+import global_test_mode
 import exception_util
 
 REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX = "[ REVIT WARNINGS HANDLER ]"
@@ -160,7 +160,7 @@ def FailuresProcessingEventHandler(sender, args, output):
   return
 
 def WithFailuresProcessingHandler(app, action, output_):
-  output = test_mode_util.PrefixedOutputForTestMode(output_, REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX)
+  output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX)
   result = None
   failuresProcessingEventHandler = (
       EventHandler[FailuresProcessingEventArgs](

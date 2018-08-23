@@ -25,7 +25,7 @@ clr.ImportExtensions(System.Linq)
 
 from System.IO import File
 
-import test_mode_util
+import global_test_mode
 import server_util
 import stream_io_util
 import revit_process_host
@@ -142,7 +142,7 @@ def RunScriptedRevitSession(
 
       hostRevitProcessId = hostRevitProcess.Id
 
-      test_mode_util.ExportRevitProcessId(hostRevitProcessId)
+      global_test_mode.ExportRevitProcessId(hostRevitProcessId)
 
       snapshotDataFilePaths = [
           snapshot_data_util.GetSnapshotDataFilePath(scriptData.DataExportFolderPath.GetValue())

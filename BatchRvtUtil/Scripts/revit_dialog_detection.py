@@ -24,7 +24,7 @@ import System
 import win32_user32
 import ui_automation_util
 import script_host_error
-import test_mode_util
+import global_test_mode
 
 REVIT_DIALOG_MESSAGE_HANDLER_PREFIX = "[ REVIT DIALOG BOX HANDLER ]"
 
@@ -118,7 +118,7 @@ def DismissRevitDialogBox(title, buttons, targetButtonText, output):
   return
 
 def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
-  output = test_mode_util.PrefixedOutputForTestMode(output_, REVIT_DIALOG_MESSAGE_HANDLER_PREFIX)
+  output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, REVIT_DIALOG_MESSAGE_HANDLER_PREFIX)
   enabledDialogs = ui_automation_util.GetEnabledDialogsInfo(revitProcessId)
   if len(enabledDialogs) > 0:
     for enabledDialog in enabledDialogs:

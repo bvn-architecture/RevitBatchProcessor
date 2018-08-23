@@ -23,7 +23,6 @@ import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
-from System import AppDomain
 from System.IO import Path
 
 import path_util
@@ -424,10 +423,20 @@ def RunBatchRevitTasks(batchRvtConfig):
 
   return aborted
 
+def TryGetCommandSettingsData():
+  commandSettingsData = None
+  try:
+    commandSettingsData = __command_settings_data__
+  except NameError, e:
+    pass
+  return commandSettingsData
+
 def Main():
   aborted = False
 
-  batchRvtConfig = batch_rvt_config.ConfigureBatchRvt(Output)
+  commandSettingsData = TryGetCommandSettingsData()
+
+  batchRvtConfig = batch_rvt_config.ConfigureBatchRvt(commandSettingsData, Output)
 
   if batchRvtConfig is None:
     aborted = True
