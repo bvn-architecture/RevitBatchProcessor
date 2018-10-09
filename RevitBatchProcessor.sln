@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2018", "BatchR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRevitDynamo", "BatchRevitDynamo\BatchRevitDynamo.csproj", "{B2FED296-9EA0-41DD-BB2F-951D481F527B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2019", "BatchRvtAddin2019\BatchRvtAddin2019.csproj", "{62F91AA6-AC57-451E-A91C-719D5846D247}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -73,8 +75,15 @@ Global
 		{B2FED296-9EA0-41DD-BB2F-951D481F527B}.Debug|x64.Build.0 = Debug|x64
 		{B2FED296-9EA0-41DD-BB2F-951D481F527B}.Release|x64.ActiveCfg = Release|x64
 		{B2FED296-9EA0-41DD-BB2F-951D481F527B}.Release|x64.Build.0 = Release|x64
+		{62F91AA6-AC57-451E-A91C-719D5846D247}.Debug|x64.ActiveCfg = Debug|x64
+		{62F91AA6-AC57-451E-A91C-719D5846D247}.Debug|x64.Build.0 = Debug|x64
+		{62F91AA6-AC57-451E-A91C-719D5846D247}.Release|x64.ActiveCfg = Release|x64
+		{62F91AA6-AC57-451E-A91C-719D5846D247}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D981AC6-C42D-4297-9B98-43CD6A4C78A3}
 	EndGlobalSection
 EndGlobal
