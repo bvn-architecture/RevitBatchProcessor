@@ -119,6 +119,7 @@ REVIT_VERSION_TEXT_PREFIXES_2015 = ["Autodesk Revit 2015", "Autodesk Revit Archi
 REVIT_VERSION_TEXT_PREFIXES_2016 = ["Autodesk Revit 2016", "Autodesk Revit Architecture 2016"]
 REVIT_VERSION_TEXT_PREFIX_2017 = "Autodesk Revit 2017"
 REVIT_VERSION_TEXT_PREFIX_2018 = "Autodesk Revit 2018"
+REVIT_VERSION_TEXT_PREFIX_2019 = "Autodesk Revit 2019"
 
 class SupportedRevitFileInfo():
   def __init__(self, revitFilePath):
@@ -134,6 +135,8 @@ class SupportedRevitFileInfo():
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2017
       elif revitVersionText.StartsWith(REVIT_VERSION_TEXT_PREFIX_2018):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2018
+      elif revitVersionText.StartsWith(REVIT_VERSION_TEXT_PREFIX_2019):
+        revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2019
     self.revitVersionNumber = revitVersionNumber
     return
 

@@ -48,6 +48,7 @@ namespace BatchRvtUtil
                 { RevitVersion.SupportedRevitVersion.Revit2016, "BatchRvtAddin2016.addin" },
                 { RevitVersion.SupportedRevitVersion.Revit2017, "BatchRvtAddin2017.addin" },
                 { RevitVersion.SupportedRevitVersion.Revit2018, "BatchRvtAddin2018.addin" },
+                { RevitVersion.SupportedRevitVersion.Revit2019, "BatchRvtAddin2019.addin" }
             };
 
         private static string ConstructCommandLineArguments(IEnumerable<KeyValuePair<string, string>> arguments)
