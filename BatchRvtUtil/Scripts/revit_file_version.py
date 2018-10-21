@@ -104,8 +104,8 @@ def GetRevitFileVersionInfoText(revitFilePath):
   revitVersionInfoText = str.Empty
   bytes = GetBasicFileInfoBytes(revitFilePath)
   asciiString = Encoding.ASCII.GetString(bytes)
-  TEXT_MARKER = '\r\n'
-  TEXT_MARKER_ALT = '\x04\r\x00\n\x00'
+  TEXT_MARKER = '\r\n' # Most common delimiter around the text section.
+  TEXT_MARKER_ALT = '\x04\r\x00\n\x00' # Alternative delimiter (occasionally encountered... not sure why though).
   textMarker = TEXT_MARKER
   textMarkerIndices = util.FindAllIndicesOf(asciiString, textMarker)
   numberOfTextMarkerIndices = len(textMarkerIndices)
