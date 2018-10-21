@@ -84,7 +84,7 @@ def ReadAllBytes(stream):
   readCount = stream.Read(buffer, 0, length)
   return buffer.Take(readCount).ToArray()
 
-def GetRevitVersionText(revitFilePath):
+def GetRevitVersionText_OldMethod(revitFilePath):
   storageRoot = GetStorageRoot(revitFilePath)
   stream = GetBasicFileInfoStream(storageRoot)
   bytes = ReadAllBytes(stream)
@@ -167,9 +167,9 @@ def ExtractRevitVersionInfoFromText(revitVersionInfoText):
     revitVersionDescription = revitBuildLineText.Trim()
   return revitVersionDescription
 
-def ExtractRevitVersionDescription(revitFilePath):
+def GetRevitVersionText(revitFilePath):
   revitVersionInfoText = TryGetRevitFileVersionInfoText(revitFilePath)
-  revitVersionDescription = ExtractRevitVersionInfoFromText(revitVersionInfoText)
-  return revitVersionDescription
+  revitVersionText = ExtractRevitVersionInfoFromText(revitVersionInfoText)
+  return revitVersionText
 
 
