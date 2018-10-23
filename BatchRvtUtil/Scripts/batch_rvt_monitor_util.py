@@ -55,7 +55,7 @@ def ShowSupportedRevitFileInfo(supportedRevitFileInfo, output):
   output("\t" + "File size: " + fileSizeText)
   if fileExists:
     revitVersionText = revitFileInfo.TryGetRevitVersionText()
-    revitVersionText = revitVersionText if revitVersionText is not None else "NOT DETECTED!"
+    revitVersionText = revitVersionText if not str.IsNullOrWhiteSpace(revitVersionText) else "NOT DETECTED!"
     output("\t" + "Revit version: " + revitVersionText)
   return
 

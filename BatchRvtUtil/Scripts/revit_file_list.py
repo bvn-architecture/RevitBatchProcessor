@@ -137,7 +137,7 @@ class SupportedRevitFileInfo():
     self.revitFileInfo = RevitFileInfo(revitFilePath)
     revitVersionText = self.revitFileInfo.TryGetRevitVersionText()
     revitVersionNumber = None
-    if revitVersionText is not None:
+    if not str.IsNullOrWhiteSpace(revitVersionText):
       if any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2015):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2015
       elif any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2016):
