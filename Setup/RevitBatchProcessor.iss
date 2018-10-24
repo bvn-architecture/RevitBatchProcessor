@@ -25,6 +25,8 @@ Source: "..\BatchRvtAddin2017\bin\x64\Release\*"; DestDir: "{userappdata}\Autode
 Source: "..\BatchRvtAddin2017\BatchRvtAddin2017.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2017"; Flags: ignoreversion
 Source: "..\BatchRvtAddin2018\bin\x64\Release\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2018\BatchRvt"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\BatchRvtAddin2018\BatchRvtAddin2018.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2018"; Flags: ignoreversion
+Source: "..\BatchRvtAddin2019\bin\x64\Release\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2019\BatchRvt"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\BatchRvtAddin2019\BatchRvtAddin2019.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2019"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Revit Batch Processor (GUI)"; Filename: "{app}\BatchRvtGUI.exe"; WorkingDir: "{app}"
