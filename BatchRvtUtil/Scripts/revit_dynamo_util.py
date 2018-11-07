@@ -20,15 +20,22 @@ DYNAMO_RUNTYPE_AUTOMATIC = "Automatic"
 DYNAMO_RUNTYPE_MANUAL = "Manual"
 DYNAMO_WORKSPACE_NODE = "Workspace"
 DYNAMO_RUNTYPE_ATTRIBUTE = "RunType"
+DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE = "HasRunWithoutCrash"
+DYNAMO_ATTRIBUTE_VALUE_TRUE = "True"
+DYNAMO_ATTRIBUTE_VALUE_FALSE = "False"
 
 def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
   prevRunType = None
   doc = XmlDocument()
   try:
     doc.Load(dynamoScriptFilePath)
-    dynamoRunTypeAttribute = doc[DYNAMO_WORKSPACE_NODE].Attributes[DYNAMO_RUNTYPE_ATTRIBUTE]
+    dynamoWorkspaceNode = doc[DYNAMO_WORKSPACE_NODE]
+    dynamoRunTypeAttribute = dynamoWorkspaceNode.Attributes[DYNAMO_RUNTYPE_ATTRIBUTE]
     prevRunType = dynamoRunTypeAttribute.Value
     dynamoRunTypeAttribute.Value = runType
+    dynamoHasRunWithoutCrashAttribute = dynamoWorkspaceNode.Attributes[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE]
+    if dynamoHasRunWithoutCrashAttribute is not None:
+      dynamoHasRunWithoutCrashAttribute.Value = DYNAMO_ATTRIBUTE_VALUE_TRUE
     doc.Save(dynamoScriptFilePath)
   except Exception, e:
     prevRunType = None
@@ -44,6 +51,17 @@ def GetDynamoScriptRunType(dynamoScriptFilePath):
     runType = None
   return runType
 
+def GetDynamoScriptHasRunWithoutCrash(dynamoScriptFilePath):
+  hasRunWithoutCrash = None
+  doc = XmlDocument()
+  try:
+    doc.Load(dynamoScriptFilePath)
+    dynamoWorkspaceNode = doc[DYNAMO_WORKSPACE_NODE]
+    hasRunWithoutCrash = dynamoWorkspaceNode.Attributes[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE].Value
+  except Exception, e:
+    hasRunWithoutCrash = None
+  return hasRunWithoutCrash
+
 # NOTE: Dynamo requires an active UIDocument! The document must be active before executing this function.
 #       The Dynamo script must have been saved with the 'Automatic' run mode!
 def ExecuteDynamoScriptInternal(uiapp, dynamoScriptFilePath, showUI=False):
@@ -55,6 +73,13 @@ def ExecuteDynamoScriptInternal(uiapp, dynamoScriptFilePath, showUI=False):
         "The Dynamo script has Run mode set to '" + dynamoScriptRunType + "'. " +
         "It must be set to '" + DYNAMO_RUNTYPE_AUTOMATIC + "' in order for Dynamo script automation to work."
       )
+  hasRunWithoutCrash = GetDynamoScriptHasRunWithoutCrash(dynamoScriptFilePath)
+  if hasRunWithoutCrash is not None:
+    if hasRunWithoutCrash != DYNAMO_ATTRIBUTE_VALUE_TRUE:
+      raise Exception(
+          "The Dynamo script has attribute '" + DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE + "' set to '" + hasRunWithoutCrash + "'. " +
+          "It must be set to '" + DYNAMO_ATTRIBUTE_VALUE_TRUE + "' in order for Dynamo script automation to work."
+        )
   revitVersionNumber = uiapp.Application.VersionNumber
   if revitVersionNumber == "2015":
     raise Exception("Automation of Dynamo scripts is not supported in Revit 2015!")
