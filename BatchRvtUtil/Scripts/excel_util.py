@@ -170,11 +170,19 @@ def WithNewExcelWorkbook(workbookAction, saveChanges=False):
   result = WithExcelApp(excelAppAction)
   return result
 
-def ReadRowsTextFromWorkbook(excelFilePath):
+def ReadRowsTextFromWorkbook(excelFilePath, worksheetName=None):
   def excelWorkbookAction(workbook):
-    worksheet = workbook.Worksheets[1]
+    worksheet = workbook.Worksheets[worksheetName] if worksheetName is not None else workbook.Worksheets[1]
     rows = ReadRowsTextFromWorksheet(worksheet)
     return rows
   rows = WithExcelWorkbook(excelFilePath, excelWorkbookAction)
   return rows
+
+def WriteRowsTextToWorkbook(excelFilePath, rows, worksheetName=None):
+  def excelWorkbookAction(workbook):
+    worksheet = workbook.Worksheets[worksheetName] if worksheetName is not None else workbook.Worksheets[1]
+    WriteRowsToWorksheet(worksheet, rows)
+    return
+  WithExcelWorkbook(excelFilePath, excelWorkbookAction, saveChanges=True)
+  return
 
