@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
+using System.IO;
 using WinForms = System.Windows.Forms;
 
 using Autodesk.Revit.UI;
@@ -39,7 +40,7 @@ namespace BatchRvt.Addin.Revit2019
     {
         private static void SetupBatchScriptHost(ControlledApplication controlledApplication)
         {
-            var pluginFolderPath = typeof(BatchRvtAddinApplication).Assembly.Location;
+            var pluginFolderPath = Path.GetDirectoryName(typeof(BatchRvtAddinApplication).Assembly.Location);
 
             var batchRvtExternalEventHandler = new BatchRvtExternalEventHandler(pluginFolderPath);
 
