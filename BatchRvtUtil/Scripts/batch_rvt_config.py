@@ -33,7 +33,7 @@ import session_data_util
 import revit_file_list
 import batch_rvt_util
 import script_util
-from batch_rvt_util import CommandSettings, BatchRvtSettings, BatchRvt, RevitVersion
+from batch_rvt_util import CommandSettings, CommandLineUtil, BatchRvtSettings, BatchRvt, RevitVersion
 
 LOG_NAME = "BatchRvt"
 
@@ -373,6 +373,21 @@ def ConfigureBatchRvt(commandSettingsData, output):
   output("Log File:")
   output()
   output("\t" + batchRvtConfig.LogFilePath)
+
+  haveHelpOption = options[CommandSettings.HELP_OPTION]
+  if not CommandLineUtil.HaveArguments() or haveHelpOption:
+    output()
+    output("Help:")
+    output()
+    output("\t" + "Usage:")
+    output()
+    output("\t\t" + "BatchRvt.exe --settings_file <SETTINGS FILE PATH> [--log_folder <LOG FOLDER PATH>]")
+    output()
+    output("\t" + "Example:")
+    output()
+    output("\t\t" + "BatchRvt.exe --settings_file BatchRvt.Settings.json --log_folder .")
+
+    aborted = True
 
   if (not RevitVersion.GetInstalledRevitVersions().Any()):
     output()

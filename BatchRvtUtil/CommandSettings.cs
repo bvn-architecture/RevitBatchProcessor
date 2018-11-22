@@ -30,6 +30,7 @@ namespace BatchRvtUtil
         public const string SESSION_ID_OPTION = "session_id";
         public const string TASK_DATA_OPTION = "task_data";
         public const string TEST_MODE_FOLDER_PATH_OPTION = "test_mode_folder_path";
+        public const string HELP_OPTION = "help";
 
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
             new Dictionary<string, Func<string, object>>() {
@@ -37,7 +38,8 @@ namespace BatchRvtUtil
                 { LOG_FOLDER_PATH_OPTION, ParseExistingFolderPathOptionValue },
                 { SESSION_ID_OPTION, ParseTextOptionValue },
                 { TASK_DATA_OPTION, ParseTextOptionValue },
-                { TEST_MODE_FOLDER_PATH_OPTION, ParseTextOptionValue }
+                { TEST_MODE_FOLDER_PATH_OPTION, ParseTextOptionValue },
+                { HELP_OPTION, null }
             };
 
         public static string ParseTextOptionValue(string textOptionValue)
