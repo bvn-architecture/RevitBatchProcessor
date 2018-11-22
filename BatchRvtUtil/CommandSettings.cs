@@ -125,7 +125,11 @@ namespace BatchRvtUtil
                     kv => new { Option = kv.Key, Parser = kv.Value }
                 ).ToDictionary(
                     optionAndValue => optionAndValue.Option,
-                    optionAndValue => optionAndValue.Parser(CommandLineUtil.GetCommandLineOption(optionAndValue.Option))
+                    optionAndValue => (
+                        (optionAndValue.Parser != null) ?
+                        optionAndValue.Parser(CommandLineUtil.GetCommandLineOption(optionAndValue.Option, expectOptionValue: true)) :
+                        CommandLineUtil.HasCommandLineOption(optionAndValue.Option, expectOptionValue: false)
+                    )
                 );
         }
 
