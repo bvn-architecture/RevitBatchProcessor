@@ -25,23 +25,72 @@ namespace BatchRvtUtil
 {
     public static class CommandLineUtil
     {
-        public static string GetCommandLineOption(string optionSwitch)
+        public const string OptionSwitchPrefix = "--";
+
+        private static int FindArgOptionSwitch(string[] args, string optionSwitch)
+        {
+            return Array.FindIndex(args, 1, arg => arg.ToLower() == (OptionSwitchPrefix + optionSwitch.ToLower()));
+        }
+
+        private static string GetArgOptionValue(string [] args, string optionSwitch)
         {
             string optionValue = null;
-            
-            var args = Environment.GetCommandLineArgs();
 
-            if (args.Length > 1)
+            int optionSwitchIndex = FindArgOptionSwitch(args, optionSwitch);
+
+            if (optionSwitchIndex != -1)
             {
-                var optionSwitchIndex = Array.FindIndex(args, 1, arg => arg.ToLower() == ("--" + optionSwitch.ToLower()));
-    
-                if (optionSwitchIndex != -1 && (optionSwitchIndex + 1) < args.Length)
+                if ((optionSwitchIndex + 1) < args.Length)
                 {
                     optionValue = args[optionSwitchIndex + 1];
+
+                    if (optionValue.StartsWith(OptionSwitchPrefix))
+                    {
+                        optionValue = null;
+                    }
                 }
             }
 
             return optionValue;
+        }
+
+        public static bool HaveArguments()
+        {
+            var args = Environment.GetCommandLineArgs();
+
+            return (args.Length > 1);
+        }
+
+        public static string GetCommandLineOption(string optionSwitch, bool expectOptionValue = true)
+        {
+            string optionValue = null;
+
+            var args = Environment.GetCommandLineArgs();
+
+            if (args.Length > 1)
+            {
+                var optionSwitchIndex = FindArgOptionSwitch(args, optionSwitch);
+
+                if (optionSwitchIndex != -1)
+                {
+                    if (expectOptionValue)
+                    {
+                        optionValue = GetArgOptionValue(args, optionSwitch);
+                    }
+                    else
+                    {
+                        optionValue = string.Empty; // Indicates a value-less option exists.
+                    }
+
+                }
+            }
+
+            return optionValue;
+        }
+
+        public static bool HasCommandLineOption(string optionSwitch, bool expectOptionValue = true)
+        {
+            return GetCommandLineOption(optionSwitch, expectOptionValue) != null;
         }
     }
 }
