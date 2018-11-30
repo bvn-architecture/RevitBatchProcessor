@@ -30,6 +30,9 @@ namespace BatchRvtUtil
         public const string SESSION_ID_OPTION = "session_id";
         public const string TASK_DATA_OPTION = "task_data";
         public const string TEST_MODE_FOLDER_PATH_OPTION = "test_mode_folder_path";
+        public const string REVIT_FILE_LIST_OPTION = "file_list";
+        public const string REVIT_VERSION_OPTION = "revit_version";
+        public const string TASK_SCRIPT_FILE_PATH_OPTION = "task_script";
         public const string HELP_OPTION = "help";
 
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
@@ -39,6 +42,9 @@ namespace BatchRvtUtil
                 { SESSION_ID_OPTION, ParseTextOptionValue },
                 { TASK_DATA_OPTION, ParseTextOptionValue },
                 { TEST_MODE_FOLDER_PATH_OPTION, ParseTextOptionValue },
+                { REVIT_VERSION_OPTION, ParseRevitVersionOptionValue },
+                { REVIT_FILE_LIST_OPTION, ParseExistingFilePathOptionValue },
+                { TASK_SCRIPT_FILE_PATH_OPTION, ParseExistingFilePathOptionValue },
                 { HELP_OPTION, null }
             };
 

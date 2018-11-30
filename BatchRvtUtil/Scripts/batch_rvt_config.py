@@ -389,6 +389,44 @@ def ConfigureBatchRvt(commandSettingsData, output):
 
     aborted = True
 
+  revitVersionOption = None
+  if not aborted:  
+    if CommandLineUtil.HasCommandLineOption(CommandSettings.REVIT_VERSION_OPTION, False):
+      revitVersionOption = options[CommandSettings.REVIT_VERSION_OPTION]
+      if revitVersionOption is not None:
+        output()
+        output("Using specific Revit version: " + revitVersionOption)
+      else:
+        output()
+        output("Invalid value for " + CommandLineUtil.OptionSwitchPrefix + CommandSettings.REVIT_VERSION_OPTION + " option!")
+        aborted = True
+
+  revitFileListOption = None
+  if not aborted:
+    if CommandLineUtil.HasCommandLineOption(CommandSettings.REVIT_FILE_LIST_OPTION):
+      revitFileListOption = options[CommandSettings.REVIT_FILE_LIST_OPTION]
+      if revitFileListOption is None:
+        output()
+        output("ERROR: Revit file list not found.")
+        aborted = True
+    elif CommandLineUtil.HasCommandLineOption(CommandSettings.REVIT_FILE_LIST_OPTION, False):
+      output()
+      output("ERROR: Missing Revit file list option value!")
+      aborted = True
+
+  taskScriptFilePathOption = None
+  if not aborted:
+    if CommandLineUtil.HasCommandLineOption(CommandSettings.TASK_SCRIPT_FILE_PATH_OPTION):
+      taskScriptFilePathOption = options[CommandSettings.TASK_SCRIPT_FILE_PATH_OPTION]
+      if taskScriptFilePathOption is None:
+        output()
+        output("ERROR: Task script file not found.")
+        aborted = True
+    elif CommandLineUtil.HasCommandLineOption(CommandSettings.TASK_SCRIPT_FILE_PATH_OPTION, False):
+      output()
+      output("ERROR: Missing Task script file option value!")
+      aborted = True
+
   if (not RevitVersion.GetInstalledRevitVersions().Any()):
     output()
     output("ERROR: Could not detect the BatchRvt addin for any version of Revit installed on this machine!")
@@ -399,12 +437,31 @@ def ConfigureBatchRvt(commandSettingsData, output):
   if not aborted:
     if commandSettingsData is not None and commandSettingsData.Settings is not None:
       batchRvtSettings = commandSettingsData.Settings
-    else:
+    elif batchRvtConfig.SettingsFilePath is not None:
       batchRvtSettings = GetBatchRvtSettings(batchRvtConfig.SettingsFilePath, output)
       if batchRvtSettings is None:
         aborted = True
+    elif revitFileListOption is not None and taskScriptFilePathOption is not None:
+      # Initialize appropriate defaults for non-settings-file mode.
+      batchRvtSettings = BatchRvtSettings()
+      batchRvtSettings.CentralFileOpenOption.SetValue(BatchRvt.CentralFileOpenOption.Detach) # TODO: make this a command line option too?
+      batchRvtSettings.RevitProcessingOption.SetValue(BatchRvt.RevitProcessingOption.BatchRevitFileProcessing)
+      batchRvtSettings.RevitSessionOption.SetValue(BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion) # TODO: reconsider default?
+      batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable)
+      batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(False) # TODO: reconsider default?
+    else:
+      output()
+      output("ERROR: No settings file specified or settings file not found.")
+      aborted = True
 
   if not aborted:
+    if revitVersionOption is not None:
+      batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion)
+      batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(RevitVersion.GetSupportedRevitVersion(revitVersionOption))
+    if revitFileListOption is not None:
+      batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListOption)
+    if taskScriptFilePathOption is not None:
+      batchRvtSettings.TaskScriptFilePath.SetValue(taskScriptFilePathOption)
     aborted = ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output)
 
   return batchRvtConfig if not aborted else None
