@@ -5,7 +5,7 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 ## Latest version
 
-[Installer for Revit Batch Processor v1.4](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.1/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.4.1](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.1/RevitBatchProcessorSetup.exe)
 
 ***Now supports Revit 2019!***
 
@@ -49,7 +49,7 @@ This tool enables you to do things with Revit files on a very large scale. Becau
 
 ## Installer
 
-[Installer for Revit Batch Processor v1.4](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.1/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.4.1](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.1/RevitBatchProcessorSetup.exe)
 
 The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
 
