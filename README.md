@@ -154,6 +154,14 @@ Optionally you can also specify the location for the log file:
 %LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --log_folder "C:\MyBatchTasks\Logs" --settings_file "C:\MyBatchTasks\BatchRvt.Settings.json"
 ```
 
+Alternatively, RBP can be run in batch processing mode without a settings file, using some basic arguments:
+
+```
+%LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx --revit_version 2018
+```
+
+NOTE: this mode will operate in Detach mode when processing Central files. The **--revit_version** argument is optional here---if it is omitted then RBP will use the version of Revit that each Revit file was saved in.
+
 # Contribute
 
 Feedback and suggestions for improvement are more than welcome! Please track and submit bugs via the Github Issues page. If you're feeling particularly adventurous you may even submit your own code via a Github pull request.
