@@ -150,8 +150,16 @@ def WithExceptionLogging(action, output):
     raise
   return result
 
+def GetWorksharingCentralModelPath(doc):
+  centralModelPath = None
+  try:
+    centralModelPath = doc.GetWorksharingCentralModelPath()
+  except InvalidOperationException, e:
+    centralModelPath = None
+  return centralModelPath
+
 def GetCentralModelFilePath(doc):
-  modelPath = doc.GetWorksharingCentralModelPath()
+  modelPath = GetWorksharingCentralModelPath(doc)
   filePath = (
       ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
       if modelPath is not None else
