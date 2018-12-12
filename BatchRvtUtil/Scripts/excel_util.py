@@ -154,7 +154,7 @@ def WithExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
   result = WithExcelApp(excelAppAction)
   return result
 
-def WithNewExcelWorkbook(workbookAction, saveChanges=False):
+def WithNewExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
   result = None
   def excelAppAction(app):
     result = None
@@ -165,6 +165,8 @@ def WithNewExcelWorkbook(workbookAction, saveChanges=False):
       result = workbookAction(workbook)
     finally:
       if workbook is not None:
+        if saveChanges:
+          workbook.SaveAs(excelFilePath)
         workbook.Close(saveChanges)
     return result
   result = WithExcelApp(excelAppAction)
@@ -186,3 +188,13 @@ def WriteRowsTextToWorkbook(excelFilePath, rows, worksheetName=None):
   WithExcelWorkbook(excelFilePath, excelWorkbookAction, saveChanges=True)
   return
 
+def WriteRowsTextToNewWorkbook(excelFilePath, rows, worksheetName=None):
+  def excelWorkbookAction(workbook):
+    newWorksheetName = "Sheet1" if worksheetName is None else worksheetName
+    workbook.Worksheets.Add()
+    worksheet = workbook.Worksheets[1]
+    worksheet.Name = newWorksheetName
+    WriteRowsToWorksheet(worksheet, rows)
+    return
+  WithNewExcelWorkbook(excelFilePath, excelWorkbookAction, saveChanges=True)
+  return
