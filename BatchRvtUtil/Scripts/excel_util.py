@@ -76,10 +76,17 @@ def GetLastUsedColumnNumber(range):
 
 def WriteRowsToWorksheet(worksheet, rows):
   for rowIndex, row in enumerate(rows):
-    excelRow = worksheet.Rows[rowIndex + 1]
+    excelRows = worksheet.Rows
+    excelRow = excelRows[rowIndex + 1]
     excelRow.NumberFormat = "@" # Set type to 'Text'
     for cellIndex, cellValue in enumerate(row):
-      excelRow.Cells[cellIndex + 1].Value2 = cellValue
+      cells = excelRow.Cells
+      cell = cells[cellIndex + 1]
+      cell.Value2 = cellValue
+      Marshal.FinalReleaseComObject(cell)
+      Marshal.FinalReleaseComObject(cells)
+    Marshal.FinalReleaseComObject(excelRow)
+    Marshal.FinalReleaseComObject(excelRows)
   return
 
 def ReadRowsFromWorksheet(worksheet):
@@ -136,12 +143,14 @@ def WithExcelApp(excelAppAction):
     app.DisplayAlerts = True
     app.ScreenUpdating = True
     app.Quit()
+    Marshal.FinalReleaseComObject(app)
   return result
 
 def WithExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
   result = None
   def excelAppAction(app):
     result = None
+    workbooks = None
     workbook = None
     try:
       workbooks = app.Workbooks
@@ -150,6 +159,9 @@ def WithExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
     finally:
       if workbook is not None:
         workbook.Close(saveChanges)
+        Marshal.FinalReleaseComObject(workbook)
+      if workbooks is not None:
+        Marshal.FinalReleaseComObject(workbooks)
     return result
   result = WithExcelApp(excelAppAction)
   return result
@@ -158,6 +170,7 @@ def WithNewExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
   result = None
   def excelAppAction(app):
     result = None
+    workbooks = None
     workbook = None
     try:
       workbooks = app.Workbooks
@@ -168,22 +181,31 @@ def WithNewExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
         if saveChanges:
           workbook.SaveAs(excelFilePath)
         workbook.Close(saveChanges)
+        Marshal.FinalReleaseComObject(workbook)
+      if workbooks is not None:
+        Marshal.FinalReleaseComObject(workbooks)
     return result
   result = WithExcelApp(excelAppAction)
   return result
 
 def ReadRowsTextFromWorkbook(excelFilePath, worksheetName=None):
   def excelWorkbookAction(workbook):
-    worksheet = workbook.Worksheets[worksheetName] if worksheetName is not None else workbook.Worksheets[1]
+    worksheets = workbook.Worksheets
+    worksheet = worksheets[worksheetName] if worksheetName is not None else worksheets[1]
     rows = ReadRowsTextFromWorksheet(worksheet)
+    Marshal.FinalReleaseComObject(worksheet)
+    Marshal.FinalReleaseComObject(worksheets)
     return rows
   rows = WithExcelWorkbook(excelFilePath, excelWorkbookAction)
   return rows
 
 def WriteRowsTextToWorkbook(excelFilePath, rows, worksheetName=None):
   def excelWorkbookAction(workbook):
-    worksheet = workbook.Worksheets[worksheetName] if worksheetName is not None else workbook.Worksheets[1]
+    worksheets = workbook.Worksheets
+    worksheet = worksheets[worksheetName] if worksheetName is not None else worksheets[1]
     WriteRowsToWorksheet(worksheet, rows)
+    Marshal.FinalReleaseComObject(worksheet)
+    Marshal.FinalReleaseComObject(worksheets)
     return
   WithExcelWorkbook(excelFilePath, excelWorkbookAction, saveChanges=True)
   return
@@ -191,10 +213,13 @@ def WriteRowsTextToWorkbook(excelFilePath, rows, worksheetName=None):
 def WriteRowsTextToNewWorkbook(excelFilePath, rows, worksheetName=None):
   def excelWorkbookAction(workbook):
     newWorksheetName = "Sheet1" if worksheetName is None else worksheetName
-    workbook.Worksheets.Add()
-    worksheet = workbook.Worksheets[1]
+    worksheets = workbook.Worksheets
+    worksheets.Add()
+    worksheet = worksheets[1]
     worksheet.Name = newWorksheetName
     WriteRowsToWorksheet(worksheet, rows)
+    Marshal.FinalReleaseComObject(worksheet)
+    Marshal.FinalReleaseComObject(worksheets)
     return
   WithNewExcelWorkbook(excelFilePath, excelWorkbookAction, saveChanges=True)
   return
