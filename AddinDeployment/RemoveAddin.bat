@@ -8,8 +8,8 @@ IF [%1]==[] (
 set RevitVersion=%~1
 set AddinFileName=BatchRvtAddin%RevitVersion%.addin
 set TargetAddinsDir=%APPDATA%\Autodesk\Revit\Addins\%RevitVersion%
-set TargetAddinFolderPath=%TargetAddinsDir%\BatchRvt
-set TargetAddinFilePath=%TargetAddinsDir%\%AddinFileName%
+set TargetAddinFolderPath="%TargetAddinsDir%\BatchRvt"
+set TargetAddinFilePath="%TargetAddinsDir%\%AddinFileName%"
 
 echo.
 echo ********************************************************************************
