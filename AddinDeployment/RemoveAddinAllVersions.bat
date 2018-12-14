@@ -16,5 +16,9 @@ echo.
 echo Removing BatchRvt addin for Revit 2018
 call RemoveAddin.bat 2018
 
+echo.
+echo Removing BatchRvt addin for Revit 2019
+call RemoveAddin.bat 2019
+
 echo Done.
 echo.
