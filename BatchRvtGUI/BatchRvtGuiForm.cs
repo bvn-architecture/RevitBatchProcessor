@@ -54,6 +54,13 @@ namespace BatchRvtGUI
         private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
         private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
 
+        private const string ALL_FILES_WITH_AN_EXTENSION_PATTERN = "*.*";
+
+        private const string REVIT_PROJECT_FILE_EXTENSION = ".rvt";
+        private const string REVIT_PROJECT_FILE_PATTERN = "*" + REVIT_PROJECT_FILE_EXTENSION;
+        private const string REVIT_FAMILY_FILE_EXTENSION = ".rfa";
+        private const string REVIT_FAMILY_FILE_PATTERN = "*" + REVIT_FAMILY_FILE_EXTENSION;
+
         private const int SETUP_HEIGHT = 642;
         private const int SETUP_INITIAL_WIDTH = 875;
         private const int SETUP_MINIMUM_WIDTH = 875;
@@ -1108,6 +1115,154 @@ namespace BatchRvtGUI
             {
                 this.timeOutNumericUpDown.Value = 0;
             }
+        }
+
+        private static IEnumerable<string> FindRevitFiles(string folderPath, SearchOption searchOption, RevitFileScanningOptionsUI.RevitFileType revitFileType)
+        {
+            var searchFilePattern = ALL_FILES_WITH_AN_EXTENSION_PATTERN;
+
+            if (revitFileType == RevitFileScanningOptionsUI.RevitFileType.Project)
+            {
+                searchFilePattern = REVIT_PROJECT_FILE_PATTERN;
+            }
+            else if (revitFileType == RevitFileScanningOptionsUI.RevitFileType.Family)
+            {
+                searchFilePattern = REVIT_FAMILY_FILE_PATTERN;
+            }
+            else if (revitFileType == RevitFileScanningOptionsUI.RevitFileType.ProjectAndFamily)
+            {
+                searchFilePattern = ALL_FILES_WITH_AN_EXTENSION_PATTERN;
+            }
+
+            var revitFilePaths = (
+                    PathUtil.SafeEnumerateFiles(folderPath, searchFilePattern, searchOption)
+                    .Where(filePath => HasRevitFileExtension(filePath))
+                    .ToList()
+                );
+
+            return revitFilePaths;
+        }
+
+        private void newRevitFileListButton_Click(object sender, EventArgs e)
+        {
+            var folderBrowserDialog = new FolderBrowserDialog();
+
+            folderBrowserDialog.Description = "Select a folder containing Revit files";
+
+            // TODO: remember last folder path and assign it to folderBrowserDialog.SelectedPath
+
+            var dialogResult = folderBrowserDialog.ShowDialog(this);
+
+            if (dialogResult == DialogResult.OK)
+            {
+                var selectedFolderPath = folderBrowserDialog.SelectedPath;
+
+                if (!string.IsNullOrWhiteSpace(selectedFolderPath))
+                {
+                    // TODO: scan for Revit files, populate a new excel file list and assign the path to the settings.
+                    // TODO: provide options for:
+                    //         - search top level directory only VERSUS search all sub directories.
+                    //         - expand network paths (or leave as is).
+                    //         - scan for revit project files, revit family files, or both.
+                    //         - attempt to determine and report revit version info in additional columns
+
+                    var revitFileScanningOptionsUI = new RevitFileScanningOptionsUI();
+
+                    var optionsDialogResult = revitFileScanningOptionsUI.ShowDialog(this);
+
+                    if (optionsDialogResult == DialogResult.OK)
+                    {
+                        var selectedRevitFileType = revitFileScanningOptionsUI.GetSelectedRevitFileType();
+
+                        bool includeSubfolders = revitFileScanningOptionsUI.IncludeSubfolders();
+
+                        var selectedSearchOption = includeSubfolders ?
+                            SearchOption.AllDirectories :
+                            SearchOption.TopDirectoryOnly;
+
+                        bool expandNetworkPaths = revitFileScanningOptionsUI.ExpandNetworkPaths(); // TODO: implement option action!
+                        bool extractRevitVersionInfo = revitFileScanningOptionsUI.ExtractRevitVersionInfo(); // TODO: implement option action!
+
+                        var revitFilePaths = FindRevitFiles(selectedFolderPath, selectedSearchOption, selectedRevitFileType);
+
+                        if (expandNetworkPaths)
+                        {
+                            revitFilePaths = PathUtil.ExpandedFullNetworkPaths(revitFilePaths).ToList();
+                        }
+
+                        var rows = revitFilePaths.Select(revitFilePath => new[] { revitFilePath }).ToList();
+
+                        if (extractRevitVersionInfo)
+                        {
+                            rows = (
+                                    revitFilePaths
+                                    .Zip(
+                                            PathUtil.GetRevitVersionTexts(revitFilePaths),
+                                            (revitFilePath, revitVersionText) => new[] { revitFilePath, revitVersionText }
+                                        )
+                                    .ToList()
+                                );
+                        }
+
+                        var initialDirectory = PathUtil.GetExistingFileDirectoryPath(this.revitFileListTextBox.Text);
+
+                        BrowseForSave(
+                                "Save New Revit file list",
+                                revitFileListPath => {
+
+                                    bool isSaved = false;
+
+                                    try
+                                    {
+                                        TextFileUtil.WriteToTabDelimitedTxtFile(rows, revitFileListPath);
+                                        isSaved = true;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        isSaved = false;
+                                    }
+
+                                    if (isSaved)
+                                    {
+                                        this.revitFileListTextBox.Text = revitFileListPath;
+                                    }
+                                    else
+                                    {
+                                        ShowErrorMessageBox("ERROR: Failed to Save the new Revit file list!");
+                                    }
+                                },
+                                TextFileUtil.TEXT_FILE_EXTENSION,
+                                TextFileUtil.TEXT_FILE_FILTER,
+                                initialDirectory,
+                                initialFileName: "revit_file_list.txt"
+                            );
+                    }
+                }
+            }
+        }
+
+        public static bool HasRevitProjectFileExtension(string filePath)
+        {
+            var extension = Path.GetExtension(filePath).ToLower();
+
+            return extension.ToLower() == REVIT_PROJECT_FILE_EXTENSION;
+        }
+
+        public static bool HasRevitFamilyFileExtension(string filePath)
+        {
+            var extension = Path.GetExtension(filePath).ToLower();
+
+            return extension.ToLower() == REVIT_FAMILY_FILE_EXTENSION;
+        }
+
+        public static bool HasRevitFileExtension(string filePath)
+        {
+            var extension = Path.GetExtension(filePath).ToLower();
+
+            return new[] {
+                    REVIT_PROJECT_FILE_EXTENSION,
+                    REVIT_FAMILY_FILE_EXTENSION
+                }.Any(revitExtension => extension == revitExtension.ToLower());
         }
     }
 }

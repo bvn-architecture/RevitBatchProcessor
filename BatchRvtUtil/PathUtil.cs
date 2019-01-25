@@ -21,11 +21,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using BatchRvt.ScriptHost;
+using ScriptingHosting = Microsoft.Scripting.Hosting;
+using IronPythonHosting = IronPython.Hosting;
 
 namespace BatchRvtUtil
 {
     public static class PathUtil
     {
+        private static ScriptingHosting.ScriptEngine engine;
+        private static ScriptingHosting.ScriptScope pathUtilModuleScope;
+        private static ScriptingHosting.ScriptScope revitFileListModuleScope;
+        private static dynamic PYTHON_FUNCTION_ExpandedFullNetworkPath;
+        private static dynamic PYTHON_FUNCTION_RevitFileInfo;
+
         public static bool FileExists(string filePath)
         {
             return File.Exists(filePath);
@@ -61,6 +70,173 @@ namespace BatchRvtUtil
         public static string GetFileDirectoryName(string filePath)
         {
             return new FileInfo(filePath).Directory.Name;
+        }
+
+        private static void IgnoringPathExceptions(Action action)
+        {
+            IgnoringPathExceptions(
+                    () => {
+                        action();
+                        return true; // dummy return type/value.
+                    }
+                );
+
+            return;
+        }
+
+        private static T IgnoringPathExceptions<T>(Func<T> func)
+        {
+            var result = default(T);
+
+            try
+            {
+                result = func();
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                // Do nothing.
+            }
+            catch (PathTooLongException e)
+            {
+                // Do nothing.
+            }
+            catch (IOException e)
+            {
+                // Do nothing.
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<string> SafeEnumerateFiles(string root, string pattern, SearchOption searchOption)
+        {
+            return SafeEnumerateFiles(new DirectoryInfo(root), pattern, searchOption);
+        }
+
+        // See https://stackoverflow.com/questions/13130052/directoryinfo-enumeratefiles-causes-unauthorizedaccessexception-and-other
+        public static IEnumerable<string> SafeEnumerateFiles(DirectoryInfo root, string pattern, SearchOption searchOption)
+        {
+            if (root != null && root.Exists)
+            {
+                var topLevelFilePaths = IgnoringPathExceptions(
+                        () => {
+                            return root
+                                .EnumerateFiles(pattern, SearchOption.TopDirectoryOnly)
+                                .Select(fileInfo => fileInfo.FullName);
+                        }
+                    );
+
+                foreach (var filePath in (topLevelFilePaths ?? Enumerable.Empty<string>()))
+                {
+                    yield return filePath;
+                }
+
+                if (searchOption == SearchOption.AllDirectories)
+                {
+                    var subFolderFilePaths = IgnoringPathExceptions(
+                            () => {
+                                return root
+                                    .EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
+                                    .SelectMany(dir => SafeEnumerateFiles(dir, pattern, searchOption));
+                            }
+                        );
+
+                    foreach (var filePath in (subFolderFilePaths ?? Enumerable.Empty<string>()))
+                    {
+                        yield return filePath;
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<string> SafeEnumerateFolders(string root, string pattern, SearchOption searchOption)
+        {
+            return SafeEnumerateFolders(new DirectoryInfo(root), pattern, searchOption);
+        }
+
+        // See https://stackoverflow.com/questions/13130052/directoryinfo-enumeratefiles-causes-unauthorizedaccessexception-and-other
+        public static IEnumerable<string> SafeEnumerateFolders(DirectoryInfo root, string pattern, SearchOption searchOption)
+        {
+            if (root != null && root.Exists)
+            {
+                var topLevelFolderPaths = IgnoringPathExceptions(
+                        () => {
+                            return root
+                                .EnumerateDirectories(pattern, SearchOption.TopDirectoryOnly)
+                                .Select(folderInfo => folderInfo.FullName);
+                        }
+                    );
+
+                foreach (var folderPath in (topLevelFolderPaths ?? Enumerable.Empty<string>()))
+                {
+                    yield return folderPath;
+                }
+
+                if (searchOption == SearchOption.AllDirectories)
+                {
+                    var subFolderFolderPaths = IgnoringPathExceptions(
+                            () => {
+                                return root
+                                    .EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
+                                    .SelectMany(dir => SafeEnumerateFolders(dir, pattern, searchOption));
+                            }
+                        );
+
+                    foreach (var folderPath in (subFolderFolderPaths ?? Enumerable.Empty<string>()))
+                    {
+                        yield return folderPath;
+                    }
+                }
+            }
+        }
+
+        private static string GetExecutableFolderPath()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        private static void InitPythonFunctions()
+        {
+            bool needToAddSearchPath = (engine == null);
+
+            engine = engine ?? ScriptUtil.CreatePythonEngine();
+
+            if (needToAddSearchPath)
+            {
+                var scriptsFolderPath = Path.Combine(GetExecutableFolderPath(), BatchRvt.SCRIPTS_FOLDER_NAME);
+
+                ScriptUtil.AddSearchPaths(engine, new[] { scriptsFolderPath });
+            }
+
+            pathUtilModuleScope = pathUtilModuleScope ?? IronPythonHosting.Python.ImportModule(engine, "path_util");
+            PYTHON_FUNCTION_ExpandedFullNetworkPath = PYTHON_FUNCTION_ExpandedFullNetworkPath ?? pathUtilModuleScope.GetVariable("ExpandedFullNetworkPath");
+
+            revitFileListModuleScope = revitFileListModuleScope ?? IronPythonHosting.Python.ImportModule(engine, "revit_file_list");
+            PYTHON_FUNCTION_RevitFileInfo = PYTHON_FUNCTION_RevitFileInfo ?? revitFileListModuleScope.GetVariable("RevitFileInfo");
+        }
+
+        private static string ExpandedFullNetworkPath(string fullPath)
+        {
+            return (PYTHON_FUNCTION_ExpandedFullNetworkPath(fullPath) as string) ?? string.Empty;
+        }
+
+        public static IEnumerable<string> ExpandedFullNetworkPaths(IEnumerable<string> fullPaths)
+        {
+            InitPythonFunctions();
+
+            return fullPaths.Select(ExpandedFullNetworkPath).ToList();
+        }
+
+        private static string GetRevitVersionText(string fullPath)
+        {
+            return (PYTHON_FUNCTION_RevitFileInfo(fullPath).TryGetRevitVersionText() as string) ?? string.Empty;
+        }
+
+        public static IEnumerable<string> GetRevitVersionTexts(IEnumerable<string> fullPaths)
+        {
+            InitPythonFunctions();
+
+            return fullPaths.Select(GetRevitVersionText).ToList();
         }
     }
 }

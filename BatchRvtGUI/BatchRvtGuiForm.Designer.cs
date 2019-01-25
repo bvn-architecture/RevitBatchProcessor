@@ -82,6 +82,7 @@
             this.importSettingsButton = new System.Windows.Forms.Button();
             this.exportSettingsButton = new System.Windows.Forms.Button();
             this.showAdvancedSettingsCheckBox = new System.Windows.Forms.CheckBox();
+            this.newRevitFileListButton = new System.Windows.Forms.Button();
             this.settingsGroupBox.SuspendLayout();
             this.singleRevitTaskProcessingGroupBox.SuspendLayout();
             this.dataExportGroupBox.SuspendLayout();
@@ -102,7 +103,7 @@
             this.revitFileListTextBox.Location = new System.Drawing.Point(85, 42);
             this.revitFileListTextBox.Name = "revitFileListTextBox";
             this.revitFileListTextBox.ReadOnly = true;
-            this.revitFileListTextBox.Size = new System.Drawing.Size(651, 20);
+            this.revitFileListTextBox.Size = new System.Drawing.Size(551, 20);
             this.revitFileListTextBox.TabIndex = 2;
             // 
             // dataExportFolderTextBox
@@ -118,7 +119,7 @@
             // browseRevitFileListButton
             // 
             this.browseRevitFileListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseRevitFileListButton.Location = new System.Drawing.Point(742, 40);
+            this.browseRevitFileListButton.Location = new System.Drawing.Point(642, 40);
             this.browseRevitFileListButton.Name = "browseRevitFileListButton";
             this.browseRevitFileListButton.Size = new System.Drawing.Size(75, 23);
             this.browseRevitFileListButton.TabIndex = 3;
@@ -317,6 +318,7 @@
             this.batchRevitFileProcessingGroupBox.Controls.Add(this.revitSessionGroupBox);
             this.batchRevitFileProcessingGroupBox.Controls.Add(this.enableBatchProcessingCheckBox);
             this.batchRevitFileProcessingGroupBox.Controls.Add(this.revitFileListLabel);
+            this.batchRevitFileProcessingGroupBox.Controls.Add(this.newRevitFileListButton);
             this.batchRevitFileProcessingGroupBox.Controls.Add(this.revitFileListTextBox);
             this.batchRevitFileProcessingGroupBox.Controls.Add(this.centralFileProcessingGroupBox);
             this.batchRevitFileProcessingGroupBox.Controls.Add(this.browseRevitFileListButton);
@@ -339,7 +341,7 @@
             this.revitSessionGroupBox.Location = new System.Drawing.Point(472, 68);
             this.revitSessionGroupBox.Name = "revitSessionGroupBox";
             this.revitSessionGroupBox.Size = new System.Drawing.Size(345, 97);
-            this.revitSessionGroupBox.TabIndex = 6;
+            this.revitSessionGroupBox.TabIndex = 7;
             this.revitSessionGroupBox.TabStop = false;
             this.revitSessionGroupBox.Text = "Revit Session";
             // 
@@ -405,7 +407,7 @@
             this.centralFileProcessingGroupBox.Location = new System.Drawing.Point(6, 68);
             this.centralFileProcessingGroupBox.Name = "centralFileProcessingGroupBox";
             this.centralFileProcessingGroupBox.Size = new System.Drawing.Size(145, 120);
-            this.centralFileProcessingGroupBox.TabIndex = 4;
+            this.centralFileProcessingGroupBox.TabIndex = 5;
             this.centralFileProcessingGroupBox.TabStop = false;
             this.centralFileProcessingGroupBox.Text = "Central File Processing";
             // 
@@ -462,7 +464,7 @@
             this.revitFileProcessingGroupBox.Location = new System.Drawing.Point(157, 68);
             this.revitFileProcessingGroupBox.Name = "revitFileProcessingGroupBox";
             this.revitFileProcessingGroupBox.Size = new System.Drawing.Size(309, 97);
-            this.revitFileProcessingGroupBox.TabIndex = 5;
+            this.revitFileProcessingGroupBox.TabIndex = 6;
             this.revitFileProcessingGroupBox.TabStop = false;
             this.revitFileProcessingGroupBox.Text = "Revit File Processing";
             // 
@@ -711,6 +713,17 @@
             this.showAdvancedSettingsCheckBox.UseVisualStyleBackColor = true;
             this.showAdvancedSettingsCheckBox.CheckedChanged += new System.EventHandler(this.showAdvancedSettingsCheckBox_CheckedChanged);
             // 
+            // newRevitFileListButton
+            // 
+            this.newRevitFileListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.newRevitFileListButton.Location = new System.Drawing.Point(723, 40);
+            this.newRevitFileListButton.Name = "newRevitFileListButton";
+            this.newRevitFileListButton.Size = new System.Drawing.Size(94, 23);
+            this.newRevitFileListButton.TabIndex = 4;
+            this.newRevitFileListButton.Text = "New List ...";
+            this.newRevitFileListButton.UseVisualStyleBackColor = true;
+            this.newRevitFileListButton.Click += new System.EventHandler(this.newRevitFileListButton_Click);
+            // 
             // BatchRvtGuiForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -811,6 +824,7 @@
         private System.Windows.Forms.CheckBox showAdvancedSettingsCheckBox;
         private System.Windows.Forms.NumericUpDown timeOutNumericUpDown;
         private System.Windows.Forms.CheckBox discardWorksetsCheckBox;
+        private System.Windows.Forms.Button newRevitFileListButton;
     }
 }
 

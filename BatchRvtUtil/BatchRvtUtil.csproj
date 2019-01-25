@@ -39,6 +39,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\IronPython-2.7.3\IronPython.Modules.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Dynamic, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\IronPython-2.7.3\Microsoft.Dynamic.dll</HintPath>
@@ -75,6 +76,7 @@
     <Compile Include="ScriptDataUtil.cs" />
     <Compile Include="SettingsUtil.cs" />
     <Compile Include="StreamIOUtil.cs" />
+    <Compile Include="TextFileUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BatchRvtScriptHost\BatchRvtScriptHost.csproj">
