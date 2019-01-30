@@ -185,6 +185,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "RevitFileScanningOptionsUI";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Revit File Scanning Options";
             this.optionsGroupBox.ResumeLayout(false);
             this.otherOptionsGroupBox.ResumeLayout(false);

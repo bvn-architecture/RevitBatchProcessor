@@ -1120,7 +1120,8 @@ namespace BatchRvtGUI
         private static IEnumerable<string> FindRevitFiles(
                 string folderPath,
                 SearchOption searchOption,
-                RevitFileScanningOptionsUI.RevitFileType revitFileType
+                RevitFileScanningOptionsUI.RevitFileType revitFileType,
+                Func<string, bool> progressReporter
             )
         {
             var searchFilePattern = ALL_FILES_WITH_AN_EXTENSION_PATTERN;
@@ -1138,13 +1139,84 @@ namespace BatchRvtGUI
                 searchFilePattern = ALL_FILES_WITH_AN_EXTENSION_PATTERN;
             }
 
-            var revitFilePaths = (
-                    PathUtil.SafeEnumerateFiles(folderPath, searchFilePattern, searchOption)
-                    .Where(filePath => HasRevitFileExtension(filePath))
-                    .ToList()
-                );
+            var foldersToScan = Enumerable.Empty<string>();
+
+            if (searchOption == SearchOption.AllDirectories)
+            {
+                foldersToScan = (
+                        new[] { folderPath }
+                        .Concat(PathUtil.SafeEnumerateFolders(folderPath, "*", SearchOption.AllDirectories))
+                    );
+            }
+            else
+            {
+                foldersToScan = new[] { folderPath };
+            }
+
+            var revitFilePaths = new List<string>();
+
+            foreach (var folderToScan in foldersToScan)
+            {
+                bool cancelled = progressReporter(folderToScan);
+
+                if (cancelled)
+                {
+                    break;
+                }
+
+                revitFilePaths.AddRange(
+                        PathUtil.SafeEnumerateFiles(folderToScan, searchFilePattern, SearchOption.TopDirectoryOnly)
+                        .Where(filePath => HasRevitFileExtension(filePath))
+                    );
+            }
 
             return revitFilePaths;
+        }
+
+        private static List<string[]> FindAndExtractRevitFilesInfoWithProgressReporting(
+                string baseFolderPath,
+                SearchOption searchOption,
+                RevitFileScanningOptionsUI.RevitFileType revitFileType,
+                bool expandNetworkPaths,
+                bool extractRevitVersionInfo,
+                Func<string, bool> progressReporter
+            )
+        {
+            var infoRows = new List<string[]>();
+
+            progressReporter("Scanning for Revit files ...");
+
+            var revitFilePaths = FindRevitFiles(baseFolderPath, searchOption, revitFileType, progressReporter);
+
+            bool cancelled = progressReporter(string.Empty);
+
+            if (!cancelled)
+            {
+                if (expandNetworkPaths)
+                {
+                    progressReporter("Expanding network paths ...");
+
+                    revitFilePaths = PathUtil.ExpandedFullNetworkPaths(revitFilePaths).ToList();
+                }
+
+                infoRows = revitFilePaths.Select(revitFilePath => new[] { revitFilePath }).ToList();
+
+                if (extractRevitVersionInfo)
+                {
+                    progressReporter("Extracting Revit files version information ...");
+
+                    infoRows = (
+                            revitFilePaths
+                            .Zip(
+                                    PathUtil.GetRevitVersionTexts(revitFilePaths),
+                                    (revitFilePath, revitVersionText) => new[] { revitFilePath, revitVersionText }
+                                )
+                            .ToList()
+                        );
+                }
+            }
+
+            return infoRows;
         }
 
         private void newRevitFileListButton_Click(object sender, EventArgs e)
@@ -1163,13 +1235,6 @@ namespace BatchRvtGUI
 
                 if (!string.IsNullOrWhiteSpace(selectedFolderPath))
                 {
-                    // TODO: scan for Revit files, populate a new excel file list and assign the path to the settings.
-                    // TODO: provide options for:
-                    //         - search top level directory only VERSUS search all sub directories.
-                    //         - expand network paths (or leave as is).
-                    //         - scan for revit project files, revit family files, or both.
-                    //         - attempt to determine and report revit version info in additional columns
-
                     var revitFileScanningOptionsUI = new RevitFileScanningOptionsUI();
 
                     var optionsDialogResult = revitFileScanningOptionsUI.ShowDialog(this);
@@ -1187,60 +1252,59 @@ namespace BatchRvtGUI
                         bool expandNetworkPaths = revitFileScanningOptionsUI.ExpandNetworkPaths();
                         bool extractRevitVersionInfo = revitFileScanningOptionsUI.ExtractRevitVersionInfo();
 
+                        var rows = Enumerable.Empty<IEnumerable<string>>();
 
-                        var revitFilePaths = FindRevitFiles(selectedFolderPath, selectedSearchOption, selectedRevitFileType);
+                        Action<Func<string, bool>> revitFileScanningProgressReporter =
+                            (progressReporter) => {
+                                rows = FindAndExtractRevitFilesInfoWithProgressReporting(
+                                    selectedFolderPath,
+                                    selectedSearchOption,
+                                    selectedRevitFileType,
+                                    expandNetworkPaths,
+                                    extractRevitVersionInfo,
+                                    progressReporter
+                                );
+                            };
 
-                        if (expandNetworkPaths)
+                        var revitFileScanningProgressUI = new RevitFileScanningProgressUI(revitFileScanningProgressReporter);
+
+                        var scanningDialogResult = revitFileScanningProgressUI.ShowDialog(this);
+
+                        if (scanningDialogResult == DialogResult.OK)
                         {
-                            revitFilePaths = PathUtil.ExpandedFullNetworkPaths(revitFilePaths).ToList();
-                        }
+                            var initialDirectory = PathUtil.GetExistingFileDirectoryPath(this.revitFileListTextBox.Text);
 
-                        var rows = revitFilePaths.Select(revitFilePath => new[] { revitFilePath }).ToList();
+                            BrowseForSave(
+                                    "Save New Revit file list",
+                                    revitFileListPath => {
 
-                        if (extractRevitVersionInfo)
-                        {
-                            rows = (
-                                    revitFilePaths
-                                    .Zip(
-                                            PathUtil.GetRevitVersionTexts(revitFilePaths),
-                                            (revitFilePath, revitVersionText) => new[] { revitFilePath, revitVersionText }
-                                        )
-                                    .ToList()
+                                        bool isSaved = false;
+
+                                        try
+                                        {
+                                            TextFileUtil.WriteToTabDelimitedTxtFile(rows, revitFileListPath);
+                                            isSaved = true;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            isSaved = false;
+                                        }
+
+                                        if (isSaved)
+                                        {
+                                            this.revitFileListTextBox.Text = revitFileListPath;
+                                        }
+                                        else
+                                        {
+                                            ShowErrorMessageBox("ERROR: Failed to Save the new Revit file list!");
+                                        }
+                                    },
+                                    TextFileUtil.TEXT_FILE_EXTENSION,
+                                    TextFileUtil.TEXT_FILE_FILTER,
+                                    initialDirectory,
+                                    initialFileName: "revit_file_list.txt"
                                 );
                         }
-
-                        var initialDirectory = PathUtil.GetExistingFileDirectoryPath(this.revitFileListTextBox.Text);
-
-                        BrowseForSave(
-                                "Save New Revit file list",
-                                revitFileListPath => {
-
-                                    bool isSaved = false;
-
-                                    try
-                                    {
-                                        TextFileUtil.WriteToTabDelimitedTxtFile(rows, revitFileListPath);
-                                        isSaved = true;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        isSaved = false;
-                                    }
-
-                                    if (isSaved)
-                                    {
-                                        this.revitFileListTextBox.Text = revitFileListPath;
-                                    }
-                                    else
-                                    {
-                                        ShowErrorMessageBox("ERROR: Failed to Save the new Revit file list!");
-                                    }
-                                },
-                                TextFileUtil.TEXT_FILE_EXTENSION,
-                                TextFileUtil.TEXT_FILE_FILTER,
-                                initialDirectory,
-                                initialFileName: "revit_file_list.txt"
-                            );
                     }
                 }
             }

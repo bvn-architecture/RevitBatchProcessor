@@ -92,6 +92,12 @@
     <Compile Include="RevitFileScanningOptionsUI.Designer.cs">
       <DependentUpon>RevitFileScanningOptionsUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="RevitFileScanningProgressUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RevitFileScanningProgressUI.Designer.cs">
+      <DependentUpon>RevitFileScanningProgressUI.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="BatchRvtGuiForm.resx">
       <DependentUpon>BatchRvtGuiForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -107,6 +113,9 @@
     </Compile>
     <EmbeddedResource Include="RevitFileScanningOptionsUI.resx">
       <DependentUpon>RevitFileScanningOptionsUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RevitFileScanningProgressUI.resx">
+      <DependentUpon>RevitFileScanningProgressUI.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
