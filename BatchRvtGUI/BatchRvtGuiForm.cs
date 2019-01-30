@@ -1117,7 +1117,11 @@ namespace BatchRvtGUI
             }
         }
 
-        private static IEnumerable<string> FindRevitFiles(string folderPath, SearchOption searchOption, RevitFileScanningOptionsUI.RevitFileType revitFileType)
+        private static IEnumerable<string> FindRevitFiles(
+                string folderPath,
+                SearchOption searchOption,
+                RevitFileScanningOptionsUI.RevitFileType revitFileType
+            )
         {
             var searchFilePattern = ALL_FILES_WITH_AN_EXTENSION_PATTERN;
 
@@ -1180,8 +1184,9 @@ namespace BatchRvtGUI
                             SearchOption.AllDirectories :
                             SearchOption.TopDirectoryOnly;
 
-                        bool expandNetworkPaths = revitFileScanningOptionsUI.ExpandNetworkPaths(); // TODO: implement option action!
-                        bool extractRevitVersionInfo = revitFileScanningOptionsUI.ExtractRevitVersionInfo(); // TODO: implement option action!
+                        bool expandNetworkPaths = revitFileScanningOptionsUI.ExpandNetworkPaths();
+                        bool extractRevitVersionInfo = revitFileScanningOptionsUI.ExtractRevitVersionInfo();
+
 
                         var revitFilePaths = FindRevitFiles(selectedFolderPath, selectedSearchOption, selectedRevitFileType);
 
