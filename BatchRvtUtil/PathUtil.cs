@@ -32,8 +32,10 @@ namespace BatchRvtUtil
         private static ScriptingHosting.ScriptEngine engine;
         private static ScriptingHosting.ScriptScope pathUtilModuleScope;
         private static ScriptingHosting.ScriptScope revitFileListModuleScope;
+        private static ScriptingHosting.ScriptScope revitFileVersionModuleScope;
         private static dynamic PYTHON_FUNCTION_ExpandedFullNetworkPath;
         private static dynamic PYTHON_FUNCTION_RevitFileInfo;
+        private static dynamic PYTHON_FUNCTION_GetRevitVersionNumberTextFromRevitVersionText;
 
         public static bool FileExists(string filePath)
         {
@@ -231,6 +233,9 @@ namespace BatchRvtUtil
 
             revitFileListModuleScope = revitFileListModuleScope ?? IronPythonHosting.Python.ImportModule(engine, "revit_file_list");
             PYTHON_FUNCTION_RevitFileInfo = PYTHON_FUNCTION_RevitFileInfo ?? revitFileListModuleScope.GetVariable("RevitFileInfo");
+
+            revitFileVersionModuleScope = revitFileVersionModuleScope ?? IronPythonHosting.Python.ImportModule(engine, "revit_file_version");
+            PYTHON_FUNCTION_GetRevitVersionNumberTextFromRevitVersionText = PYTHON_FUNCTION_GetRevitVersionNumberTextFromRevitVersionText ?? revitFileVersionModuleScope.GetVariable("GetRevitVersionNumberTextFromRevitVersionText");
         }
 
         private static string ExpandedFullNetworkPath(string fullPath)
@@ -245,16 +250,19 @@ namespace BatchRvtUtil
             return fullPaths.Select(ExpandedFullNetworkPath).ToList();
         }
 
-        private static string GetRevitVersionText(string fullPath)
+        private static string[] GetRevitVersionTexts(string fullPath)
         {
-            return (PYTHON_FUNCTION_RevitFileInfo(fullPath).TryGetRevitVersionText() as string) ?? string.Empty;
+            var revitVersionText = (PYTHON_FUNCTION_RevitFileInfo(fullPath).TryGetRevitVersionText() as string) ?? string.Empty;
+            var revitVersionNumberText = (PYTHON_FUNCTION_GetRevitVersionNumberTextFromRevitVersionText(revitVersionText) as string) ?? string.Empty;
+
+            return new[] { revitVersionNumberText, revitVersionText };
         }
 
-        public static IEnumerable<string> GetRevitVersionTexts(IEnumerable<string> fullPaths)
+        public static IEnumerable<string[]> GetRevitVersionTexts(IEnumerable<string> fullPaths)
         {
             InitPythonFunctions();
 
-            return fullPaths.Select(GetRevitVersionText).ToList();
+            return fullPaths.Select(GetRevitVersionTexts).ToList();
         }
     }
 }

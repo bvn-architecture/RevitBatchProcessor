@@ -173,9 +173,20 @@ def GetRevitVersionText(revitFilePath):
   return revitVersionText
 
 def GenerateRevitVersionTextPrefixes(revitVersionNumberText, includeDisciplineVersions=False):
-  REVIT_VERSION_TEXT_PREFIXES = ["Autodesk Revit"]
+  REVIT_VERSION_TEXT_PREFIXES = [
+      "Autodesk Revit",
+      "Revit" # Very old versions (e.g. 2010) may have this prefix.
+    ]
   if includeDisciplineVersions:
-    REVIT_VERSION_TEXT_PREFIXES.extend(["Autodesk Revit Architecture", "Autodesk Revit MEP", "Autodesk Revit Structure"])
+    REVIT_VERSION_TEXT_PREFIXES.extend([
+        "Autodesk Revit Architecture",
+        "Autodesk Revit MEP",
+        "Autodesk Revit Structure",
+        # Very old versions (e.g. 2010) may have the following prefixes.
+        "Revit Architecture",
+        "Revit MEP",
+        "Revit Structure"
+      ])
   return [str.Join(" ", prefix, revitVersionNumberText) for prefix in REVIT_VERSION_TEXT_PREFIXES]
 
 REVIT_VERSION_TEXT_PREFIXES_2010 = GenerateRevitVersionTextPrefixes("2010", includeDisciplineVersions=True)

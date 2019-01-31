@@ -1209,7 +1209,7 @@ namespace BatchRvtGUI
                             revitFilePaths
                             .Zip(
                                     PathUtil.GetRevitVersionTexts(revitFilePaths),
-                                    (revitFilePath, revitVersionText) => new[] { revitFilePath, revitVersionText }
+                                    (revitFilePath, revitVersionTexts) => new[] { revitFilePath, revitVersionTexts[0], revitVersionTexts[1] }
                                 )
                             .ToList()
                         );
