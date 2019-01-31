@@ -110,7 +110,13 @@ namespace BatchRvtUtil
 
         public static IEnumerable<string> SafeEnumerateFiles(string root, string pattern, SearchOption searchOption)
         {
-            return SafeEnumerateFiles(new DirectoryInfo(root), pattern, searchOption);
+            // NOTE: DirectoryInfo can throw path-related exceptions, hence the use of IgnoringPathExceptions here.
+            return IgnoringPathExceptions(
+                    () =>
+                    {
+                        return SafeEnumerateFiles(new DirectoryInfo(root), pattern, searchOption);
+                    }
+                ) ?? Enumerable.Empty<string>();
         }
 
         // See https://stackoverflow.com/questions/13130052/directoryinfo-enumeratefiles-causes-unauthorizedaccessexception-and-other
@@ -122,7 +128,8 @@ namespace BatchRvtUtil
                         () => {
                             return root
                                 .EnumerateFiles(pattern, SearchOption.TopDirectoryOnly)
-                                .Select(fileInfo => fileInfo.FullName);
+                                .Select(fileInfo => fileInfo.FullName)
+                                .ToList(); // Ensures these are fully enumerate here so any exceptions are caught.
                         }
                     );
 
@@ -135,9 +142,11 @@ namespace BatchRvtUtil
                 {
                     var subFolderFilePaths = IgnoringPathExceptions(
                             () => {
-                                return root
+                                var topLevelFolderPaths = root
                                     .EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
-                                    .SelectMany(dir => SafeEnumerateFiles(dir, pattern, searchOption));
+                                    .ToList(); // Ensures these are fully enumerate here so any exceptions are caught.
+
+                                return topLevelFolderPaths.SelectMany(dir => SafeEnumerateFiles(dir, pattern, searchOption));
                             }
                         );
 
@@ -151,7 +160,13 @@ namespace BatchRvtUtil
 
         public static IEnumerable<string> SafeEnumerateFolders(string root, string pattern, SearchOption searchOption)
         {
-            return SafeEnumerateFolders(new DirectoryInfo(root), pattern, searchOption);
+            // NOTE: DirectoryInfo can throw path-related exceptions, hence the use of IgnoringPathExceptions here.
+            return IgnoringPathExceptions(
+                    () =>
+                    {
+                        return SafeEnumerateFolders(new DirectoryInfo(root), pattern, searchOption);
+                    }
+                ) ?? Enumerable.Empty<string>();
         }
 
         // See https://stackoverflow.com/questions/13130052/directoryinfo-enumeratefiles-causes-unauthorizedaccessexception-and-other
@@ -163,7 +178,8 @@ namespace BatchRvtUtil
                         () => {
                             return root
                                 .EnumerateDirectories(pattern, SearchOption.TopDirectoryOnly)
-                                .Select(folderInfo => folderInfo.FullName);
+                                .Select(folderInfo => folderInfo.FullName)
+                                .ToList(); // Ensures these are fully enumerate here so any exceptions are caught.
                         }
                     );
 
@@ -176,9 +192,11 @@ namespace BatchRvtUtil
                 {
                     var subFolderFolderPaths = IgnoringPathExceptions(
                             () => {
-                                return root
+                                var subFolderPaths = root
                                     .EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
-                                    .SelectMany(dir => SafeEnumerateFolders(dir, pattern, searchOption));
+                                    .ToList(); // Ensures these are fully enumerate here so any exceptions are caught.
+
+                                return subFolderPaths.SelectMany(dir => SafeEnumerateFolders(dir, pattern, searchOption));
                             }
                         );
 
