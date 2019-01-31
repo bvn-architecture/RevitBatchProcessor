@@ -175,7 +175,10 @@ def GetRevitVersionText(revitFilePath):
 def GenerateRevitVersionTextPrefixes(revitVersionNumberText, includeDisciplineVersions=False):
   REVIT_VERSION_TEXT_PREFIXES = [
       "Autodesk Revit",
-      "Revit" # Very old versions (e.g. 2010) may have this prefix.
+      "Autodesk Revit LT",
+      # Very old versions (e.g. 2010) may have the following prefixes.
+      "Revit",
+      "Revit LT"
     ]
   if includeDisciplineVersions:
     REVIT_VERSION_TEXT_PREFIXES.extend([
