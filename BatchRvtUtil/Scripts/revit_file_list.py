@@ -115,38 +115,21 @@ def GetRevitFileList(settingsFilePath):
     revitFileList = FromExcelFile(settingsFilePath)
   return revitFileList
 
-def GenerateRevitVersionTextPrefixes(revitVersionNumberText, includeDisciplineVersions=False):
-  REVIT_VERSION_TEXT_PREFIXES = ["Autodesk Revit"]
-  if includeDisciplineVersions:
-    REVIT_VERSION_TEXT_PREFIXES.extend(["Autodesk Revit Architecture", "Autodesk Revit MEP", "Autodesk Revit Structure"])
-  return [str.Join(" ", prefix, revitVersionNumberText) for prefix in REVIT_VERSION_TEXT_PREFIXES]
-
-REVIT_VERSION_TEXT_PREFIXES_2010 = GenerateRevitVersionTextPrefixes("2010", includeDisciplineVersions=True)
-REVIT_VERSION_TEXT_PREFIXES_2011 = GenerateRevitVersionTextPrefixes("2011", includeDisciplineVersions=True)
-REVIT_VERSION_TEXT_PREFIXES_2012 = GenerateRevitVersionTextPrefixes("2012", includeDisciplineVersions=True)
-REVIT_VERSION_TEXT_PREFIXES_2013 = GenerateRevitVersionTextPrefixes("2013", includeDisciplineVersions=True)
-REVIT_VERSION_TEXT_PREFIXES_2014 = GenerateRevitVersionTextPrefixes("2014", includeDisciplineVersions=True)
-REVIT_VERSION_TEXT_PREFIXES_2015 = GenerateRevitVersionTextPrefixes("2015", includeDisciplineVersions=True)
-REVIT_VERSION_TEXT_PREFIXES_2016 = GenerateRevitVersionTextPrefixes("2016", includeDisciplineVersions=True)
-REVIT_VERSION_TEXT_PREFIXES_2017 = GenerateRevitVersionTextPrefixes("2017")
-REVIT_VERSION_TEXT_PREFIXES_2018 = GenerateRevitVersionTextPrefixes("2018")
-REVIT_VERSION_TEXT_PREFIXES_2019 = GenerateRevitVersionTextPrefixes("2019")
-
 class SupportedRevitFileInfo():
   def __init__(self, revitFilePath):
     self.revitFileInfo = RevitFileInfo(revitFilePath)
     revitVersionText = self.revitFileInfo.TryGetRevitVersionText()
     revitVersionNumber = None
     if not str.IsNullOrWhiteSpace(revitVersionText):
-      if any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2015):
+      if any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2015):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2015
-      elif any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2016):
+      elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2016):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2016
-      elif any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2017):
+      elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2017):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2017
-      elif any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2018):
+      elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2018):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2018
-      elif any(revitVersionText.StartsWith(prefix) for prefix in REVIT_VERSION_TEXT_PREFIXES_2019):
+      elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2019):
         revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2019
     self.revitVersionNumber = revitVersionNumber
     return

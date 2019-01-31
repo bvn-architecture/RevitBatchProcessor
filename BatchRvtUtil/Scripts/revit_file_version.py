@@ -172,4 +172,47 @@ def GetRevitVersionText(revitFilePath):
   revitVersionText = ExtractRevitVersionInfoFromText(revitVersionInfoText)
   return revitVersionText
 
+def GenerateRevitVersionTextPrefixes(revitVersionNumberText, includeDisciplineVersions=False):
+  REVIT_VERSION_TEXT_PREFIXES = ["Autodesk Revit"]
+  if includeDisciplineVersions:
+    REVIT_VERSION_TEXT_PREFIXES.extend(["Autodesk Revit Architecture", "Autodesk Revit MEP", "Autodesk Revit Structure"])
+  return [str.Join(" ", prefix, revitVersionNumberText) for prefix in REVIT_VERSION_TEXT_PREFIXES]
+
+REVIT_VERSION_TEXT_PREFIXES_2010 = GenerateRevitVersionTextPrefixes("2010", includeDisciplineVersions=True)
+REVIT_VERSION_TEXT_PREFIXES_2011 = GenerateRevitVersionTextPrefixes("2011", includeDisciplineVersions=True)
+REVIT_VERSION_TEXT_PREFIXES_2012 = GenerateRevitVersionTextPrefixes("2012", includeDisciplineVersions=True)
+REVIT_VERSION_TEXT_PREFIXES_2013 = GenerateRevitVersionTextPrefixes("2013", includeDisciplineVersions=True)
+REVIT_VERSION_TEXT_PREFIXES_2014 = GenerateRevitVersionTextPrefixes("2014", includeDisciplineVersions=True)
+REVIT_VERSION_TEXT_PREFIXES_2015 = GenerateRevitVersionTextPrefixes("2015", includeDisciplineVersions=True)
+REVIT_VERSION_TEXT_PREFIXES_2016 = GenerateRevitVersionTextPrefixes("2016", includeDisciplineVersions=True)
+REVIT_VERSION_TEXT_PREFIXES_2017 = GenerateRevitVersionTextPrefixes("2017")
+REVIT_VERSION_TEXT_PREFIXES_2018 = GenerateRevitVersionTextPrefixes("2018")
+REVIT_VERSION_TEXT_PREFIXES_2019 = GenerateRevitVersionTextPrefixes("2019")
+
+def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
+  revitVersionNumberText = None
+  if not str.IsNullOrWhiteSpace(revitVersionText):
+    def StartsWithOneOfPrefixes(text, prefixes):
+      return any(text.StartsWith(prefix) for prefix in prefixes)
+    if StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2010):
+      revitVersionNumberText = "2010"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2011):
+      revitVersionNumberText = "2011"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2012):
+      revitVersionNumberText = "2012"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2013):
+      revitVersionNumberText = "2013"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2014):
+      revitVersionNumberText = "2014"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2015):
+      revitVersionNumberText = "2015"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2016):
+      revitVersionNumberText = "2016"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2017):
+      revitVersionNumberText = "2017"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2018):
+      revitVersionNumberText = "2018"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2019):
+      revitVersionNumberText = "2019"
+  return revitVersionNumberText
 
