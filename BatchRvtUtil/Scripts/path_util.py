@@ -22,7 +22,7 @@ import clr
 import System
 from System import Environment, ArgumentException, StringComparison, Char
 import System.IO
-from System.IO import Path, File, Directory, FileInfo, DirectoryInfo
+from System.IO import Path, File, Directory, FileInfo, DirectoryInfo, PathTooLongException
 
 import win32_mpr
 
@@ -91,13 +91,16 @@ def GetDriveRemoteName(path):
 
 def GetFullNetworkPath(path):
   fullNetworkPath = None
-  if not Path.IsPathRooted(path):
-    raise ArgumentException("A full file path must be specified.", "path")
-  pathRoot = Path.GetPathRoot(path)
-  driveRemoteName = GetDriveRemoteName(pathRoot)
-  if driveRemoteName is not None:
-    pathWithoutRoot = path.Substring(pathRoot.Length)
-    fullNetworkPath = Path.Combine(driveRemoteName, pathWithoutRoot)
+  try:
+    if not Path.IsPathRooted(path):
+      raise ArgumentException("A full file path must be specified.", "path")
+    pathRoot = Path.GetPathRoot(path)
+    driveRemoteName = GetDriveRemoteName(pathRoot)
+    if driveRemoteName is not None:
+      pathWithoutRoot = path.Substring(pathRoot.Length)
+      fullNetworkPath = Path.Combine(driveRemoteName, pathWithoutRoot)
+  except PathTooLongException, e:
+    fullNetworkPath = None
   return fullNetworkPath
 
 def ExpandedFullNetworkPath(path):
