@@ -1188,27 +1188,61 @@ namespace BatchRvtGUI
 
             var revitFilePaths = FindRevitFiles(baseFolderPath, searchOption, revitFileType, progressReporter);
 
+            int numberOfRevitFilePaths = revitFilePaths.Count();
+
             bool cancelled = progressReporter(string.Empty);
 
             if (!cancelled)
             {
                 if (expandNetworkPaths)
                 {
-                    progressReporter("Expanding network paths ...");
+                    string expandingNetworkPathsMessagePrefix = "Expanding network paths";
 
-                    revitFilePaths = PathUtil.ExpandedFullNetworkPaths(revitFilePaths).ToList();
+                    var indexedExpandedRevitFilePaths = 
+                        PathUtil.EnumerateExpandedFullNetworkPaths(revitFilePaths)
+                        .Select((revitFilePath, index) => Tuple.Create(index, revitFilePath));
+
+                    var expandedRevitFilePaths = new List<string>();
+
+                    foreach (var indexedExpandedRevitFilePath in indexedExpandedRevitFilePaths)
+                    {
+                        int index = indexedExpandedRevitFilePath.Item1;
+                        string expandedRevitFilePath = indexedExpandedRevitFilePath.Item2;
+
+                        progressReporter(expandingNetworkPathsMessagePrefix + " (" + (index + 1).ToString() + " of " + numberOfRevitFilePaths.ToString() + ") ...");
+
+                        expandedRevitFilePaths.Add(expandedRevitFilePath);
+                    }
+
+                    revitFilePaths = expandedRevitFilePaths;
                 }
 
                 infoRows = revitFilePaths.Select(revitFilePath => new[] { revitFilePath }).ToList();
 
                 if (extractRevitVersionInfo)
                 {
-                    progressReporter("Extracting Revit files version information ...");
+                    string extractingNetworkPathsMessagePrefix = "Extracting Revit files version information";
+
+                    var indexedRevitVersionTexts =
+                        PathUtil.EnumerateRevitVersionTexts(revitFilePaths)
+                        .Select((revitFilePath, index) => Tuple.Create(index, revitFilePath));
+
+                    var allRevitVersionTexts = new List<string[]>();
+                    
+                    foreach (var indexedRevitVersionText in indexedRevitVersionTexts)
+                    {
+                        int index = indexedRevitVersionText.Item1;
+                        string[] revitVersionTexts = indexedRevitVersionText.Item2;
+
+                        progressReporter(extractingNetworkPathsMessagePrefix + " (" + (index + 1).ToString() + " of " + numberOfRevitFilePaths.ToString() + ") ...");
+
+                        allRevitVersionTexts.Add(revitVersionTexts);
+                    }
 
                     infoRows = (
                             revitFilePaths
                             .Zip(
-                                    PathUtil.GetRevitVersionTexts(revitFilePaths),
+                                    allRevitVersionTexts,
                                     (revitFilePath, revitVersionTexts) => new[] { revitFilePath, revitVersionTexts[0], revitVersionTexts[1] }
                                 )
                             .ToList()

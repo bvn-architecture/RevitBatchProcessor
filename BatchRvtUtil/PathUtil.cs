@@ -243,11 +243,11 @@ namespace BatchRvtUtil
             return (PYTHON_FUNCTION_ExpandedFullNetworkPath(fullPath) as string) ?? string.Empty;
         }
 
-        public static IEnumerable<string> ExpandedFullNetworkPaths(IEnumerable<string> fullPaths)
+        public static IEnumerable<string> EnumerateExpandedFullNetworkPaths(IEnumerable<string> fullPaths)
         {
             InitPythonFunctions();
 
-            return fullPaths.Select(ExpandedFullNetworkPath).ToList();
+            return fullPaths.Select(ExpandedFullNetworkPath);
         }
 
         private static string[] GetRevitVersionTexts(string fullPath)
@@ -258,11 +258,11 @@ namespace BatchRvtUtil
             return new[] { revitVersionNumberText, revitVersionText };
         }
 
-        public static IEnumerable<string[]> GetRevitVersionTexts(IEnumerable<string> fullPaths)
+        public static IEnumerable<string[]> EnumerateRevitVersionTexts(IEnumerable<string> fullPaths)
         {
             InitPythonFunctions();
 
-            return fullPaths.Select(GetRevitVersionTexts).ToList();
+            return fullPaths.Select(GetRevitVersionTexts);
         }
     }
 }
