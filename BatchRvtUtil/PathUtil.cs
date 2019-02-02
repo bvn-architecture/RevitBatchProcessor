@@ -210,11 +210,6 @@ namespace BatchRvtUtil
             }
         }
 
-        private static string GetExecutableFolderPath()
-        {
-            return AppDomain.CurrentDomain.BaseDirectory;
-        }
-
         private static void InitPythonFunctions()
         {
             bool needToAddSearchPath = (engine == null);
@@ -223,7 +218,7 @@ namespace BatchRvtUtil
 
             if (needToAddSearchPath)
             {
-                var scriptsFolderPath = Path.Combine(GetExecutableFolderPath(), BatchRvt.SCRIPTS_FOLDER_NAME);
+                var scriptsFolderPath = BatchRvt.GetBatchRvtScriptsFolderPath();
 
                 ScriptUtil.AddSearchPaths(engine, new[] { scriptsFolderPath });
             }
