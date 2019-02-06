@@ -1,5 +1,5 @@
 
-# Revit Batch Processor
+# Revit Batch Processor (RBP)
 
 Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
@@ -8,6 +8,8 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 [Installer for Revit Batch Processor v1.4.3](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.3/RevitBatchProcessorSetup.exe)
 
 ***Now supports Revit 2019!***
+
+***NEW in v1.4.3 - Generate the list of Revit model file paths automatically using the GUI.***
 
 See the [Releases](https://github.com/bvn-architecture/RevitBatchProcessor/releases) page for more information.
 
@@ -37,6 +39,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Option to process files (of the same Revit version) in the same Revit session, or to process each file in its own Revit session. The latter is useful if Revit happens to crash during processing, since this won't block further processing.
 - Automatic Revit dialog / message box handling. These, in addition to Revit error messages are handled and logged to the GUI console. This makes the batch processor very likely to complete its tasks without any user intervention required!
 - Ability to import and export settings. This feature combined with the simple [command-line interface](#command-line-interface) allows for batch processing tasks to be setup to run automatically on a schedule (using the Windows Task Scheduler) without the GUI.
+- Generate a .txt-based list of Revit model file paths compatible with RBP. The *New List* button in the GUI will prompt for a folder path to scan for Revit files. Optionally you can specify the type of Revit files to scan for and also whether to include subfolders in the scan.
 
 ## Unlimited Power
 
@@ -107,6 +110,8 @@ The ***two ingredients*** you will need in order to use the Revit Batch Processo
   P:\16\ProjectXYZ\ModelB.rvt
   P:\16\ProjectXYZ\ConsultantModel.rvt
   ```
+
+  NOTE: as of v1.4.3 you can generate this list in .txt format using the *New List* button in the GUI. It will prompt you for a folder to scan for Revit files. Optionally you can specify the type of Revit files to scan for and also whether to include subfolders in the scan.
 
 - A **Dynamo (.dyn)** or **Python (.py)** task script. This script will be executed once for each file in the list.
 
