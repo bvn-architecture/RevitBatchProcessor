@@ -25,7 +25,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Testing your own Revit API scripts and Revit addins against a variety of Revit models and families in an automated manner.
 - Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!
 
-![Screenshot of the UI](BatchRvt_Screenshot.1.3.0.png)
+![Screenshot of the UI](BatchRvt_Screenshot.1.4.3.png)
 
 ## Features
 
