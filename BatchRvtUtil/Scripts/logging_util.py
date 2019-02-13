@@ -20,6 +20,7 @@
 
 import clr
 import System
+from System.IO import Path, File
 
 import batch_rvt_util
 from batch_rvt_util import LogFile
@@ -33,4 +34,21 @@ def InitializeLogging(logName, logFolderPath):
 def GetLogFilePath():
   logFile = LOG_FILE[0]
   return logFile.GetLogFilePath() if logFile is not None else str.Empty
+
+def DumpPlainTextLogFile():
+  plainTextLogFilePath = None
+  logFilePath = GetLogFilePath()
+  if not str.IsNullOrWhiteSpace(logFilePath):
+    plainTextLogFilePath = Path.Combine(
+        Path.GetDirectoryName(logFilePath),
+        Path.GetFileNameWithoutExtension(logFilePath) + ".txt"
+      )
+    try:
+      File.WriteAllLines(
+          plainTextLogFilePath,
+          LogFile.ReadLinesAsPlainText(logFilePath)
+        )
+    except Exception, e:
+      plainTextLogFilePath = None
+  return plainTextLogFilePath
 

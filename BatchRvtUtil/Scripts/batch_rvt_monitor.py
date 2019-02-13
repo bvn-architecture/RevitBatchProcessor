@@ -38,6 +38,7 @@ from script_util import Output
 import batch_rvt_config
 import batch_rvt_util
 from batch_rvt_util import RevitVersion, ScriptDataUtil, BatchRvt
+import logging_util
 
 def HasSupportedRevitFilePath(supportedRevitFileInfo):
   fullFilePath = supportedRevitFileInfo.GetRevitFileInfo().GetFullPath()
@@ -478,6 +479,15 @@ def Main():
     Output("Operation aborted.")
   else:
     Output("Operation completed.")
+    
+    plainTextLogFilePath = logging_util.DumpPlainTextLogFile()
+    if not str.IsNullOrWhiteSpace(plainTextLogFilePath):
+      Output()
+      Output()
+      Output("A plain-text copy of the Log File has been saved to:")
+      Output()
+      Output("\t" + plainTextLogFilePath)
+  
   Output()
   return
 
