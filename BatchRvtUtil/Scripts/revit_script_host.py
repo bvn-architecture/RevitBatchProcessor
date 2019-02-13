@@ -54,9 +54,6 @@ from revit_script_util import ScriptDataUtil
 END_SESSION_DELAY_IN_SECONDS = 5
 CLOSE_MAIN_WINDOW_ATTEMPTS = 10
 
-def GetEnvironmentVariables(process):
-  return process.StartInfo.EnvironmentVariables
-
 def GetCurrentProcess():
   return Process.GetCurrentProcess()
 
@@ -343,8 +340,7 @@ def DoRevitSessionProcessing(
   return results
 
 def Main():
-  currentProcess = GetCurrentProcess()
-  environmentVariables = GetEnvironmentVariables(currentProcess)
+  environmentVariables = script_environment.GetEnvironmentVariables()
   outputPipeHandleString = script_environment.GetScriptOutputPipeHandleString(environmentVariables)
   scriptFilePath = script_environment.GetScriptFilePath(environmentVariables)
   scriptDataFilePath = script_environment.GetScriptDataFilePath(environmentVariables)

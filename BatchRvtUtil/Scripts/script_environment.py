@@ -20,6 +20,9 @@
 
 import clr
 import System
+from System import NullReferenceException
+from System.Diagnostics import Process
+
 
 BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = "BATCHRVT__SCRIPTS_FOLDER_PATH"
 SCRIPT_FILE_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__SCRIPT_FILE_PATH"
@@ -152,4 +155,13 @@ def InitEnvironmentVariables(
   SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId)
   SetTestModeFolderPath(environmentVariables, testModeFolderPath)
   return
+
+def GetEnvironmentVariables():
+  environmentVariables = None
+  # NOTE: Have encountered (at least once) a NullReferenceException upon accessing the EnvironmentVariables property!
+  try:
+    environmentVariables = Process.GetCurrentProcess().StartInfo.EnvironmentVariables
+  except NullReferenceException, e:
+    environmentVariables = None
+  return environmentVariables
 

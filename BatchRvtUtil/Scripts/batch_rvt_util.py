@@ -20,7 +20,31 @@
 
 import clr
 import System
-clr.AddReference("BatchRvtUtil")
+from System.IO import IOException, Path, Directory
+
+import script_environment
+
+BATCH_RVT_UTIL_ASSEMBLY_NAME = "BatchRvtUtil"
+
+ 
+def GetParentFolder(folderPath):
+  return Directory.GetParent(folderPath).FullName
+
+def RemoveTrailingDirectorySeparators(folderPath):
+  return folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+
+def AddBatchRvtUtilAssemblyReference():
+  try:
+    clr.AddReference(BATCH_RVT_UTIL_ASSEMBLY_NAME)
+  except IOException, e: # Can occur if PyRevit is installed. Need to use AddReferenceToFileAndPath() in this case.
+    environmentVariables = script_environment.GetEnvironmentVariables()
+    batchRvtScriptsFolderPath = script_environment.GetBatchRvtScriptsFolderPath(environmentVariables)
+    batchRvtFolderPath = GetParentFolder(RemoveTrailingDirectorySeparators(batchRvtScriptsFolderPath))
+    clr.AddReferenceToFileAndPath(Path.Combine(batchRvtFolderPath, BATCH_RVT_UTIL_ASSEMBLY_NAME))
+  return
+
+AddBatchRvtUtilAssemblyReference()
+
 import BatchRvtUtil
 from BatchRvtUtil import *
 
