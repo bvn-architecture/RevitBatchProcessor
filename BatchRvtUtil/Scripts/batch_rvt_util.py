@@ -20,26 +20,29 @@
 
 import clr
 import System
-from System.IO import IOException, Path, Directory
-
-import script_environment
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
+from System import AppDomain
+from System.IO import IOException, Path
 
 BATCH_RVT_UTIL_ASSEMBLY_NAME = "BatchRvtUtil"
+BATCH_RVT_SCRIPT_HOST_ASSEMBLY_NAME = "BatchRvtScriptHost"
 
- 
-def GetParentFolder(folderPath):
-  return Directory.GetParent(folderPath).FullName
-
-def RemoveTrailingDirectorySeparators(folderPath):
-  return folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+def GetExistingLoadedAssembly(assemblyName):
+  return (
+      AppDomain.CurrentDomain.GetAssemblies()
+      .FirstOrDefault(lambda assembly: assembly.GetName().Name == assemblyName)
+    )
 
 def AddBatchRvtUtilAssemblyReference():
   try:
     clr.AddReference(BATCH_RVT_UTIL_ASSEMBLY_NAME)
   except IOException, e: # Can occur if PyRevit is installed. Need to use AddReferenceToFileAndPath() in this case.
-    environmentVariables = script_environment.GetEnvironmentVariables()
-    batchRvtScriptsFolderPath = script_environment.GetBatchRvtScriptsFolderPath(environmentVariables)
-    batchRvtFolderPath = GetParentFolder(RemoveTrailingDirectorySeparators(batchRvtScriptsFolderPath))
+    batchRvtScriptHostAssembly = GetExistingLoadedAssembly(BATCH_RVT_SCRIPT_HOST_ASSEMBLY_NAME)
+    clr.AddReference(batchRvtScriptHostAssembly)
+    from BatchRvt.ScriptHost import ScriptHostUtil
+    environmentVariables = ScriptHostUtil.GetEnvironmentVariables()
+    batchRvtFolderPath = ScriptHostUtil.GetBatchRvtFolderPath(environmentVariables)
     clr.AddReferenceToFileAndPath(Path.Combine(batchRvtFolderPath, BATCH_RVT_UTIL_ASSEMBLY_NAME))
   return
 
