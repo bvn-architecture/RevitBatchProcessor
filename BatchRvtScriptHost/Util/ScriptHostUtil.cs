@@ -60,7 +60,7 @@ namespace BatchRvt.ScriptHost
 
                     var pluginFullFolderPath = Path.GetFullPath(pluginFolderPath);
                     var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, BatchScriptHostFilename);
-                    var batchRvtFolderPath = GetParentFolder(RemoveTrailingDirectorySeparators(batchRvtScriptsFolderPath));
+                    var batchRvtFolderPath = GetBatchRvtFolderPath(environmentVariables);
 
                     ScriptUtil.AddSearchPaths(engine, new[] {
                         batchRvtScriptsFolderPath,
@@ -89,7 +89,16 @@ namespace BatchRvt.ScriptHost
             return folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
-        private static string GetBatchRvtScriptsFolderPath(StringDictionary environmentVariables)
+        public static string GetBatchRvtFolderPath(StringDictionary environmentVariables)
+        {
+            var batchRvtScriptsFolderPath = GetBatchRvtScriptsFolderPath(environmentVariables);
+
+            return (batchRvtScriptsFolderPath != null) ?
+                GetParentFolder(RemoveTrailingDirectorySeparators(batchRvtScriptsFolderPath)) :
+                null;
+        }
+
+        public static string GetBatchRvtScriptsFolderPath(StringDictionary environmentVariables)
         {
             return GetEnvironmentVariable(
                     environmentVariables,
@@ -102,7 +111,7 @@ namespace BatchRvt.ScriptHost
             return environmentVariables[variableName];
         }
 
-        private static StringDictionary GetEnvironmentVariables()
+        public static StringDictionary GetEnvironmentVariables()
         {
             StringDictionary environmentVariables = null;
 
