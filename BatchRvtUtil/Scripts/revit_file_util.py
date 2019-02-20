@@ -103,61 +103,53 @@ def OpenAndActivateBatchRvtTemporaryDocument(uiApplication):
   uiDoc = uiApplication.OpenAndActivateDocument(BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
   return uiDoc
 
-def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
-  if isinstance(localModelPath, str):
-    localModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(localModelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
+def ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig):
   worksetConfig = (
+      worksetConfig if worksetConfig is not None else
       WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
       if closeAllWorksets else
       WorksetConfiguration()
     )
+  return worksetConfig
+
+def ToModelPath(modelPath):
+  if isinstance(modelPath, str):
+    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+  return modelPath
+
+def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None):
+  modelPath = ToModelPath(modelPath)
+  localModelPath = ToModelPath(localModelPath)
+  openOptions = OpenOptions()
+  openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
+  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
   return application.OpenDocumentFile(localModelPath, openOptions)
 
-def OpenAndActivateNewLocal(uiApplication, modelPath, localModelPath, closeAllWorksets=False):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
-  if isinstance(localModelPath, str):
-    localModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(localModelPath)
+def OpenAndActivateNewLocal(uiApplication, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None):
+  modelPath = ToModelPath(modelPath)
+  localModelPath = ToModelPath(localModelPath)
   openOptions = OpenOptions()
   openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
-  worksetConfig = (
-      WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
-      if closeAllWorksets else
-      WorksetConfiguration()
-    )
+  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
   return uiApplication.OpenAndActivateDocument(localModelPath, openOptions, False)
 
-def OpenDetachAndPreserveWorksets(application, modelPath, closeAllWorksets=False):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+def OpenDetachAndPreserveWorksets(application, modelPath, closeAllWorksets=False, worksetConfig=None):
+  modelPath = ToModelPath(modelPath)
   openOptions = OpenOptions()
   openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
-  worksetConfig = (
-      WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
-      if closeAllWorksets else
-      WorksetConfiguration()
-    )
+  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   return application.OpenDocumentFile(modelPath, openOptions)
 
-def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllWorksets=False):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllWorksets=False, worksetConfig=None):
+  modelPath = ToModelPath(modelPath)
   openOptions = OpenOptions()
   openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
-  worksetConfig = (
-      WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
-      if closeAllWorksets else
-      WorksetConfiguration()
-    )
+  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
@@ -169,20 +161,17 @@ def OpenDetachAndDiscardWorksets(application, modelPath):
   return application.OpenDocumentFile(modelPath, openOptions)
 
 def OpenAndActivateDetachAndDiscardWorksets(uiApplication, modelPath):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+  modelPath = ToModelPath(modelPath)
   openOptions = OpenOptions()
   openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
   return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
 def OpenDocumentFile(application, modelPath):
-  if isinstance(modelPath, ModelPath):
-    modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+  modelPath = ToModelPath(modelPath)
   return application.OpenDocumentFile(modelPath)
 
 def OpenAndActivateDocumentFile(uiApplication, modelPath):
-  if isinstance(modelPath, ModelPath):
-    modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+  modelPath = ToModelPath(modelPath)
   return uiApplication.OpenAndActivateDocument(modelPath)
 
 def RelinquishAll(doc, shouldWaitForLockAvailabilityCallback=None):
