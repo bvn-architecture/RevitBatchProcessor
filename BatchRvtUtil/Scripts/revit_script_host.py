@@ -146,6 +146,7 @@ def RunBatchTaskScript(scriptFilePath):
     openCreateNewLocal = False # default is False because the file may not be a workshared Central file.
     isCentralModel = False
     isLocalModel = False
+    worksetConfig = None
     try:
       output()
       output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + centralFilePath)
@@ -225,9 +226,9 @@ def RunBatchTaskScript(scriptFilePath):
             output()
             output("WARNING: failed to delete the local file!")
           path_util.CreateDirectoryForFilePath(localFilePath)
-          result = revit_script_util.RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, processDocument, output)
+          result = revit_script_util.RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, processDocument, output)
         elif isCentralModel or isLocalModel:
-          result = revit_script_util.RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksetsOnDetach, processDocument, output)
+          result = revit_script_util.RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksetsOnDetach, worksetConfig, processDocument, output)
         else:
           result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, processDocument, output)
     except Exception, e:

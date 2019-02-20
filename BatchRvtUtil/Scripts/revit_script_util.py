@@ -191,30 +191,30 @@ def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
   app.PurgeReleasedAPIObjects()
   return
 
-def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, documentAction, output):
+def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, worksetConfig, documentAction, output):
   app = uiapp.Application
   result = None
   output()
   output("Opening detached instance of central file: " + centralFilePath)
-  # TODO: decide if worksets should be closed or open (currently the script closes them)
+  closeAllWorksets = worksetConfig is None
   if openInUI:
     if discardWorksets:
       uidoc = revit_file_util.OpenAndActivateDetachAndDiscardWorksets(uiapp, centralFilePath)
     else:
-      uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, closeAllWorksets=True)
+      uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, closeAllWorksets, worksetConfig)
     doc = uidoc.Document
   else:
     if discardWorksets:
       doc = revit_file_util.OpenDetachAndDiscardWorksets(app, centralFilePath)
     else:
-      doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, closeAllWorksets=True)
+      doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, closeAllWorksets, worksetConfig)
   try:
     result = documentAction(doc)
   finally:
     SafeCloseWithoutSave(doc, openInUI, "Closed detached instance of central file: " + centralFilePath, output)
   return result
 
-def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
+def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, documentAction, output):
   try:
     app = uiapp.Application
     result = None
@@ -222,12 +222,12 @@ def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, 
     output("Opening local instance of central file: " + centralFilePath)
     output()
     output("New local file: " + localFilePath)
-    # TODO: decide if worksets should be closed or open (currently the script closes them)
+    closeAllWorksets = worksetConfig is None
     if openInUI:
-      uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, closeAllWorksets=True)
+      uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, closeAllWorksets, worksetConfig)
       doc = uidoc.Document
     else:
-      doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, closeAllWorksets=True)
+      doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, closeAllWorksets, worksetConfig)
     try:
       result = documentAction(doc)
     finally:
@@ -257,16 +257,16 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
     SafeCloseWithoutSave(doc, openInUI, "Closed file: " + revitFilePath, output)
   return result
 
-def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, documentAction, output):
+def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, worksetConfig, documentAction, output):
   def revitAction():
-    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, documentAction, output)
+    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, worksetConfig, documentAction, output)
     return result    
   result = WithErrorReportingAndHandling(uiapp, revitAction, output)
   return result
 
-def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output):
+def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, documentAction, output):
   def revitAction():
-    result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, documentAction, output)
+    result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, documentAction, output)
     return result    
   result = WithErrorReportingAndHandling(uiapp, revitAction, output)
   return result
