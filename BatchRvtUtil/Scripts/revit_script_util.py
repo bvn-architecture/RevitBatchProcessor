@@ -201,13 +201,13 @@ def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets
     if discardWorksets:
       uidoc = revit_file_util.OpenAndActivateDetachAndDiscardWorksets(uiapp, centralFilePath)
     else:
-      uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, True)
+      uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, closeAllWorksets=True)
     doc = uidoc.Document
   else:
     if discardWorksets:
       doc = revit_file_util.OpenDetachAndDiscardWorksets(app, centralFilePath)
     else:
-      doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, True)
+      doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, closeAllWorksets=True)
   try:
     result = documentAction(doc)
   finally:
@@ -224,10 +224,10 @@ def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, 
     output("New local file: " + localFilePath)
     # TODO: decide if worksets should be closed or open (currently the script closes them)
     if openInUI:
-      uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, True)
+      uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, closeAllWorksets=True)
       doc = uidoc.Document
     else:
-      doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, True)
+      doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, closeAllWorksets=True)
     try:
       result = documentAction(doc)
     finally:
