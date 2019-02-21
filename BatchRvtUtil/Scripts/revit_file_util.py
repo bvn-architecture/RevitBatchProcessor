@@ -117,6 +117,11 @@ def ToModelPath(modelPath):
     modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
   return modelPath
 
+def ToUserVisiblePath(modelPath):
+  if isinstance(modelPath, ModelPath):
+    modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+  return modelPath
+
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None):
   modelPath = ToModelPath(modelPath)
   localModelPath = ToModelPath(localModelPath)
@@ -167,11 +172,11 @@ def OpenAndActivateDetachAndDiscardWorksets(uiApplication, modelPath):
   return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
 def OpenDocumentFile(application, modelPath):
-  modelPath = ToModelPath(modelPath)
+  modelPath = ToUserVisiblePath(modelPath)
   return application.OpenDocumentFile(modelPath)
 
 def OpenAndActivateDocumentFile(uiApplication, modelPath):
-  modelPath = ToModelPath(modelPath)
+  modelPath = ToUserVisiblePath(modelPath)
   return uiApplication.OpenAndActivateDocument(modelPath)
 
 def RelinquishAll(doc, shouldWaitForLockAvailabilityCallback=None):
