@@ -62,18 +62,18 @@ namespace BatchRvtGUI
         private const string REVIT_FAMILY_FILE_PATTERN = "*" + REVIT_FAMILY_FILE_EXTENSION;
 
         private const int SETUP_HEIGHT = 642;
-        private const int SETUP_INITIAL_WIDTH = 875;
-        private const int SETUP_MINIMUM_WIDTH = 875;
+        private const int SETUP_INITIAL_WIDTH = 1024;
+        private const int SETUP_MINIMUM_WIDTH = 1024;
         private const int SETUP_MAXIMUM_WIDTH = 1600;
 
         private readonly System.Drawing.Size SETUP_INITIAL_SIZE = new System.Drawing.Size(SETUP_INITIAL_WIDTH, SETUP_HEIGHT);
         private readonly System.Drawing.Size SETUP_MINIMUM_SIZE = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, SETUP_HEIGHT);
         private readonly System.Drawing.Size SETUP_MAXIMUM_SIZE = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, SETUP_HEIGHT);
 
-        private const int RUNNING_INITIAL_WIDTH = 875;
+        private const int RUNNING_INITIAL_WIDTH = 1024;
         private const int RUNNING_INITIAL_HEIGHT = 875;
         private const int RUNNING_MINIMUM_HEIGHT = 875;
-        private const int RUNNING_MINIMUM_WIDTH = 875;
+        private const int RUNNING_MINIMUM_WIDTH = 1024;
 
         private readonly System.Drawing.Size RUNNING_INITIAL_SIZE = new System.Drawing.Size(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
         private readonly System.Drawing.Size RUNNING_MINIMUM_SIZE = new System.Drawing.Size(RUNNING_MINIMUM_WIDTH, RUNNING_MINIMUM_HEIGHT);
@@ -162,6 +162,9 @@ namespace BatchRvtGUI
                                 this.createNewLocalRadioButton.Checked = (this.Settings.CentralFileOpenOption.GetValue() == BatchRvt.CentralFileOpenOption.CreateNewLocal);
                                 this.deleteLocalAfterCheckBox.Checked = this.Settings.DeleteLocalAfter.GetValue();
                                 this.discardWorksetsCheckBox.Checked = this.Settings.DiscardWorksetsOnDetach.GetValue();
+                                this.closeAllWorksetsRadioButton.Checked = (this.Settings.WorksetConfigurationOption.GetValue() == BatchRvt.WorksetConfigurationOption.CloseAllWorksets);
+                                this.openAllWorksetsRadioButton.Checked = (this.Settings.WorksetConfigurationOption.GetValue() == BatchRvt.WorksetConfigurationOption.OpenAllWorksets);
+                                this.openLastViewedWorksetsRadioButton.Checked = (this.Settings.WorksetConfigurationOption.GetValue() == BatchRvt.WorksetConfigurationOption.OpenLastViewed);
                                 UpdateCentralFileProcessingControls();
                             },
                             () => {
@@ -172,6 +175,15 @@ namespace BatchRvtGUI
                                     );
                                 this.Settings.DeleteLocalAfter.SetValue(this.deleteLocalAfterCheckBox.Checked);
                                 this.Settings.DiscardWorksetsOnDetach.SetValue(this.discardWorksetsCheckBox.Checked);
+                                this.Settings.WorksetConfigurationOption.SetValue(
+                                        this.closeAllWorksetsRadioButton.Checked ?
+                                        BatchRvt.WorksetConfigurationOption.CloseAllWorksets :
+                                        (
+                                            this.openAllWorksetsRadioButton.Checked ?
+                                            BatchRvt.WorksetConfigurationOption.OpenAllWorksets :
+                                            BatchRvt.WorksetConfigurationOption.OpenLastViewed
+                                        )
+                                    );
                             }
                         ),
 
@@ -877,6 +889,7 @@ namespace BatchRvtGUI
         {
             this.deleteLocalAfterCheckBox.Enabled = this.createNewLocalRadioButton.Checked;
             this.discardWorksetsCheckBox.Enabled = this.detachFromCentralRadioButton.Checked;
+            this.worksetConfigurationGroupBox.Enabled = !(this.detachFromCentralRadioButton.Checked && this.discardWorksetsCheckBox.Checked);
         }
 
         private void useFileRevitVersionRadioButton_CheckedChanged(object sender, EventArgs e)
@@ -1366,6 +1379,11 @@ namespace BatchRvtGUI
                     REVIT_PROJECT_FILE_EXTENSION,
                     REVIT_FAMILY_FILE_EXTENSION
                 }.Any(revitExtension => extension == revitExtension.ToLower());
+        }
+
+        private void discardWorksetsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateCentralFileProcessingControls();
         }
     }
 }

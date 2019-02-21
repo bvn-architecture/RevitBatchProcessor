@@ -55,7 +55,12 @@
             this.useSameRevitSessionRadioButton = new System.Windows.Forms.RadioButton();
             this.useSeparateRevitSessionRadioButton = new System.Windows.Forms.RadioButton();
             this.enableBatchProcessingCheckBox = new System.Windows.Forms.CheckBox();
+            this.newRevitFileListButton = new System.Windows.Forms.Button();
             this.centralFileProcessingGroupBox = new System.Windows.Forms.GroupBox();
+            this.worksetConfigurationGroupBox = new System.Windows.Forms.GroupBox();
+            this.openLastViewedWorksetsRadioButton = new System.Windows.Forms.RadioButton();
+            this.openAllWorksetsRadioButton = new System.Windows.Forms.RadioButton();
+            this.closeAllWorksetsRadioButton = new System.Windows.Forms.RadioButton();
             this.discardWorksetsCheckBox = new System.Windows.Forms.CheckBox();
             this.deleteLocalAfterCheckBox = new System.Windows.Forms.CheckBox();
             this.detachFromCentralRadioButton = new System.Windows.Forms.RadioButton();
@@ -82,7 +87,6 @@
             this.importSettingsButton = new System.Windows.Forms.Button();
             this.exportSettingsButton = new System.Windows.Forms.Button();
             this.showAdvancedSettingsCheckBox = new System.Windows.Forms.CheckBox();
-            this.newRevitFileListButton = new System.Windows.Forms.Button();
             this.settingsGroupBox.SuspendLayout();
             this.singleRevitTaskProcessingGroupBox.SuspendLayout();
             this.dataExportGroupBox.SuspendLayout();
@@ -91,6 +95,7 @@
             this.revitSessionGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.timeOutNumericUpDown)).BeginInit();
             this.centralFileProcessingGroupBox.SuspendLayout();
+            this.worksetConfigurationGroupBox.SuspendLayout();
             this.revitFileProcessingGroupBox.SuspendLayout();
             this.preAndPostProcessingGroupBox.SuspendLayout();
             this.batchRvtOutputGroupBox.SuspendLayout();
@@ -103,7 +108,7 @@
             this.revitFileListTextBox.Location = new System.Drawing.Point(85, 42);
             this.revitFileListTextBox.Name = "revitFileListTextBox";
             this.revitFileListTextBox.ReadOnly = true;
-            this.revitFileListTextBox.Size = new System.Drawing.Size(551, 20);
+            this.revitFileListTextBox.Size = new System.Drawing.Size(700, 20);
             this.revitFileListTextBox.TabIndex = 2;
             // 
             // dataExportFolderTextBox
@@ -113,13 +118,13 @@
             this.dataExportFolderTextBox.Location = new System.Drawing.Point(137, 45);
             this.dataExportFolderTextBox.Name = "dataExportFolderTextBox";
             this.dataExportFolderTextBox.ReadOnly = true;
-            this.dataExportFolderTextBox.Size = new System.Drawing.Size(599, 20);
+            this.dataExportFolderTextBox.Size = new System.Drawing.Size(748, 20);
             this.dataExportFolderTextBox.TabIndex = 2;
             // 
             // browseRevitFileListButton
             // 
             this.browseRevitFileListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseRevitFileListButton.Location = new System.Drawing.Point(642, 40);
+            this.browseRevitFileListButton.Location = new System.Drawing.Point(791, 40);
             this.browseRevitFileListButton.Name = "browseRevitFileListButton";
             this.browseRevitFileListButton.Size = new System.Drawing.Size(75, 23);
             this.browseRevitFileListButton.TabIndex = 3;
@@ -130,7 +135,7 @@
             // browseDataExportFolderButton
             // 
             this.browseDataExportFolderButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseDataExportFolderButton.Location = new System.Drawing.Point(742, 43);
+            this.browseDataExportFolderButton.Location = new System.Drawing.Point(891, 43);
             this.browseDataExportFolderButton.Name = "browseDataExportFolderButton";
             this.browseDataExportFolderButton.Size = new System.Drawing.Size(75, 23);
             this.browseDataExportFolderButton.TabIndex = 3;
@@ -158,7 +163,7 @@
             this.settingsGroupBox.Controls.Add(this.preAndPostProcessingGroupBox);
             this.settingsGroupBox.Location = new System.Drawing.Point(12, 12);
             this.settingsGroupBox.Name = "settingsGroupBox";
-            this.settingsGroupBox.Size = new System.Drawing.Size(835, 553);
+            this.settingsGroupBox.Size = new System.Drawing.Size(984, 553);
             this.settingsGroupBox.TabIndex = 0;
             this.settingsGroupBox.TabStop = false;
             this.settingsGroupBox.Text = "Settings";
@@ -172,7 +177,7 @@
             this.singleRevitTaskProcessingGroupBox.Controls.Add(this.singleRevitTaskRevitVersionLabel);
             this.singleRevitTaskProcessingGroupBox.Location = new System.Drawing.Point(6, 101);
             this.singleRevitTaskProcessingGroupBox.Name = "singleRevitTaskProcessingGroupBox";
-            this.singleRevitTaskProcessingGroupBox.Size = new System.Drawing.Size(823, 73);
+            this.singleRevitTaskProcessingGroupBox.Size = new System.Drawing.Size(972, 73);
             this.singleRevitTaskProcessingGroupBox.TabIndex = 1;
             this.singleRevitTaskProcessingGroupBox.TabStop = false;
             this.singleRevitTaskProcessingGroupBox.Text = "Single Revit Task Processing";
@@ -217,7 +222,7 @@
             this.dataExportGroupBox.Controls.Add(this.dataExportFolderTextBox);
             this.dataExportGroupBox.Location = new System.Drawing.Point(6, 468);
             this.dataExportGroupBox.Name = "dataExportGroupBox";
-            this.dataExportGroupBox.Size = new System.Drawing.Size(823, 79);
+            this.dataExportGroupBox.Size = new System.Drawing.Size(972, 79);
             this.dataExportGroupBox.TabIndex = 4;
             this.dataExportGroupBox.TabStop = false;
             this.dataExportGroupBox.Text = "Data Export";
@@ -254,7 +259,7 @@
             this.taskScriptGroupBox.Controls.Add(this.browseScriptButton);
             this.taskScriptGroupBox.Location = new System.Drawing.Point(6, 19);
             this.taskScriptGroupBox.Name = "taskScriptGroupBox";
-            this.taskScriptGroupBox.Size = new System.Drawing.Size(823, 76);
+            this.taskScriptGroupBox.Size = new System.Drawing.Size(972, 76);
             this.taskScriptGroupBox.TabIndex = 0;
             this.taskScriptGroupBox.TabStop = false;
             this.taskScriptGroupBox.Text = "Task Script";
@@ -265,7 +270,7 @@
             this.showMessageBoxOnTaskScriptErrorCheckBox.Location = new System.Drawing.Point(12, 47);
             this.showMessageBoxOnTaskScriptErrorCheckBox.Name = "showMessageBoxOnTaskScriptErrorCheckBox";
             this.showMessageBoxOnTaskScriptErrorCheckBox.Size = new System.Drawing.Size(217, 17);
-            this.showMessageBoxOnTaskScriptErrorCheckBox.TabIndex = 3;
+            this.showMessageBoxOnTaskScriptErrorCheckBox.TabIndex = 4;
             this.showMessageBoxOnTaskScriptErrorCheckBox.Text = "Show Message Box on Task Script Error";
             this.showMessageBoxOnTaskScriptErrorCheckBox.UseVisualStyleBackColor = true;
             this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = false;
@@ -286,16 +291,16 @@
             this.taskScriptTextBox.Location = new System.Drawing.Point(133, 21);
             this.taskScriptTextBox.Name = "taskScriptTextBox";
             this.taskScriptTextBox.ReadOnly = true;
-            this.taskScriptTextBox.Size = new System.Drawing.Size(503, 20);
+            this.taskScriptTextBox.Size = new System.Drawing.Size(652, 20);
             this.taskScriptTextBox.TabIndex = 1;
             // 
             // taskScriptNewScriptButton
             // 
             this.taskScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.taskScriptNewScriptButton.Location = new System.Drawing.Point(723, 19);
+            this.taskScriptNewScriptButton.Location = new System.Drawing.Point(872, 19);
             this.taskScriptNewScriptButton.Name = "taskScriptNewScriptButton";
             this.taskScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
-            this.taskScriptNewScriptButton.TabIndex = 2;
+            this.taskScriptNewScriptButton.TabIndex = 3;
             this.taskScriptNewScriptButton.Text = "New Script ...";
             this.taskScriptNewScriptButton.UseVisualStyleBackColor = true;
             this.taskScriptNewScriptButton.Click += new System.EventHandler(this.taskScriptNewScriptButton_Click);
@@ -303,7 +308,7 @@
             // browseScriptButton
             // 
             this.browseScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseScriptButton.Location = new System.Drawing.Point(642, 19);
+            this.browseScriptButton.Location = new System.Drawing.Point(791, 19);
             this.browseScriptButton.Name = "browseScriptButton";
             this.browseScriptButton.Size = new System.Drawing.Size(75, 23);
             this.browseScriptButton.TabIndex = 2;
@@ -325,7 +330,7 @@
             this.batchRevitFileProcessingGroupBox.Controls.Add(this.revitFileProcessingGroupBox);
             this.batchRevitFileProcessingGroupBox.Location = new System.Drawing.Point(6, 180);
             this.batchRevitFileProcessingGroupBox.Name = "batchRevitFileProcessingGroupBox";
-            this.batchRevitFileProcessingGroupBox.Size = new System.Drawing.Size(823, 194);
+            this.batchRevitFileProcessingGroupBox.Size = new System.Drawing.Size(972, 194);
             this.batchRevitFileProcessingGroupBox.TabIndex = 2;
             this.batchRevitFileProcessingGroupBox.TabStop = false;
             this.batchRevitFileProcessingGroupBox.Text = "Batch Revit File Processing";
@@ -338,9 +343,9 @@
             this.revitSessionGroupBox.Controls.Add(this.perFileProcessingTimeOutCheckBox);
             this.revitSessionGroupBox.Controls.Add(this.useSameRevitSessionRadioButton);
             this.revitSessionGroupBox.Controls.Add(this.useSeparateRevitSessionRadioButton);
-            this.revitSessionGroupBox.Location = new System.Drawing.Point(472, 68);
+            this.revitSessionGroupBox.Location = new System.Drawing.Point(625, 68);
             this.revitSessionGroupBox.Name = "revitSessionGroupBox";
-            this.revitSessionGroupBox.Size = new System.Drawing.Size(345, 97);
+            this.revitSessionGroupBox.Size = new System.Drawing.Size(341, 97);
             this.revitSessionGroupBox.TabIndex = 7;
             this.revitSessionGroupBox.TabStop = false;
             this.revitSessionGroupBox.Text = "Revit Session";
@@ -398,18 +403,75 @@
             this.enableBatchProcessingCheckBox.UseVisualStyleBackColor = true;
             this.enableBatchProcessingCheckBox.CheckedChanged += new System.EventHandler(this.enableBatchProcessingCheckBox_CheckedChanged);
             // 
+            // newRevitFileListButton
+            // 
+            this.newRevitFileListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.newRevitFileListButton.Location = new System.Drawing.Point(872, 40);
+            this.newRevitFileListButton.Name = "newRevitFileListButton";
+            this.newRevitFileListButton.Size = new System.Drawing.Size(94, 23);
+            this.newRevitFileListButton.TabIndex = 4;
+            this.newRevitFileListButton.Text = "New List ...";
+            this.newRevitFileListButton.UseVisualStyleBackColor = true;
+            this.newRevitFileListButton.Click += new System.EventHandler(this.newRevitFileListButton_Click);
+            // 
             // centralFileProcessingGroupBox
             // 
+            this.centralFileProcessingGroupBox.Controls.Add(this.worksetConfigurationGroupBox);
             this.centralFileProcessingGroupBox.Controls.Add(this.discardWorksetsCheckBox);
             this.centralFileProcessingGroupBox.Controls.Add(this.deleteLocalAfterCheckBox);
             this.centralFileProcessingGroupBox.Controls.Add(this.detachFromCentralRadioButton);
             this.centralFileProcessingGroupBox.Controls.Add(this.createNewLocalRadioButton);
             this.centralFileProcessingGroupBox.Location = new System.Drawing.Point(6, 68);
             this.centralFileProcessingGroupBox.Name = "centralFileProcessingGroupBox";
-            this.centralFileProcessingGroupBox.Size = new System.Drawing.Size(145, 120);
+            this.centralFileProcessingGroupBox.Size = new System.Drawing.Size(298, 120);
             this.centralFileProcessingGroupBox.TabIndex = 5;
             this.centralFileProcessingGroupBox.TabStop = false;
             this.centralFileProcessingGroupBox.Text = "Central File Processing";
+            // 
+            // worksetConfigurationGroupBox
+            // 
+            this.worksetConfigurationGroupBox.Controls.Add(this.openLastViewedWorksetsRadioButton);
+            this.worksetConfigurationGroupBox.Controls.Add(this.openAllWorksetsRadioButton);
+            this.worksetConfigurationGroupBox.Controls.Add(this.closeAllWorksetsRadioButton);
+            this.worksetConfigurationGroupBox.Location = new System.Drawing.Point(152, 19);
+            this.worksetConfigurationGroupBox.Name = "worksetConfigurationGroupBox";
+            this.worksetConfigurationGroupBox.Size = new System.Drawing.Size(140, 95);
+            this.worksetConfigurationGroupBox.TabIndex = 4;
+            this.worksetConfigurationGroupBox.TabStop = false;
+            this.worksetConfigurationGroupBox.Text = "Workset Configuration";
+            // 
+            // openLastViewedWorksetsRadioButton
+            // 
+            this.openLastViewedWorksetsRadioButton.AutoSize = true;
+            this.openLastViewedWorksetsRadioButton.Location = new System.Drawing.Point(6, 65);
+            this.openLastViewedWorksetsRadioButton.Name = "openLastViewedWorksetsRadioButton";
+            this.openLastViewedWorksetsRadioButton.Size = new System.Drawing.Size(112, 17);
+            this.openLastViewedWorksetsRadioButton.TabIndex = 2;
+            this.openLastViewedWorksetsRadioButton.TabStop = true;
+            this.openLastViewedWorksetsRadioButton.Text = "Open Last Viewed";
+            this.openLastViewedWorksetsRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // openAllWorksetsRadioButton
+            // 
+            this.openAllWorksetsRadioButton.AutoSize = true;
+            this.openAllWorksetsRadioButton.Location = new System.Drawing.Point(6, 42);
+            this.openAllWorksetsRadioButton.Name = "openAllWorksetsRadioButton";
+            this.openAllWorksetsRadioButton.Size = new System.Drawing.Size(113, 17);
+            this.openAllWorksetsRadioButton.TabIndex = 1;
+            this.openAllWorksetsRadioButton.TabStop = true;
+            this.openAllWorksetsRadioButton.Text = "Open All Worksets";
+            this.openAllWorksetsRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // closeAllWorksetsRadioButton
+            // 
+            this.closeAllWorksetsRadioButton.AutoSize = true;
+            this.closeAllWorksetsRadioButton.Location = new System.Drawing.Point(6, 19);
+            this.closeAllWorksetsRadioButton.Name = "closeAllWorksetsRadioButton";
+            this.closeAllWorksetsRadioButton.Size = new System.Drawing.Size(113, 17);
+            this.closeAllWorksetsRadioButton.TabIndex = 0;
+            this.closeAllWorksetsRadioButton.TabStop = true;
+            this.closeAllWorksetsRadioButton.Text = "Close All Worksets";
+            this.closeAllWorksetsRadioButton.UseVisualStyleBackColor = true;
             // 
             // discardWorksetsCheckBox
             // 
@@ -420,6 +482,7 @@
             this.discardWorksetsCheckBox.TabIndex = 3;
             this.discardWorksetsCheckBox.Text = "Discard Worksets";
             this.discardWorksetsCheckBox.UseVisualStyleBackColor = true;
+            this.discardWorksetsCheckBox.CheckedChanged += new System.EventHandler(this.discardWorksetsCheckBox_CheckedChanged);
             // 
             // deleteLocalAfterCheckBox
             // 
@@ -461,7 +524,7 @@
             this.revitFileProcessingGroupBox.Controls.Add(this.useSpecificRevitVersionRadioButton);
             this.revitFileProcessingGroupBox.Controls.Add(this.specificRevitVersionComboBox);
             this.revitFileProcessingGroupBox.Controls.Add(this.useFileRevitVersionRadioButton);
-            this.revitFileProcessingGroupBox.Location = new System.Drawing.Point(157, 68);
+            this.revitFileProcessingGroupBox.Location = new System.Drawing.Point(310, 68);
             this.revitFileProcessingGroupBox.Name = "revitFileProcessingGroupBox";
             this.revitFileProcessingGroupBox.Size = new System.Drawing.Size(309, 97);
             this.revitFileProcessingGroupBox.TabIndex = 6;
@@ -525,7 +588,7 @@
             this.preAndPostProcessingGroupBox.Controls.Add(this.preProcessingScriptBrowseButton);
             this.preAndPostProcessingGroupBox.Location = new System.Drawing.Point(6, 380);
             this.preAndPostProcessingGroupBox.Name = "preAndPostProcessingGroupBox";
-            this.preAndPostProcessingGroupBox.Size = new System.Drawing.Size(823, 82);
+            this.preAndPostProcessingGroupBox.Size = new System.Drawing.Size(972, 82);
             this.preAndPostProcessingGroupBox.TabIndex = 3;
             this.preAndPostProcessingGroupBox.TabStop = false;
             this.preAndPostProcessingGroupBox.Text = "Pre/Post-Processing";
@@ -537,7 +600,7 @@
             this.executePostProcessingScriptCheckBox.Location = new System.Drawing.Point(6, 50);
             this.executePostProcessingScriptCheckBox.Name = "executePostProcessingScriptCheckBox";
             this.executePostProcessingScriptCheckBox.Size = new System.Drawing.Size(204, 17);
-            this.executePostProcessingScriptCheckBox.TabIndex = 3;
+            this.executePostProcessingScriptCheckBox.TabIndex = 4;
             this.executePostProcessingScriptCheckBox.Text = "Execute Post-Processing Script (*.py):";
             this.executePostProcessingScriptCheckBox.UseVisualStyleBackColor = true;
             this.executePostProcessingScriptCheckBox.CheckedChanged += new System.EventHandler(this.executePostProcessingScriptCheckBox_CheckedChanged);
@@ -560,16 +623,16 @@
             this.postProcessingScriptTextBox.Location = new System.Drawing.Point(216, 48);
             this.postProcessingScriptTextBox.Name = "postProcessingScriptTextBox";
             this.postProcessingScriptTextBox.ReadOnly = true;
-            this.postProcessingScriptTextBox.Size = new System.Drawing.Size(420, 20);
-            this.postProcessingScriptTextBox.TabIndex = 4;
+            this.postProcessingScriptTextBox.Size = new System.Drawing.Size(569, 20);
+            this.postProcessingScriptTextBox.TabIndex = 5;
             // 
             // postProcessingScriptNewScriptButton
             // 
             this.postProcessingScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.postProcessingScriptNewScriptButton.Location = new System.Drawing.Point(723, 46);
+            this.postProcessingScriptNewScriptButton.Location = new System.Drawing.Point(872, 46);
             this.postProcessingScriptNewScriptButton.Name = "postProcessingScriptNewScriptButton";
             this.postProcessingScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
-            this.postProcessingScriptNewScriptButton.TabIndex = 2;
+            this.postProcessingScriptNewScriptButton.TabIndex = 7;
             this.postProcessingScriptNewScriptButton.Text = "New Script ...";
             this.postProcessingScriptNewScriptButton.UseVisualStyleBackColor = true;
             this.postProcessingScriptNewScriptButton.Click += new System.EventHandler(this.postProcessingScriptNewScriptButton_Click);
@@ -577,10 +640,10 @@
             // preProcessingScriptNewScriptButton
             // 
             this.preProcessingScriptNewScriptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.preProcessingScriptNewScriptButton.Location = new System.Drawing.Point(723, 17);
+            this.preProcessingScriptNewScriptButton.Location = new System.Drawing.Point(872, 17);
             this.preProcessingScriptNewScriptButton.Name = "preProcessingScriptNewScriptButton";
             this.preProcessingScriptNewScriptButton.Size = new System.Drawing.Size(94, 23);
-            this.preProcessingScriptNewScriptButton.TabIndex = 2;
+            this.preProcessingScriptNewScriptButton.TabIndex = 3;
             this.preProcessingScriptNewScriptButton.Text = "New Script ...";
             this.preProcessingScriptNewScriptButton.UseVisualStyleBackColor = true;
             this.preProcessingScriptNewScriptButton.Click += new System.EventHandler(this.preProcessingScriptNewScriptButton_Click);
@@ -588,10 +651,10 @@
             // postProcessingScriptBrowseButton
             // 
             this.postProcessingScriptBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.postProcessingScriptBrowseButton.Location = new System.Drawing.Point(642, 46);
+            this.postProcessingScriptBrowseButton.Location = new System.Drawing.Point(791, 46);
             this.postProcessingScriptBrowseButton.Name = "postProcessingScriptBrowseButton";
             this.postProcessingScriptBrowseButton.Size = new System.Drawing.Size(75, 23);
-            this.postProcessingScriptBrowseButton.TabIndex = 5;
+            this.postProcessingScriptBrowseButton.TabIndex = 6;
             this.postProcessingScriptBrowseButton.Text = "Browse ...";
             this.postProcessingScriptBrowseButton.UseVisualStyleBackColor = true;
             this.postProcessingScriptBrowseButton.Click += new System.EventHandler(this.postProcessingScriptBrowseButton_Click);
@@ -603,13 +666,13 @@
             this.preProcessingScriptTextBox.Location = new System.Drawing.Point(216, 19);
             this.preProcessingScriptTextBox.Name = "preProcessingScriptTextBox";
             this.preProcessingScriptTextBox.ReadOnly = true;
-            this.preProcessingScriptTextBox.Size = new System.Drawing.Size(420, 20);
+            this.preProcessingScriptTextBox.Size = new System.Drawing.Size(569, 20);
             this.preProcessingScriptTextBox.TabIndex = 1;
             // 
             // preProcessingScriptBrowseButton
             // 
             this.preProcessingScriptBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.preProcessingScriptBrowseButton.Location = new System.Drawing.Point(642, 17);
+            this.preProcessingScriptBrowseButton.Location = new System.Drawing.Point(791, 17);
             this.preProcessingScriptBrowseButton.Name = "preProcessingScriptBrowseButton";
             this.preProcessingScriptBrowseButton.Size = new System.Drawing.Size(75, 23);
             this.preProcessingScriptBrowseButton.TabIndex = 2;
@@ -621,10 +684,10 @@
             // 
             this.alwaysOnTopCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.alwaysOnTopCheckbox.AutoSize = true;
-            this.alwaysOnTopCheckbox.Location = new System.Drawing.Point(531, 575);
+            this.alwaysOnTopCheckbox.Location = new System.Drawing.Point(680, 575);
             this.alwaysOnTopCheckbox.Name = "alwaysOnTopCheckbox";
             this.alwaysOnTopCheckbox.Size = new System.Drawing.Size(92, 17);
-            this.alwaysOnTopCheckbox.TabIndex = 1;
+            this.alwaysOnTopCheckbox.TabIndex = 4;
             this.alwaysOnTopCheckbox.Text = "Always on top";
             this.alwaysOnTopCheckbox.UseVisualStyleBackColor = true;
             this.alwaysOnTopCheckbox.CheckedChanged += new System.EventHandler(this.alwaysOnTopCheckbox_CheckedChanged);
@@ -633,10 +696,10 @@
             // 
             this.startButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.startButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.startButton.Location = new System.Drawing.Point(629, 571);
+            this.startButton.Location = new System.Drawing.Point(778, 571);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(137, 23);
-            this.startButton.TabIndex = 2;
+            this.startButton.TabIndex = 5;
             this.startButton.Text = "Start Processing";
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);
@@ -645,10 +708,10 @@
             // 
             this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.closeButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.closeButton.Location = new System.Drawing.Point(772, 571);
+            this.closeButton.Location = new System.Drawing.Point(921, 571);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
-            this.closeButton.TabIndex = 3;
+            this.closeButton.TabIndex = 6;
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
@@ -661,8 +724,8 @@
             this.batchRvtOutputGroupBox.Controls.Add(this.batchRvtOutputTextBox);
             this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, 600);
             this.batchRvtOutputGroupBox.Name = "batchRvtOutputGroupBox";
-            this.batchRvtOutputGroupBox.Size = new System.Drawing.Size(835, 225);
-            this.batchRvtOutputGroupBox.TabIndex = 4;
+            this.batchRvtOutputGroupBox.Size = new System.Drawing.Size(984, 225);
+            this.batchRvtOutputGroupBox.TabIndex = 7;
             this.batchRvtOutputGroupBox.TabStop = false;
             this.batchRvtOutputGroupBox.Text = "Progress";
             // 
@@ -677,7 +740,7 @@
             this.batchRvtOutputTextBox.Name = "batchRvtOutputTextBox";
             this.batchRvtOutputTextBox.ReadOnly = true;
             this.batchRvtOutputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.batchRvtOutputTextBox.Size = new System.Drawing.Size(823, 200);
+            this.batchRvtOutputTextBox.Size = new System.Drawing.Size(972, 200);
             this.batchRvtOutputTextBox.TabIndex = 0;
             this.batchRvtOutputTextBox.TabStop = false;
             this.batchRvtOutputTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.batchRvtOutputTextBox_KeyDown);
@@ -687,7 +750,7 @@
             this.importSettingsButton.Location = new System.Drawing.Point(12, 571);
             this.importSettingsButton.Name = "importSettingsButton";
             this.importSettingsButton.Size = new System.Drawing.Size(110, 23);
-            this.importSettingsButton.TabIndex = 5;
+            this.importSettingsButton.TabIndex = 1;
             this.importSettingsButton.Text = "Import Settings ...";
             this.importSettingsButton.UseVisualStyleBackColor = true;
             this.importSettingsButton.Click += new System.EventHandler(this.importSettingsButton_Click);
@@ -697,7 +760,7 @@
             this.exportSettingsButton.Location = new System.Drawing.Point(128, 571);
             this.exportSettingsButton.Name = "exportSettingsButton";
             this.exportSettingsButton.Size = new System.Drawing.Size(110, 23);
-            this.exportSettingsButton.TabIndex = 5;
+            this.exportSettingsButton.TabIndex = 2;
             this.exportSettingsButton.Text = "Export Settings ...";
             this.exportSettingsButton.UseVisualStyleBackColor = true;
             this.exportSettingsButton.Click += new System.EventHandler(this.exportSettingsButton_Click);
@@ -708,27 +771,16 @@
             this.showAdvancedSettingsCheckBox.Location = new System.Drawing.Point(244, 575);
             this.showAdvancedSettingsCheckBox.Name = "showAdvancedSettingsCheckBox";
             this.showAdvancedSettingsCheckBox.Size = new System.Drawing.Size(146, 17);
-            this.showAdvancedSettingsCheckBox.TabIndex = 1;
+            this.showAdvancedSettingsCheckBox.TabIndex = 3;
             this.showAdvancedSettingsCheckBox.Text = "Show Advanced Settings";
             this.showAdvancedSettingsCheckBox.UseVisualStyleBackColor = true;
             this.showAdvancedSettingsCheckBox.CheckedChanged += new System.EventHandler(this.showAdvancedSettingsCheckBox_CheckedChanged);
-            // 
-            // newRevitFileListButton
-            // 
-            this.newRevitFileListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.newRevitFileListButton.Location = new System.Drawing.Point(723, 40);
-            this.newRevitFileListButton.Name = "newRevitFileListButton";
-            this.newRevitFileListButton.Size = new System.Drawing.Size(94, 23);
-            this.newRevitFileListButton.TabIndex = 4;
-            this.newRevitFileListButton.Text = "New List ...";
-            this.newRevitFileListButton.UseVisualStyleBackColor = true;
-            this.newRevitFileListButton.Click += new System.EventHandler(this.newRevitFileListButton_Click);
             // 
             // BatchRvtGuiForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(859, 837);
+            this.ClientSize = new System.Drawing.Size(1008, 837);
             this.Controls.Add(this.exportSettingsButton);
             this.Controls.Add(this.importSettingsButton);
             this.Controls.Add(this.batchRvtOutputGroupBox);
@@ -758,6 +810,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.timeOutNumericUpDown)).EndInit();
             this.centralFileProcessingGroupBox.ResumeLayout(false);
             this.centralFileProcessingGroupBox.PerformLayout();
+            this.worksetConfigurationGroupBox.ResumeLayout(false);
+            this.worksetConfigurationGroupBox.PerformLayout();
             this.revitFileProcessingGroupBox.ResumeLayout(false);
             this.revitFileProcessingGroupBox.PerformLayout();
             this.preAndPostProcessingGroupBox.ResumeLayout(false);
@@ -825,6 +879,10 @@
         private System.Windows.Forms.NumericUpDown timeOutNumericUpDown;
         private System.Windows.Forms.CheckBox discardWorksetsCheckBox;
         private System.Windows.Forms.Button newRevitFileListButton;
+        private System.Windows.Forms.GroupBox worksetConfigurationGroupBox;
+        private System.Windows.Forms.RadioButton openLastViewedWorksetsRadioButton;
+        private System.Windows.Forms.RadioButton openAllWorksetsRadioButton;
+        private System.Windows.Forms.RadioButton closeAllWorksetsRadioButton;
     }
 }
 
