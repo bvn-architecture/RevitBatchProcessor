@@ -47,6 +47,7 @@ namespace BatchRvtUtil
             public readonly EnumSetting<BatchRvt.CentralFileOpenOption> CentralFileOpenOption = new EnumSetting<BatchRvt.CentralFileOpenOption>("centralFileOpenOption");
             public readonly BooleanSetting DeleteLocalAfter = new BooleanSetting("deleteLocalAfter");
             public readonly BooleanSetting DiscardWorksetsOnDetach = new BooleanSetting("discardWorksetsOnDetach");
+            public readonly EnumSetting<BatchRvt.WorksetConfigurationOption> WorksetConfigurationOption = new EnumSetting<BatchRvt.WorksetConfigurationOption>("worksetConfigurationOption");
             public readonly BooleanSetting OpenInUI = new BooleanSetting("openInUI");
             public readonly IntegerSetting ProgressNumber = new IntegerSetting("progressNumber");
             public readonly IntegerSetting ProgressMax = new IntegerSetting("progressMax");
@@ -68,6 +69,7 @@ namespace BatchRvtUtil
                             this.CentralFileOpenOption,
                             this.DeleteLocalAfter,
                             this.DiscardWorksetsOnDetach,
+                            this.WorksetConfigurationOption,
                             this.OpenInUI,
                             this.ProgressNumber,
                             this.ProgressMax

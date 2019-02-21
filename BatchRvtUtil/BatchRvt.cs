@@ -33,9 +33,10 @@ namespace BatchRvtUtil
         public const string SCRIPTS_FOLDER_NAME = "Scripts";
 
         public enum CentralFileOpenOption { Detach = 0, CreateNewLocal = 1 }
-        public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1}
+        public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1 }
         public enum RevitProcessingOption { BatchRevitFileProcessing = 0, SingleRevitTaskProcessing = 1 }
         public enum RevitFileProcessingOption { UseFileRevitVersionIfAvailable = 0, UseSpecificRevitVersion = 1 }
+        public enum WorksetConfigurationOption { CloseAllWorksets = 0, OpenAllWorksets = 1, OpenLastViewed = 2 }
 
         private const string SCRIPT_DATA_FOLDER_NAME = "BatchRvt";
 

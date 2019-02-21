@@ -58,6 +58,7 @@ namespace BatchRvtUtil
         public readonly EnumSetting<BatchRvt.CentralFileOpenOption> CentralFileOpenOption = new EnumSetting<BatchRvt.CentralFileOpenOption>("centralFileOpenOption");
         public readonly BooleanSetting DeleteLocalAfter = new BooleanSetting("deleteLocalAfter");
         public readonly BooleanSetting DiscardWorksetsOnDetach = new BooleanSetting("discardWorksetsOnDetach");
+        public readonly EnumSetting<BatchRvt.WorksetConfigurationOption> WorksetConfigurationOption = new EnumSetting<BatchRvt.WorksetConfigurationOption>("worksetConfigurationOption");
 
         // Revit Session settings
         public readonly EnumSetting<BatchRvt.RevitSessionOption> RevitSessionOption = new EnumSetting<BatchRvt.RevitSessionOption>("revitSessionOption");
@@ -94,6 +95,7 @@ namespace BatchRvtUtil
                         this.CentralFileOpenOption,
                         this.DeleteLocalAfter,
                         this.DiscardWorksetsOnDetach,
+                        this.WorksetConfigurationOption,
                         this.RevitSessionOption,
                         this.RevitProcessingOption,
                         this.SingleRevitTaskRevitVersion,

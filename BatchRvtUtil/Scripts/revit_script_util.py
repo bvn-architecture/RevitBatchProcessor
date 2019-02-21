@@ -21,7 +21,7 @@
 import clr
 import System
 clr.AddReference("RevitAPI")
-from Autodesk.Revit.DB import ModelPathUtils
+from Autodesk.Revit.DB import ModelPathUtils, WorksetConfiguration, WorksetConfigurationOption
 from Autodesk.Revit.Exceptions import OperationCanceledException, CorruptModelException, InvalidOperationException, ArgumentException
 
 import exception_util
@@ -30,7 +30,7 @@ import revit_file_util
 import revit_dialog_util
 import revit_failure_handling
 import batch_rvt_util
-from batch_rvt_util import ScriptDataUtil
+from batch_rvt_util import ScriptDataUtil, BatchRvt
 
 OUTPUT_FUNCTION_CONTAINER = [None]
 
@@ -127,6 +127,9 @@ def GetDeleteLocalAfter():
 def GetDiscardWorksetsOnDetach():
   return SCRIPT_DATA_CONTAINER[0].DiscardWorksetsOnDetach.GetValue()
 
+def GetWorksetConfigurationOption():
+  return SCRIPT_DATA_CONTAINER[0].WorksetConfigurationOption.GetValue()
+
 def GetProgressNumber():
   return SCRIPT_DATA_CONTAINER[0].ProgressNumber.GetValue()
 
@@ -149,6 +152,14 @@ def WithExceptionLogging(action, output):
     exception_util.LogOutputErrorDetails(e, output)
     raise
   return result
+
+def CreateWorksetConfiguration(batchRvtWorksetConfigurationOption):
+  worksetConfigurationOption = (
+      WorksetConfigurationOption.CloseAllWorksets if batchRvtWorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.CloseAllWorksets else
+      WorksetConfigurationOption.OpenAllWorksets if batchRvtWorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.OpenAllWorksets else
+      WorksetConfigurationOption.OpenLastViewed
+    )
+  return WorksetConfiguration(worksetConfigurationOption)
 
 def GetWorksharingCentralModelPath(doc):
   centralModelPath = None
@@ -257,16 +268,32 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, documentAction, output):
     SafeCloseWithoutSave(doc, openInUI, "Closed file: " + revitFilePath, output)
   return result
 
-def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, worksetConfig, documentAction, output):
+def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, batchRvtWorksetConfigurationOption, documentAction, output):
   def revitAction():
-    result = WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, worksetConfig, documentAction, output)
+    result = WithOpenedDetachedDocument(
+        uiapp,
+        openInUI,
+        centralFilePath,
+        discardWorksets,
+        CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
+        documentAction,
+        output
+      )
     return result    
   result = WithErrorReportingAndHandling(uiapp, revitAction, output)
   return result
 
-def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, documentAction, output):
+def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, batchRvtWorksetConfigurationOption, documentAction, output):
   def revitAction():
-    result = WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, documentAction, output)
+    result = WithOpenedNewLocalDocument(
+        uiapp,
+        openInUI,
+        centralFilePath,
+        localFilePath,
+        CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
+        documentAction,
+        output
+      )
     return result    
   result = WithErrorReportingAndHandling(uiapp, revitAction, output)
   return result

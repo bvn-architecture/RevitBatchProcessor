@@ -76,6 +76,7 @@ class BatchRvtConfig:
     self.CentralFileOpenOption = None
     self.DeleteLocalAfter = None
     self.DiscardWorksetsOnDetach = None
+    self.WorksetConfigurationOption = None
 
     # Revit Session settings
     self.RevitSessionOption = None
@@ -173,6 +174,7 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
   batchRvtConfig.CentralFileOpenOption = batchRvtSettings.CentralFileOpenOption.GetValue()
   batchRvtConfig.DeleteLocalAfter = batchRvtSettings.DeleteLocalAfter.GetValue()
   batchRvtConfig.DiscardWorksetsOnDetach = batchRvtSettings.DiscardWorksetsOnDetach.GetValue()
+  batchRvtConfig.WorksetConfigurationOption = batchRvtSettings.WorksetConfigurationOption.GetValue()
 
   # Revit Session settings
   batchRvtConfig.RevitSessionOption = batchRvtSettings.RevitSessionOption.GetValue()
@@ -287,14 +289,28 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
       output("Central File Processing mode:")
       output()
       output("\t" + centralFileProcessingDescription)
+      usingWorksetConfigurationOption = False
       if (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.CreateNewLocal):
+        usingWorksetConfigurationOption = True
         if (batchRvtConfig.DeleteLocalAfter):
           output()
           output("\t" + "Local File will be deleted after processing.")
       elif (batchRvtConfig.CentralFileOpenOption == BatchRvt.CentralFileOpenOption.Detach):
         if (batchRvtConfig.DiscardWorksetsOnDetach):
+          usingWorksetConfigurationOption = False
           output()
           output("\t" + "Worksets will be discarded upon detach.")
+        else:
+          usingWorksetConfigurationOption = True
+
+      if usingWorksetConfigurationOption:
+        worksetConfigurationOptionDescription = (
+            "Close All" if batchRvtConfig.WorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.CloseAllWorksets else
+            "Open All" if batchRvtConfig.WorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.OpenAllWorksets else
+            "Open Last Viewed"
+          )
+        output()
+        output("\t" + "Worksets Configuration: " + worksetConfigurationOptionDescription)
 
   return aborted
 
