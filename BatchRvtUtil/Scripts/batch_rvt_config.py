@@ -468,7 +468,7 @@ def ConfigureBatchRvt(commandSettingsData, output):
           " options simultaneously."
         )
       aborted = True
-    else:
+    elif haveDetachOption or haveCreateNewLocalOption:
       centralFileOpenOption = (
           BatchRvt.CentralFileOpenOption.CreateNewLocal if haveCreateNewLocalOption
           else BatchRvt.CentralFileOpenOption.Detach # default
