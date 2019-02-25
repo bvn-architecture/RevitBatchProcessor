@@ -454,6 +454,44 @@ def ConfigureBatchRvt(commandSettingsData, output):
       output("ERROR: Missing Task script file option value!")
       aborted = True
 
+  centralFileOpenOption = None
+  if not aborted:
+    haveDetachOption = CommandLineUtil.HasCommandLineOption(CommandSettings.DETACH_OPTION, False)
+    haveCreateNewLocalOption = CommandLineUtil.HasCommandLineOption(CommandSettings.CREATE_NEW_LOCAL_OPTION, False)
+    if haveDetachOption and haveCreateNewLocalOption:
+      output()
+      output(
+          "ERROR: You cannot specify both " +
+          CommandLineUtil.OptionSwitchPrefix + CommandSettings.DETACH_OPTION +
+          " and " +
+          CommandLineUtil.OptionSwitchPrefix + CommandSettings.CREATE_NEW_LOCAL_OPTION +
+          " options simultaneously."
+        )
+      aborted = True
+    else:
+      centralFileOpenOption = (
+          BatchRvt.CentralFileOpenOption.CreateNewLocal if haveCreateNewLocalOption
+          else BatchRvt.CentralFileOpenOption.Detach # default
+        )
+
+  worksetsOption = None
+  if not aborted:
+    if CommandLineUtil.HasCommandLineOption(CommandSettings.WORKSETS_OPTION):
+      worksetsOptionValue = options[CommandSettings.WORKSETS_OPTION]
+      if worksetsOptionValue is None:
+        output()
+        output("ERROR: Invalid " + CommandLineUtil.OptionSwitchPrefix + CommandSettings.WORKSETS_OPTION + " option value!")
+        aborted = True
+      else:
+        worksetsOption = (
+            BatchRvt.WorksetConfigurationOption.OpenAllWorksets if worksetsOptionValue == CommandSettings.OPEN_ALL_WORKSETS_OPTION_VALUE
+            else BatchRvt.WorksetConfigurationOption.CloseAllWorksets # default
+          )
+    elif CommandLineUtil.HasCommandLineOption(CommandSettings.WORKSETS_OPTION, False):
+      output()
+      output("ERROR: Missing " + CommandLineUtil.OptionSwitchPrefix + CommandSettings.WORKSETS_OPTION + " option value!")
+      aborted = True
+
   if (not RevitVersion.GetInstalledRevitVersions().Any()):
     output()
     output("ERROR: Could not detect the BatchRvt addin for any version of Revit installed on this machine!")
@@ -471,7 +509,6 @@ def ConfigureBatchRvt(commandSettingsData, output):
     elif revitFileListOption is not None and taskScriptFilePathOption is not None:
       # Initialize appropriate defaults for non-settings-file mode.
       batchRvtSettings = BatchRvtSettings()
-      batchRvtSettings.CentralFileOpenOption.SetValue(BatchRvt.CentralFileOpenOption.Detach) # TODO: make this a command line option too?
       batchRvtSettings.RevitProcessingOption.SetValue(BatchRvt.RevitProcessingOption.BatchRevitFileProcessing)
       batchRvtSettings.RevitSessionOption.SetValue(BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion) # TODO: reconsider default?
       batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable)
@@ -482,6 +519,7 @@ def ConfigureBatchRvt(commandSettingsData, output):
       aborted = True
 
   if not aborted:
+    # Handles command-line overrides
     if revitVersionOption is not None:
       batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion)
       batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(RevitVersion.GetSupportedRevitVersion(revitVersionOption))
@@ -489,6 +527,10 @@ def ConfigureBatchRvt(commandSettingsData, output):
       batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListOption)
     if taskScriptFilePathOption is not None:
       batchRvtSettings.TaskScriptFilePath.SetValue(taskScriptFilePathOption)
+    if centralFileOpenOption is not None:
+      batchRvtSettings.CentralFileOpenOption.SetValue(centralFileOpenOption)
+    if worksetsOption is not None:
+      batchRvtSettings.WorksetConfigurationOption.SetValue(worksetsOption)
     aborted = ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output)
 
   return batchRvtConfig if not aborted else None

@@ -33,6 +33,11 @@ namespace BatchRvtUtil
         public const string REVIT_FILE_LIST_OPTION = "file_list";
         public const string REVIT_VERSION_OPTION = "revit_version";
         public const string TASK_SCRIPT_FILE_PATH_OPTION = "task_script";
+        public const string DETACH_OPTION = "detach";
+        public const string CREATE_NEW_LOCAL_OPTION = "create_new_local";
+        public const string WORKSETS_OPTION = "worksets";
+        public const string CLOSE_ALL_WORKSETS_OPTION_VALUE = "close_all";
+        public const string OPEN_ALL_WORKSETS_OPTION_VALUE = "open_all";
         public const string HELP_OPTION = "help";
 
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
@@ -45,6 +50,9 @@ namespace BatchRvtUtil
                 { REVIT_VERSION_OPTION, ParseRevitVersionOptionValue },
                 { REVIT_FILE_LIST_OPTION, ParseExistingFilePathOptionValue },
                 { TASK_SCRIPT_FILE_PATH_OPTION, ParseExistingFilePathOptionValue },
+                { DETACH_OPTION, null },
+                { CREATE_NEW_LOCAL_OPTION, null },
+                { WORKSETS_OPTION, ParseWorksetsOptionValue },
                 { HELP_OPTION, null }
             };
 
@@ -124,6 +132,15 @@ namespace BatchRvtUtil
             }
 
             return parsedValue;
+        }
+
+        public static string ParseWorksetsOptionValue(string worksetsOptionValue)
+        {
+            var parsedTextOptionValue = ParseTextOptionValue(worksetsOptionValue);
+
+            var VALID_WORKSETS_OPTION_VALUES = new[] { CLOSE_ALL_WORKSETS_OPTION_VALUE, OPEN_ALL_WORKSETS_OPTION_VALUE };
+
+            return VALID_WORKSETS_OPTION_VALUES.FirstOrDefault(optionValue => optionValue == parsedTextOptionValue);
         }
 
         public static Dictionary<string, object> GetCommandLineOptions()
