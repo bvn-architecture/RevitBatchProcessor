@@ -88,6 +88,20 @@ namespace BatchRvtUtil
             return optionValue;
         }
 
+        public static IEnumerable<string> GetAllCommandLineOptionSwitches()
+        {
+            var allOptionSwitches = Enumerable.Empty<string>();
+
+            var args = Environment.GetCommandLineArgs();
+
+            if (args.Length > 1)
+            {
+                allOptionSwitches = args.Where(arg => arg.StartsWith(OptionSwitchPrefix));
+            }
+
+            return allOptionSwitches.Select(optionSwitch => optionSwitch.Substring(OptionSwitchPrefix.Length).ToLower()).ToList();
+        }
+
         public static bool HasCommandLineOption(string optionSwitch, bool expectOptionValue = true)
         {
             return GetCommandLineOption(optionSwitch, expectOptionValue) != null;

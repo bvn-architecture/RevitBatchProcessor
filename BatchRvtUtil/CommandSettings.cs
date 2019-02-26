@@ -39,6 +39,20 @@ namespace BatchRvtUtil
         public const string CLOSE_ALL_WORKSETS_OPTION_VALUE = "close_all";
         public const string OPEN_ALL_WORKSETS_OPTION_VALUE = "open_all";
         public const string HELP_OPTION = "help";
+        public static readonly string[] ALL_VALID_OPTONS = new [] {
+                SETTINGS_FILE_PATH_OPTION,
+                LOG_FOLDER_PATH_OPTION,
+                SESSION_ID_OPTION,
+                TASK_DATA_OPTION,
+                TEST_MODE_FOLDER_PATH_OPTION,
+                REVIT_FILE_LIST_OPTION,
+                REVIT_VERSION_OPTION,
+                TASK_SCRIPT_FILE_PATH_OPTION,
+                DETACH_OPTION,
+                CREATE_NEW_LOCAL_OPTION,
+                WORKSETS_OPTION,
+                HELP_OPTION
+            };
 
         private static readonly Dictionary<string, Func<string, object>> OPTION_PARSERS =
             new Dictionary<string, Func<string, object>>() {
@@ -156,6 +170,13 @@ namespace BatchRvtUtil
                         CommandLineUtil.HasCommandLineOption(optionAndValue.Option, expectOptionValue: false)
                     )
                 );
+        }
+
+        public static IEnumerable<string> GetInvalidOptions()
+        {
+            return CommandLineUtil.GetAllCommandLineOptionSwitches()
+                .Where(optionSwitch => !ALL_VALID_OPTONS.Contains(optionSwitch))
+                .ToList();
         }
 
         public class Data

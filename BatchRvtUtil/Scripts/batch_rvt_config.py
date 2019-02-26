@@ -406,15 +406,46 @@ def ConfigureBatchRvt(commandSettingsData, output):
     output()
     output("\t" + "Usage (without a settings file):")
     output()
-    output("\t\t" + "BatchRvt.exe --file_list <REVIT FILE LIST PATH> --task_script <TASK SCRIPT FILE PATH> [--revit_version <REVIT VERSION>] [--log_folder <LOG FOLDER PATH>]")
+    output("\t\t" + "BatchRvt.exe --file_list <REVIT FILE LIST PATH> --task_script <TASK SCRIPT FILE PATH>")
     output()
-    output("\t" + "(NOTE: this mode operates in batch mode only; operates in detach mode for central files.)")
+    output("\t" + "(NOTE: this mode operates in batch mode only; by default operates in detach mode for central files.)")
     output()
-    output("\t" + "Example:")
+    output()
+    output("\t" + "Additional command-line options:")
+    output()
+    output("\t\t" + "--revit_version <REVIT VERSION>")
+    output()
+    output("\t\t" + "--log_folder <LOG FOLDER PATH>")
+    output()
+    output("\t\t" + "--detach | --create_new_local")
+    output()
+    output("\t\t" + "--worksets <open_all | close_all>")
+    output()
+    output("\t\t" + "--help")
+    output()
+    output()
+    output("\t" + "Examples:")
     output()
     output("\t\t" + "BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx")
+    output()
+    output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.txt --create_new_local --worksets open_all")
+    output()
+    output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.xlsx --revit_version 2019 --detach --worksets close_all")
+    output()
 
     aborted = True
+
+  if not aborted:
+    invalidOptions = CommandSettings.GetInvalidOptions()
+    if invalidOptions.Any():
+      output()
+      output("ERROR: unknown command-line option(s):")
+      output()
+      for invalidOption in invalidOptions:
+        output("\t" + CommandLineUtil.OptionSwitchPrefix + invalidOption)
+      output()
+      output("See --help option for command-line usage.")
+      aborted = True
 
   revitVersionOption = None
   if not aborted:  
