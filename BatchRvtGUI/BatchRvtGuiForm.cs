@@ -256,6 +256,7 @@ namespace BatchRvtGUI
                                 this.useFileRevitVersionRadioButton.Checked = (this.Settings.RevitFileProcessingOption.GetValue() == BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable);
                                 this.useSpecificRevitVersionRadioButton.Checked = (this.Settings.RevitFileProcessingOption.GetValue() == BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion);
                                 this.useMinimumAvailableVersionCheckBox.Checked = this.Settings.IfNotAvailableUseMinimumAvailableRevitVersion.GetValue();
+                                this.auditOnOpeningCheckBox.Checked = this.Settings.AuditOnOpening.GetValue();
                                 Populate(
                                         this.specificRevitVersionComboBox,
                                         RevitVersion.GetInstalledRevitVersions().Select(RevitVersion.GetRevitVersionText),
@@ -273,6 +274,7 @@ namespace BatchRvtGUI
                                 this.Settings.BatchRevitTaskRevitVersion.SetValue(
                                         RevitVersion.GetSupportedRevitVersion(this.specificRevitVersionComboBox.SelectedItem as string)
                                     );
+                                this.Settings.AuditOnOpening.SetValue(this.auditOnOpeningCheckBox.Checked);
                             }
                         ),
 

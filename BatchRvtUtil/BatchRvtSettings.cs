@@ -74,6 +74,7 @@ namespace BatchRvtUtil
         public readonly BooleanSetting IfNotAvailableUseMinimumAvailableRevitVersion = new BooleanSetting("ifNotAvailableUseMinimumAvailableRevitVersion");
         public readonly EnumSetting<RevitVersion.SupportedRevitVersion> BatchRevitTaskRevitVersion = new EnumSetting<RevitVersion.SupportedRevitVersion>("batchRevitTaskRevitVersion");
         public readonly BooleanSetting OpenInUI = new BooleanSetting("openInUI");
+        public readonly BooleanSetting AuditOnOpening = new BooleanSetting("auditOnOpening");
 
         // UI settings
         public readonly BooleanSetting ShowAdvancedSettings = new BooleanSetting("showAdvancedSettings");
@@ -103,6 +104,7 @@ namespace BatchRvtUtil
                         this.IfNotAvailableUseMinimumAvailableRevitVersion,
                         this.BatchRevitTaskRevitVersion,
                         this.OpenInUI,
+                        this.AuditOnOpening,
                         this.ShowAdvancedSettings
                     }
                 );
@@ -268,6 +270,7 @@ namespace BatchRvtUtil
             batchRvtSettings.RevitFileProcessingOption.SetValue(revitFileVersionOption);
             batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(fallbackToMinimumAvailableRevitVersion);
             batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(taskRevitVersion);
+            batchRvtSettings.AuditOnOpening.SetValue(false); // TODO: implement this option for this function?
 
             return batchRvtSettings;
         }

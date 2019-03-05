@@ -66,6 +66,7 @@
             this.detachFromCentralRadioButton = new System.Windows.Forms.RadioButton();
             this.createNewLocalRadioButton = new System.Windows.Forms.RadioButton();
             this.revitFileProcessingGroupBox = new System.Windows.Forms.GroupBox();
+            this.auditOnOpeningCheckBox = new System.Windows.Forms.CheckBox();
             this.useMinimumAvailableVersionCheckBox = new System.Windows.Forms.CheckBox();
             this.useSpecificRevitVersionRadioButton = new System.Windows.Forms.RadioButton();
             this.specificRevitVersionComboBox = new System.Windows.Forms.ComboBox();
@@ -520,16 +521,27 @@
             // 
             // revitFileProcessingGroupBox
             // 
+            this.revitFileProcessingGroupBox.Controls.Add(this.auditOnOpeningCheckBox);
             this.revitFileProcessingGroupBox.Controls.Add(this.useMinimumAvailableVersionCheckBox);
             this.revitFileProcessingGroupBox.Controls.Add(this.useSpecificRevitVersionRadioButton);
             this.revitFileProcessingGroupBox.Controls.Add(this.specificRevitVersionComboBox);
             this.revitFileProcessingGroupBox.Controls.Add(this.useFileRevitVersionRadioButton);
             this.revitFileProcessingGroupBox.Location = new System.Drawing.Point(310, 68);
             this.revitFileProcessingGroupBox.Name = "revitFileProcessingGroupBox";
-            this.revitFileProcessingGroupBox.Size = new System.Drawing.Size(309, 97);
+            this.revitFileProcessingGroupBox.Size = new System.Drawing.Size(309, 120);
             this.revitFileProcessingGroupBox.TabIndex = 6;
             this.revitFileProcessingGroupBox.TabStop = false;
             this.revitFileProcessingGroupBox.Text = "Revit File Processing";
+            // 
+            // auditOnOpeningCheckBox
+            // 
+            this.auditOnOpeningCheckBox.AutoSize = true;
+            this.auditOnOpeningCheckBox.Location = new System.Drawing.Point(6, 90);
+            this.auditOnOpeningCheckBox.Name = "auditOnOpeningCheckBox";
+            this.auditOnOpeningCheckBox.Size = new System.Drawing.Size(108, 17);
+            this.auditOnOpeningCheckBox.TabIndex = 4;
+            this.auditOnOpeningCheckBox.Text = "Audit on Opening";
+            this.auditOnOpeningCheckBox.UseVisualStyleBackColor = true;
             // 
             // useMinimumAvailableVersionCheckBox
             // 
@@ -883,6 +895,7 @@
         private System.Windows.Forms.RadioButton openLastViewedWorksetsRadioButton;
         private System.Windows.Forms.RadioButton openAllWorksetsRadioButton;
         private System.Windows.Forms.RadioButton closeAllWorksetsRadioButton;
+        private System.Windows.Forms.CheckBox auditOnOpeningCheckBox;
     }
 }
 
