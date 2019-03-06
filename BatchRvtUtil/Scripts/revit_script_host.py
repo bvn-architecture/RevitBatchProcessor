@@ -233,6 +233,7 @@ def RunBatchTaskScript(scriptFilePath):
               centralFilePath,
               localFilePath,
               worksetConfigurationOption,
+              auditOnOpening,
               processDocument,
               output
             )
@@ -243,11 +244,12 @@ def RunBatchTaskScript(scriptFilePath):
               centralFilePath,
               discardWorksetsOnDetach,
               worksetConfigurationOption,
+              auditOnOpening,
               processDocument,
               output
             )
         else:
-          result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, processDocument, output)
+          result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, auditOnOpening, processDocument, output)
     except Exception, e:
       aborted = True
       snapshotError = exception_util.GetExceptionDetails(e)
