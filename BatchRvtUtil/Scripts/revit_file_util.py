@@ -70,11 +70,7 @@ def ReloadLastest(doc):
   return
 
 def CopyModel(app, sourceModelPath, destinationFilePath, overwrite=True):
-  sourceModelPath = (
-      sourceModelPath
-      if isinstance(sourceModelPath, ModelPath) else
-      ModelPathUtils.ConvertUserVisiblePathToModelPath(sourceModelPath)
-    )
+  sourceModelPath = ToModelPath(sourceModelPath)
   app.CopyModel(
       sourceModelPath,
       destinationFilePath,
@@ -122,7 +118,7 @@ def ToUserVisiblePath(modelPath):
     modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
   return modelPath
 
-def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None):
+def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
   modelPath = ToModelPath(modelPath)
   localModelPath = ToModelPath(localModelPath)
   openOptions = OpenOptions()
@@ -130,9 +126,11 @@ def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False,
   worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
+  if audit:
+    openOptions.Audit = True
   return application.OpenDocumentFile(localModelPath, openOptions)
 
-def OpenAndActivateNewLocal(uiApplication, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None):
+def OpenAndActivateNewLocal(uiApplication, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
   modelPath = ToModelPath(modelPath)
   localModelPath = ToModelPath(localModelPath)
   openOptions = OpenOptions()
@@ -140,44 +138,69 @@ def OpenAndActivateNewLocal(uiApplication, modelPath, localModelPath, closeAllWo
   worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
   WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
+  if audit:
+    openOptions.Audit = True
   return uiApplication.OpenAndActivateDocument(localModelPath, openOptions, False)
 
-def OpenDetachAndPreserveWorksets(application, modelPath, closeAllWorksets=False, worksetConfig=None):
+def OpenDetachAndPreserveWorksets(application, modelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
   modelPath = ToModelPath(modelPath)
   openOptions = OpenOptions()
   openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
   worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+  if audit:
+    openOptions.Audit = True
   return application.OpenDocumentFile(modelPath, openOptions)
 
-def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllWorksets=False, worksetConfig=None):
+def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
   modelPath = ToModelPath(modelPath)
   openOptions = OpenOptions()
   openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
   worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
   openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+  if audit:
+    openOptions.Audit = True
   return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
-def OpenDetachAndDiscardWorksets(application, modelPath):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
-  return application.OpenDocumentFile(modelPath, openOptions)
-
-def OpenAndActivateDetachAndDiscardWorksets(uiApplication, modelPath):
+def OpenDetachAndDiscardWorksets(application, modelPath, audit=False):
   modelPath = ToModelPath(modelPath)
   openOptions = OpenOptions()
   openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
+  if audit:
+    openOptions.Audit = True
+  return application.OpenDocumentFile(modelPath, openOptions)
+
+def OpenAndActivateDetachAndDiscardWorksets(uiApplication, modelPath, audit=False):
+  modelPath = ToModelPath(modelPath)
+  openOptions = OpenOptions()
+  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
+  if audit:
+    openOptions.Audit = True
   return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
-def OpenDocumentFile(application, modelPath):
-  modelPath = ToUserVisiblePath(modelPath)
-  return application.OpenDocumentFile(modelPath)
+def OpenDocumentFile(application, modelPath, audit=False):
+  doc = None
+  if audit:
+    openOptions = OpenOptions()
+    openOptions.Audit = True
+    modelPath = ToModelPath(modelPath) # OpenDocumentFile() overload requires a ModelPath
+    doc = application.OpenDocumentFile(modelPath, openOptions)
+  else:
+    modelPath = ToUserVisiblePath(modelPath) # OpenDocumentFile() overload requires a string
+    doc = application.OpenDocumentFile(modelPath)
+  return doc
 
-def OpenAndActivateDocumentFile(uiApplication, modelPath):
-  modelPath = ToUserVisiblePath(modelPath)
-  return uiApplication.OpenAndActivateDocument(modelPath)
+def OpenAndActivateDocumentFile(uiApplication, modelPath, audit=False):
+  uidoc = None
+  if audit:
+    openOptions = OpenOptions()
+    openOptions.Audit = True
+    modelPath = ToModelPath(modelPath) # OpenAndActivateDocument() overload requires a ModelPath
+    uidoc = uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
+  else:
+    modelPath = ToUserVisiblePath(modelPath) # OpenAndActivateDocument() overload requires a string
+    uidoc = uiApplication.OpenAndActivateDocument(modelPath)
+  return uidoc
 
 def RelinquishAll(doc, shouldWaitForLockAvailabilityCallback=None):
   relinquishOptions = RelinquishOptions(True)
@@ -222,8 +245,7 @@ def SaveAs(
       worksharingSaveAsOptions=None,
       maximumBackups=None
     ):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+  modelPath = ToModelPath(modelPath)
   saveAsOptions = SaveAsOptions()
   saveAsOptions.Compact = compact
   saveAsOptions.OverwriteExistingFile = overwriteExisting
@@ -243,11 +265,11 @@ def CreateWorksharingSaveAsOptions(saveAsCentral=False, openWorksetsDefault=Simp
   worksharingSaveAsOptions.SaveAsCentral = saveAsCentral
   return worksharingSaveAsOptions
 
-def DetachAndSaveModel(app, centralModelFilePath, detachedModelFilePath):
+def DetachAndSaveModel(app, centralModelFilePath, detachedModelFilePath, audit=False):
   centralModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(centralModelFilePath)
   CopyModel(app, centralModelPath, detachedModelFilePath)
   detachedModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(detachedModelFilePath)
-  doc = OpenDetachAndPreserveWorksets(app, detachedModelPath)
+  doc = OpenDetachAndPreserveWorksets(app, detachedModelPath, audit=audit)
   SaveAsNewCentral(doc, detachedModelPath)
   # Relinquish ownership (Saving the new central file takes ownership of worksets so relinquishing must be done
   # after it, if at all)
