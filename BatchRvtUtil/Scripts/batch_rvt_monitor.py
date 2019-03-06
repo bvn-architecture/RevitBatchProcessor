@@ -326,6 +326,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
         scriptData.DeleteLocalAfter.SetValue(batchRvtConfig.DeleteLocalAfter)
         scriptData.DiscardWorksetsOnDetach.SetValue(batchRvtConfig.DiscardWorksetsOnDetach)
         scriptData.WorksetConfigurationOption.SetValue(batchRvtConfig.WorksetConfigurationOption)
+        scriptData.AuditOnOpening.SetValue(batchRvtConfig.AuditOnOpening)
         scriptData.ProgressNumber.SetValue(progressNumber+index)
         scriptData.ProgressMax.SetValue(totalFilesCount)
         scriptDatas.append(scriptData)

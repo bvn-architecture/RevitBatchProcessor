@@ -38,6 +38,7 @@ namespace BatchRvtUtil
         public const string WORKSETS_OPTION = "worksets";
         public const string CLOSE_ALL_WORKSETS_OPTION_VALUE = "close_all";
         public const string OPEN_ALL_WORKSETS_OPTION_VALUE = "open_all";
+        public const string AUDIT_ON_OPENING_OPTION = "audit";
         public const string HELP_OPTION = "help";
         public static readonly string[] ALL_VALID_OPTONS = new [] {
                 SETTINGS_FILE_PATH_OPTION,
@@ -51,6 +52,7 @@ namespace BatchRvtUtil
                 DETACH_OPTION,
                 CREATE_NEW_LOCAL_OPTION,
                 WORKSETS_OPTION,
+                AUDIT_ON_OPENING_OPTION,
                 HELP_OPTION
             };
 
@@ -67,6 +69,7 @@ namespace BatchRvtUtil
                 { DETACH_OPTION, null },
                 { CREATE_NEW_LOCAL_OPTION, null },
                 { WORKSETS_OPTION, ParseWorksetsOptionValue },
+                { AUDIT_ON_OPENING_OPTION, null },
                 { HELP_OPTION, null }
             };
 

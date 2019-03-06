@@ -130,6 +130,9 @@ def GetDiscardWorksetsOnDetach():
 def GetWorksetConfigurationOption():
   return SCRIPT_DATA_CONTAINER[0].WorksetConfigurationOption.GetValue()
 
+def GetAuditOnOpening():
+  return SCRIPT_DATA_CONTAINER[0].AuditOnOpening.GetValue()
+
 def GetProgressNumber():
   return SCRIPT_DATA_CONTAINER[0].ProgressNumber.GetValue()
 

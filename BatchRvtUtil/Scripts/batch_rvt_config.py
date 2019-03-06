@@ -91,6 +91,7 @@ class BatchRvtConfig:
     self.RevitFileProcessingOption = None
     self.IfNotAvailableUseMinimumAvailableRevitVersion = None
     self.BatchRevitTaskRevitVersion = None
+    self.AuditOnOpening = False
     self.OpenInUI = False
 
     return
@@ -189,6 +190,7 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
   batchRvtConfig.RevitFileProcessingOption = batchRvtSettings.RevitFileProcessingOption.GetValue()
   batchRvtConfig.IfNotAvailableUseMinimumAvailableRevitVersion = batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.GetValue()
   batchRvtConfig.BatchRevitTaskRevitVersion = batchRvtSettings.BatchRevitTaskRevitVersion.GetValue()
+  batchRvtConfig.AuditOnOpening = batchRvtSettings.AuditOnOpening.GetValue()
   batchRvtConfig.OpenInUI = batchRvtSettings.OpenInUI.GetValue()
 
   if not File.Exists(batchRvtConfig.ScriptFilePath):
@@ -311,6 +313,10 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
           )
         output()
         output("\t" + "Worksets Configuration: " + worksetConfigurationOptionDescription)
+
+      if batchRvtConfig.AuditOnOpening:
+        output()
+        output("\t" + "Revit files will be audited on opening.")
 
   return aborted
 
@@ -523,6 +529,12 @@ def ConfigureBatchRvt(commandSettingsData, output):
       output("ERROR: Missing " + CommandLineUtil.OptionSwitchPrefix + CommandSettings.WORKSETS_OPTION + " option value!")
       aborted = True
 
+  auditOnOpeningOption = None
+  if not aborted:
+    haveAuditOnOpeningOption = CommandLineUtil.HasCommandLineOption(CommandSettings.AUDIT_ON_OPENING_OPTION)
+    if haveAuditOnOpeningOption:
+      auditOnOpeningOption = haveAuditOnOpeningOption
+
   if (not RevitVersion.GetInstalledRevitVersions().Any()):
     output()
     output("ERROR: Could not detect the BatchRvt addin for any version of Revit installed on this machine!")
@@ -544,6 +556,7 @@ def ConfigureBatchRvt(commandSettingsData, output):
       batchRvtSettings.RevitSessionOption.SetValue(BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion) # TODO: reconsider default?
       batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable)
       batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(False) # TODO: reconsider default?
+      batchRvtSettings.AuditOnOpening.SetValue(False)
     else:
       output()
       output("ERROR: No settings file specified or settings file not found.")
@@ -562,6 +575,8 @@ def ConfigureBatchRvt(commandSettingsData, output):
       batchRvtSettings.CentralFileOpenOption.SetValue(centralFileOpenOption)
     if worksetsOption is not None:
       batchRvtSettings.WorksetConfigurationOption.SetValue(worksetsOption)
+    if auditOnOpeningOption is not None:
+      batchRvtSettings.AuditOnOpening.SetValue(auditOnOpeningOption)
     aborted = ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output)
 
   return batchRvtConfig if not aborted else None

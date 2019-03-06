@@ -49,6 +49,7 @@ namespace BatchRvtUtil
             public readonly BooleanSetting DiscardWorksetsOnDetach = new BooleanSetting("discardWorksetsOnDetach");
             public readonly EnumSetting<BatchRvt.WorksetConfigurationOption> WorksetConfigurationOption = new EnumSetting<BatchRvt.WorksetConfigurationOption>("worksetConfigurationOption");
             public readonly BooleanSetting OpenInUI = new BooleanSetting("openInUI");
+            public readonly BooleanSetting AuditOnOpening = new BooleanSetting("auditOnOpening");
             public readonly IntegerSetting ProgressNumber = new IntegerSetting("progressNumber");
             public readonly IntegerSetting ProgressMax = new IntegerSetting("progressMax");
 
@@ -71,6 +72,7 @@ namespace BatchRvtUtil
                             this.DiscardWorksetsOnDetach,
                             this.WorksetConfigurationOption,
                             this.OpenInUI,
+                            this.AuditOnOpening,
                             this.ProgressNumber,
                             this.ProgressMax
                         }

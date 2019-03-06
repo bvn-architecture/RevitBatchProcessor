@@ -109,6 +109,7 @@ def RunBatchTaskScript(scriptFilePath):
   deleteLocalAfter = revit_script_util.GetDeleteLocalAfter()
   discardWorksetsOnDetach = revit_script_util.GetDiscardWorksetsOnDetach()
   worksetConfigurationOption = revit_script_util.GetWorksetConfigurationOption()
+  auditOnOpening = revit_script_util.GetAuditOnOpening()
   progressNumber = revit_script_util.GetProgressNumber()
   progressMax = revit_script_util.GetProgressMax()
   output = revit_script_util.Output
