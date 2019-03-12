@@ -5,7 +5,7 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 ## Latest version
 
-[Installer for Revit Batch Processor v1.4.4](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.4/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.4.6](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.6/RevitBatchProcessorSetup.exe)
 
 ***Now supports Revit 2019!***
 
@@ -27,7 +27,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 - Testing your own Revit API scripts and Revit addins against a variety of Revit models and families in an automated manner.
 - Essentially anything you can do to one Revit file with the Revit API or a Dynamo script, you can now do to many!
 
-![Screenshot of the UI](BatchRvt_Screenshot.1.4.3.png)
+![Screenshot of the UI](BatchRvt_Screenshot.1.4.6.png)
 
 ## Features
 
@@ -52,7 +52,7 @@ This tool enables you to do things with Revit files on a very large scale. Becau
 
 ## Installer
 
-[Installer for Revit Batch Processor v1.4.4](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.4/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.4.6](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.6/RevitBatchProcessorSetup.exe)
 
 The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
 
@@ -166,6 +166,12 @@ Alternatively, RBP can be run in batch processing mode without a settings file, 
 ```
 
 NOTE: this mode will operate in Detach mode when processing Central files. The **--revit_version** argument is optional here---if it is omitted then RBP will use the version of Revit that each Revit file was saved in.
+
+To see help on all available command-line options use `--help`:
+
+```
+%LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --help
+```
 
 # Contribute
 
