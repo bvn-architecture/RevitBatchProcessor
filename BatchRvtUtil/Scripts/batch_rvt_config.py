@@ -535,7 +535,7 @@ def ConfigureBatchRvt(commandSettingsData, output):
 
   auditOnOpeningOption = None
   if not aborted:
-    haveAuditOnOpeningOption = CommandLineUtil.HasCommandLineOption(CommandSettings.AUDIT_ON_OPENING_OPTION)
+    haveAuditOnOpeningOption = CommandLineUtil.HasCommandLineOption(CommandSettings.AUDIT_ON_OPENING_OPTION, False)
     if haveAuditOnOpeningOption:
       auditOnOpeningOption = haveAuditOnOpeningOption
 
