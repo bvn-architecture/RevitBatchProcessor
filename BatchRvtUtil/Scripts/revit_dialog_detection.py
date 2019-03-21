@@ -29,6 +29,7 @@ import global_test_mode
 REVIT_DIALOG_MESSAGE_HANDLER_PREFIX = "[ REVIT DIALOG BOX HANDLER ]"
 
 MODEL_UPGRADE_WINDOW_TITLE = "Model Upgrade"
+LOAD_LINK_WINDOW_TITLE = "Load Link"
 CHANGES_NOT_SAVED_TITLE = "Changes Not Saved"
 CLOSE_PROJECT_WITHOUT_SAVING_TITLE = "Close Project Without Saving"
 SAVE_FILE_WINDOW_TITLE = "Save File"
@@ -49,6 +50,7 @@ OK_BUTTON_TEXT = "OK"
 NO_BUTTON_TEXT = "No"
 YES_BUTTON_TEXT = "Yes"
 ALWAYS_LOAD_BUTTON_TEXT = "Always Load"
+CANCEL_LINK_BUTTON_TEXT = "Cancel Link"
 DO_NOT_SAVE_THE_PROJECT_TEXT = "Do not save the project"
 RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish all elements and worksets"
 RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish elements and worksets"
@@ -131,6 +133,14 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
       win32Buttons = revitDialog.Win32Buttons
       if enabledDialog.WindowText == MODEL_UPGRADE_WINDOW_TITLE and len(buttons) == 0:
         pass # Do nothing for model upgrade dialog box. It has no buttons and will go away on its own.
+      elif (
+          enabledDialog.WindowText == LOAD_LINK_WINDOW_TITLE
+          and
+          len(win32Buttons) == 1
+          and
+          ui_automation_util.GetButtonText(win32Buttons[0]) == CANCEL_LINK_BUTTON_TEXT
+        ):
+        pass # Do nothing for this dialog box. It will go away on its own.
       elif enabledDialog.WindowText == script_host_error.BATCH_RVT_ERROR_WINDOW_TITLE:
         # Report dialog detection but do nothing for BatchRvt error message windows.
         if not HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION[0]:
