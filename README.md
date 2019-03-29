@@ -5,7 +5,7 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 ## Latest version
 
-[Installer for Revit Batch Processor v1.4.6](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.6/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.4.7](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.7/RevitBatchProcessorSetup.exe)
 
 ***NEW - Generate the list of Revit model file paths automatically using the GUI.***
 
@@ -50,7 +50,7 @@ This tool enables you to do things with Revit files on a very large scale. Becau
 
 ## Installer
 
-[Installer for Revit Batch Processor v1.4.6](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.6/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.4.7](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.4.7/RevitBatchProcessorSetup.exe)
 
 The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
 
@@ -169,6 +169,52 @@ To see help on all available command-line options use `--help`:
 
 ```
 %LOCALAPPDATA%\RevitBatchProcessor\BatchRvt.exe --help
+```
+
+```
+Help:
+
+	Usage (using a settings file):
+
+		BatchRvt.exe --settings_file <SETTINGS FILE PATH> [--log_folder <LOG FOLDER PATH>]
+
+	Example:
+
+		BatchRvt.exe --settings_file BatchRvt.Settings.json --log_folder .
+
+
+	Usage (without a settings file):
+
+		BatchRvt.exe --file_list <REVIT FILE LIST PATH> --task_script <TASK SCRIPT FILE PATH>
+
+	(NOTE: this mode operates in batch mode only; by default operates in detach mode for central files.)
+
+
+	Additional command-line options:
+
+		--revit_version <REVIT VERSION>
+
+		--log_folder <LOG FOLDER PATH>
+
+		--detach | --create_new_local
+
+		--worksets <open_all | close_all>
+
+		--audit
+
+		--help
+
+
+	Examples:
+
+		BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx
+
+		BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx --detach --audit
+
+		BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.txt --create_new_local --worksets open_all
+
+		BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.xlsx --revit_version 2019 --detach --worksets close_all
+
 ```
 
 # Contribute
