@@ -31,7 +31,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 
 - Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2019. (Of course the required version of Revit must be installed!)
 - Custom task scripts written in Python or Dynamo! Python scripts have full access to the Revit API. Dynamo scripts can of course do whatever Dynamo can do :)
-- Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work.
+- Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work. It can even load and execute your existing functions in a C# DLL (see [Executing functions in a C# DLL](#executing-functions-in-a-c-dll)).
 - Option for custom pre- and post-processing task scripts. Useful if the overall batch processing task requires some additional setup / tear down work to be done.
 - Central file processing options (Create a new local file, Detach from central).
 - Option to process files (of the same Revit version) in the same Revit session, or to process each file in its own Revit session. The latter is useful if Revit happens to crash during processing, since this won't block further processing.
@@ -142,6 +142,20 @@ The ***two ingredients*** you will need in order to use the Revit Batch Processo
   Output()
   Output("Hello Revit world!")
   ```
+
+# Executing functions in a C# DLL
+
+Using a python task script it's quite easy to load and execute code in a C# DLL. When RBP runs the python task script, it adds the task script's folder path to the search paths so that if your DLL is in the same folder as your python task script you should be able to execute your functions as follows:
+
+```python
+# For example assume your DLL is called MyUtilities.dll and you have a static function called SomeClass.DoSomeWork() in namespace MyNameSpace:
+# Assume this python script exists in the same folder as MyUtilities.dll.
+clr.AddReference("MyUtilities")
+from MyNameSpace import SomeClass
+
+# Invoke your static function, passing in any parameters you need.
+SomeClass.DoSomeWork(doc)
+```
 
 # Command-line Interface
 
