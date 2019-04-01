@@ -54,13 +54,6 @@ namespace BatchRvtGUI
         private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
         private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
 
-        private const string ALL_FILES_WITH_AN_EXTENSION_PATTERN = "*.*";
-
-        private const string REVIT_PROJECT_FILE_EXTENSION = ".rvt";
-        private const string REVIT_PROJECT_FILE_PATTERN = "*" + REVIT_PROJECT_FILE_EXTENSION;
-        private const string REVIT_FAMILY_FILE_EXTENSION = ".rfa";
-        private const string REVIT_FAMILY_FILE_PATTERN = "*" + REVIT_FAMILY_FILE_EXTENSION;
-
         private const int SETUP_HEIGHT = 642;
         private const int SETUP_INITIAL_WIDTH = 1024;
         private const int SETUP_MINIMUM_WIDTH = 1024;
@@ -1132,142 +1125,6 @@ namespace BatchRvtGUI
             }
         }
 
-        private static IEnumerable<string> FindRevitFiles(
-                string folderPath,
-                SearchOption searchOption,
-                RevitFileScanningOptionsUI.RevitFileType revitFileType,
-                Func<string, bool> progressReporter
-            )
-        {
-            var searchFilePattern = ALL_FILES_WITH_AN_EXTENSION_PATTERN;
-
-            if (revitFileType == RevitFileScanningOptionsUI.RevitFileType.Project)
-            {
-                searchFilePattern = REVIT_PROJECT_FILE_PATTERN;
-            }
-            else if (revitFileType == RevitFileScanningOptionsUI.RevitFileType.Family)
-            {
-                searchFilePattern = REVIT_FAMILY_FILE_PATTERN;
-            }
-            else if (revitFileType == RevitFileScanningOptionsUI.RevitFileType.ProjectAndFamily)
-            {
-                searchFilePattern = ALL_FILES_WITH_AN_EXTENSION_PATTERN;
-            }
-
-            var foldersToScan = Enumerable.Empty<string>();
-
-            if (searchOption == SearchOption.AllDirectories)
-            {
-                foldersToScan = (
-                        new[] { folderPath }
-                        .Concat(PathUtil.SafeEnumerateFolders(folderPath, "*", SearchOption.AllDirectories))
-                    );
-            }
-            else
-            {
-                foldersToScan = new[] { folderPath };
-            }
-
-            var revitFilePaths = new List<string>();
-
-            foreach (var folderToScan in foldersToScan)
-            {
-                bool cancelled = progressReporter(folderToScan);
-
-                if (cancelled)
-                {
-                    break;
-                }
-
-                revitFilePaths.AddRange(
-                        PathUtil.SafeEnumerateFiles(folderToScan, searchFilePattern, SearchOption.TopDirectoryOnly)
-                        .Where(filePath => HasRevitFileExtension(filePath))
-                    );
-            }
-
-            return revitFilePaths;
-        }
-
-        private static List<string[]> FindAndExtractRevitFilesInfoWithProgressReporting(
-                string baseFolderPath,
-                SearchOption searchOption,
-                RevitFileScanningOptionsUI.RevitFileType revitFileType,
-                bool expandNetworkPaths,
-                bool extractRevitVersionInfo,
-                Func<string, bool> progressReporter
-            )
-        {
-            var infoRows = new List<string[]>();
-
-            progressReporter("Scanning for Revit files ...");
-
-            var revitFilePaths = FindRevitFiles(baseFolderPath, searchOption, revitFileType, progressReporter);
-
-            int numberOfRevitFilePaths = revitFilePaths.Count();
-
-            bool cancelled = progressReporter(string.Empty);
-
-            if (!cancelled)
-            {
-                if (expandNetworkPaths)
-                {
-                    string expandingNetworkPathsMessagePrefix = "Expanding network paths";
-
-                    var indexedExpandedRevitFilePaths = 
-                        PathUtil.EnumerateExpandedFullNetworkPaths(revitFilePaths)
-                        .Select((revitFilePath, index) => Tuple.Create(index, revitFilePath));
-
-                    var expandedRevitFilePaths = new List<string>();
-
-                    foreach (var indexedExpandedRevitFilePath in indexedExpandedRevitFilePaths)
-                    {
-                        int index = indexedExpandedRevitFilePath.Item1;
-                        string expandedRevitFilePath = indexedExpandedRevitFilePath.Item2;
-
-                        progressReporter(expandingNetworkPathsMessagePrefix + " (" + (index + 1).ToString() + " of " + numberOfRevitFilePaths.ToString() + ") ...");
-
-                        expandedRevitFilePaths.Add(expandedRevitFilePath);
-                    }
-
-                    revitFilePaths = expandedRevitFilePaths;
-                }
-
-                infoRows = revitFilePaths.Select(revitFilePath => new[] { revitFilePath }).ToList();
-
-                if (extractRevitVersionInfo)
-                {
-                    string extractingNetworkPathsMessagePrefix = "Extracting Revit files version information";
-
-                    var indexedRevitVersionTexts =
-                        PathUtil.EnumerateRevitVersionTexts(revitFilePaths)
-                        .Select((revitFilePath, index) => Tuple.Create(index, revitFilePath));
-
-                    var allRevitVersionTexts = new List<string[]>();
-                    
-                    foreach (var indexedRevitVersionText in indexedRevitVersionTexts)
-                    {
-                        int index = indexedRevitVersionText.Item1;
-                        string[] revitVersionTexts = indexedRevitVersionText.Item2;
-
-                        progressReporter(extractingNetworkPathsMessagePrefix + " (" + (index + 1).ToString() + " of " + numberOfRevitFilePaths.ToString() + ") ...");
-
-                        allRevitVersionTexts.Add(revitVersionTexts);
-                    }
-
-                    infoRows = (
-                            revitFilePaths
-                            .Zip(
-                                    allRevitVersionTexts,
-                                    (revitFilePath, revitVersionTexts) => new[] { revitFilePath, revitVersionTexts[0], revitVersionTexts[1] }
-                                )
-                            .ToList()
-                        );
-                }
-            }
-
-            return infoRows;
-        }
-
         private void newRevitFileListButton_Click(object sender, EventArgs e)
         {
             var folderBrowserDialog = new FolderBrowserDialog();
@@ -1305,7 +1162,7 @@ namespace BatchRvtGUI
 
                         Action<Func<string, bool>> revitFileScanningProgressReporter =
                             (progressReporter) => {
-                                rows = FindAndExtractRevitFilesInfoWithProgressReporting(
+                                rows = RevitFileScanning.FindAndExtractRevitFilesInfoWithProgressReporting(
                                     selectedFolderPath,
                                     selectedSearchOption,
                                     selectedRevitFileType,
@@ -1357,30 +1214,6 @@ namespace BatchRvtGUI
                     }
                 }
             }
-        }
-
-        public static bool HasRevitProjectFileExtension(string filePath)
-        {
-            var extension = Path.GetExtension(filePath).ToLower();
-
-            return extension.ToLower() == REVIT_PROJECT_FILE_EXTENSION;
-        }
-
-        public static bool HasRevitFamilyFileExtension(string filePath)
-        {
-            var extension = Path.GetExtension(filePath).ToLower();
-
-            return extension.ToLower() == REVIT_FAMILY_FILE_EXTENSION;
-        }
-
-        public static bool HasRevitFileExtension(string filePath)
-        {
-            var extension = Path.GetExtension(filePath).ToLower();
-
-            return new[] {
-                    REVIT_PROJECT_FILE_EXTENSION,
-                    REVIT_FAMILY_FILE_EXTENSION
-                }.Any(revitExtension => extension == revitExtension.ToLower());
         }
 
         private void discardWorksetsCheckBox_CheckedChanged(object sender, EventArgs e)

@@ -26,33 +26,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BatchRvtUtil;
 
 namespace BatchRvtGUI
 {
     public partial class RevitFileScanningOptionsUI : Form
     {
-        public enum RevitFileType { Project, Family, ProjectAndFamily }
-
         public RevitFileScanningOptionsUI()
         {
             InitializeComponent();
         }
 
-        public RevitFileType GetSelectedRevitFileType()
+        public RevitFileScanning.RevitFileType GetSelectedRevitFileType()
         {
-            var revitFileType = RevitFileType.Project;
+            var revitFileType = RevitFileScanning.RevitFileType.Project;
 
             if (this.projectFilesRadioButton.Checked)
             {
-                revitFileType = RevitFileType.Project;
+                revitFileType = RevitFileScanning.RevitFileType.Project;
             }
             else if (this.familyFilesRadioButton.Checked)
             {
-                revitFileType = RevitFileType.Family;
+                revitFileType = RevitFileScanning.RevitFileType.Family;
             }
             else if (this.revitFilesRadioButton.Checked)
             {
-                revitFileType = RevitFileType.ProjectAndFamily;
+                revitFileType = RevitFileScanning.RevitFileType.ProjectAndFamily;
             }
 
             return revitFileType;

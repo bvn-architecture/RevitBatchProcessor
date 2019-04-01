@@ -71,6 +71,7 @@
     <Compile Include="LogFile.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="PathUtil.cs" />
+    <Compile Include="RevitFileScanning.cs" />
     <Compile Include="RevitVersion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptDataUtil.cs" />
