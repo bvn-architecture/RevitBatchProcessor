@@ -4,7 +4,7 @@ import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
-from System.IO import Path
+from System.IO import Path, Directory
 
 from System import Console, ConsoleColor, InvalidOperationException
 from System.Diagnostics import Process, ProcessStartInfo
@@ -16,7 +16,9 @@ import get_process_output
 IO_TIME_OUT_IN_MS = 5 * 60 * 10000 # 5 minutes
 
 #VC_FOLDER_PATH = r"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC"
-VC_FOLDER_PATH = r"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build"
+VC_FOLDER_PATH_COMMUNITY_2017 = r"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build"
+VC_FOLDER_PATH_COMMUNITY_2019 = r"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build"
+VC_FOLDER_PATHS = [VC_FOLDER_PATH_COMMUNITY_2017, VC_FOLDER_PATH_COMMUNITY_2019]
 VC_VARS_ALL_FILENAME = "vcvarsall.bat"
 MSBUILD_FILENAME = "msbuild.exe"
 
@@ -101,6 +103,11 @@ print "Starting..."
 
 if configuration not in EXPECTED_CONFIGS:
   raise Exception("Unexpected configuration specified: '" + configuration + "'")
+
+VC_FOLDER_PATH = VC_FOLDER_PATHS.Where(lambda p: Directory.Exists(p)).LastOrDefault()
+
+if VC_FOLDER_PATH is None:
+  raise Exception("Could not locate MSBuild toolset (for vcvarsall.bat, etc.)")
 
 COMMAND_PARTS = [
     r'"' + Path.Combine(VC_FOLDER_PATH, VC_VARS_ALL_FILENAME) + '"',
