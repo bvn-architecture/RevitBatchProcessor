@@ -201,7 +201,15 @@ namespace BatchRevitDynamo
         }
 
         // NOTE: Dynamo scripts are not supported in Revit versions earlier than 2016.
-        public enum UseRevitVersion { RevitFileVersion = 0, Revit2015 = 1, Revit2016 = 2, Revit2017 = 3, Revit2018 = 4, Revit2019 = 5 }
+        public enum UseRevitVersion {
+                RevitFileVersion = 0,
+                Revit2015 = 1,
+                Revit2016 = 2,
+                Revit2017 = 3,
+                Revit2018 = 4,
+                Revit2019 = 5,
+                Revit2020 = 6
+        }
         public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1 }
         public enum CentralFileOpenOption { Detach = 0, CreateNewLocal = 1 }
     }

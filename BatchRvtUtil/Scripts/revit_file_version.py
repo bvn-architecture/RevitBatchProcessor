@@ -202,6 +202,7 @@ REVIT_VERSION_TEXT_PREFIXES_2016 = GenerateRevitVersionTextPrefixes("2016", incl
 REVIT_VERSION_TEXT_PREFIXES_2017 = GenerateRevitVersionTextPrefixes("2017")
 REVIT_VERSION_TEXT_PREFIXES_2018 = GenerateRevitVersionTextPrefixes("2018")
 REVIT_VERSION_TEXT_PREFIXES_2019 = GenerateRevitVersionTextPrefixes("2019")
+REVIT_VERSION_TEXT_PREFIXES_2020 = GenerateRevitVersionTextPrefixes("2020")
 
 def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
   revitVersionNumberText = None
@@ -228,5 +229,7 @@ def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
       revitVersionNumberText = "2018"
     elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2019):
       revitVersionNumberText = "2019"
+    elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2020):
+      revitVersionNumberText = "2020"
   return revitVersionNumberText
 
