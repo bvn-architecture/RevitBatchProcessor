@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2035
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvt", "BatchRvt\BatchRvt.csproj", "{C877620C-DE32-455C-BF21-8F3E73E9DF68}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -32,6 +32,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRevitDynamo", "BatchRevitDynamo\BatchRevitDynamo.csproj", "{B2FED296-9EA0-41DD-BB2F-951D481F527B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2019", "BatchRvtAddin2019\BatchRvtAddin2019.csproj", "{62F91AA6-AC57-451E-A91C-719D5846D247}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2020", "BatchRvtAddin2020\BatchRvtAddin2020.csproj", "{03CFCDBE-9532-47DD-A84D-8EA9906808BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{62F91AA6-AC57-451E-A91C-719D5846D247}.Debug|x64.Build.0 = Debug|x64
 		{62F91AA6-AC57-451E-A91C-719D5846D247}.Release|x64.ActiveCfg = Release|x64
 		{62F91AA6-AC57-451E-A91C-719D5846D247}.Release|x64.Build.0 = Release|x64
+		{03CFCDBE-9532-47DD-A84D-8EA9906808BF}.Debug|x64.ActiveCfg = Debug|x64
+		{03CFCDBE-9532-47DD-A84D-8EA9906808BF}.Debug|x64.Build.0 = Debug|x64
+		{03CFCDBE-9532-47DD-A84D-8EA9906808BF}.Release|x64.ActiveCfg = Release|x64
+		{03CFCDBE-9532-47DD-A84D-8EA9906808BF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
