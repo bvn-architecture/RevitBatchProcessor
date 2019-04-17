@@ -56,7 +56,7 @@ The Revit Batch Processor (GUI) application will appear in the Start menu after 
 
 ## Build from Source code
 
-Open the solution file RevitBatchProcessor.sln in Visual Studio 2013 or later and run Build Solution (F6).
+Open the solution file RevitBatchProcessor.sln in Visual Studio 2017 or later and run Build Solution (F6).
 
 Revit addins will be automatically deployed to the Addins folder for each available Revit version [2015-2019]. e.g. %APPDATA%\Autodesk\Revit\Addins\2019
 
@@ -65,7 +65,7 @@ The BatchRvtGUI project is the GUI that drives the underlying engine (the BatchR
 # Requirements
 
 - At least one version of Revit installed. Currently supports Revit versions 2015 through 2019.
-- To build from source code, Visual Studio version 2013 or later.
+- To build from source code, Visual Studio version 2017 or later.
 - If executing Dynamo scripts from the task script, Dynamo 1.3+ installed (currently supports Revit versions 2016 through 2019). NOTE: The Dynamo script MUST have been saved with the 'Automatic' Run mode. There **MUST BE EXACTLY ONE VERSION OF DYNAMO INSTALLED** for each version of Revit.
 - If using an Excel file for the Revit File List, Microsoft Office / Excel installed.
 
