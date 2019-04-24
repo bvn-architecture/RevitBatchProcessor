@@ -62,7 +62,7 @@ def WithLoadedXmlDocument(xmlDocumentFilePath, action):
 def WithTextFileJsonObject(textFilePath, action):
   result = None
   try:
-    textFileContents = text_file_util.ReadFromTextFile(DYNAMO_WORKSPACE_JSON_FILE_PATH)
+    textFileContents = text_file_util.ReadFromTextFile(textFilePath)
     jobject = None
     try:
       jobject = json_util.DeserializeToJObject(textFileContents)
