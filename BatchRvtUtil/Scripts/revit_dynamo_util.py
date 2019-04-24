@@ -75,17 +75,20 @@ def WithTextFileJsonObject(textFilePath, action):
     result = None
   return result
 
-def WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action):
+def WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action, writeBackToFile=False):
   def jobjectAction(jobject):
     viewJObject = jobject[DYNAMO_JOBJECT_VIEW]
     dynamoJObject = viewJObject[DYNAMO_JOBJECT_DYNAMO]
-    result = action(dynamoJObject)
+    result = action(jobject, dynamoJObject)
+    if writeBackToFile:
+      serializedJObjectText = json_util.ToString(jobject, prettyPrint=True)
+      text_file_util.WriteToTextFile(dynamoScriptFilePath, serializedJObjectText)
     return result
   result = WithTextFileJsonObject(dynamoScriptFilePath, jobjectAction)
   return result
 
 def IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
-  def action(dynamoJObject):
+  def action(jobject, dynamoJObject):
     return dynamoJObject is not None
   result = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action)
   return result == True
@@ -118,7 +121,15 @@ def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
       return prevRunType
     prevRunType = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
   elif IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
-    raise Exception("Not implemented!") # TODO: implement!
+    def action(jobject, dynamoJObject):
+      prevRunTypeJValue = dynamoJObject[DYNAMO_RUNTYPE_ATTRIBUTE]
+      prevRunType = json_util.GetValueFromJValue(prevRunTypeJValue)
+      dynamoJObject[DYNAMO_RUNTYPE_ATTRIBUTE] = runType
+      dynamoHasRunWithoutCrashJValue = dynamoJObject[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE]
+      if dynamoHasRunWithoutCrashJValue is not None:
+        dynamoJObject[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE] = True
+      return prevRunType
+    prevRunType = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action, writeBackToFile=True)
   return prevRunType
 
 def GetDynamoScriptRunType(dynamoScriptFilePath):
@@ -129,9 +140,9 @@ def GetDynamoScriptRunType(dynamoScriptFilePath):
       return runType
     runType = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
   elif IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
-    def action(dynamoJObject):
+    def action(jobject, dynamoJObject):
       runTypeJValue = dynamoJObject[DYNAMO_RUNTYPE_ATTRIBUTE]
-      runType = json_util.json_util.GetValueFromJValue(runTypeJValue)
+      runType = json_util.GetValueFromJValue(runTypeJValue)
       return runType
     runType = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action)
   return runType
@@ -144,9 +155,9 @@ def GetDynamoScriptHasRunWithoutCrash(dynamoScriptFilePath):
       return hasRunWithoutCrash
     hasRunWithoutCrash = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
   elif IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
-    def action(dynamoJObject):
+    def action(jobject, dynamoJObject):
       hasRunWithoutCrashJValue = dynamoJObject[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE]
-      hasRunWithoutCrash = json_util.json_util.GetValueFromJValue(hasRunWithoutCrashJValue)
+      hasRunWithoutCrash = json_util.GetValueFromJValue(hasRunWithoutCrashJValue)
       return hasRunWithoutCrash
     hasRunWithoutCrash = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action)
   return hasRunWithoutCrash
