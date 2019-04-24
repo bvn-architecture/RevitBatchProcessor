@@ -93,13 +93,13 @@ def IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
 def WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action):
   def docAction(doc):
     dynamoWorkspaceXmlNode = doc[DYNAMO_WORKSPACE_XML_NODE]
-    result = action(dynamoWorkspaceXmlNode)
+    result = action(doc, dynamoWorkspaceXmlNode)
     return result
   result = WithLoadedXmlDocument(dynamoScriptFilePath, docAction)
   return result
 
 def IsDynamoWorkspaceXmlFile(dynamoScriptFilePath):
-  def action(dynamoWorkspaceXmlNode):
+  def action(doc, dynamoWorkspaceXmlNode):
     return dynamoWorkspaceXmlNode is not None
   result = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
   return result == True
@@ -107,7 +107,7 @@ def IsDynamoWorkspaceXmlFile(dynamoScriptFilePath):
 def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
   prevRunType = None
   if IsDynamoWorkspaceXmlFile(dynamoScriptFilePath):
-    def action(dynamoWorkspaceXmlNode):
+    def action(doc, dynamoWorkspaceXmlNode):
       dynamoRunTypeAttribute = dynamoWorkspaceXmlNode.Attributes[DYNAMO_RUNTYPE_ATTRIBUTE]
       prevRunType = dynamoRunTypeAttribute.Value
       dynamoRunTypeAttribute.Value = runType
@@ -124,7 +124,7 @@ def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
 def GetDynamoScriptRunType(dynamoScriptFilePath):
   runType = None
   if IsDynamoWorkspaceXmlFile(dynamoScriptFilePath):
-    def action(dynamoWorkspaceXmlNode):
+    def action(doc, dynamoWorkspaceXmlNode):
       runType = dynamoWorkspaceXmlNode.Attributes[DYNAMO_RUNTYPE_ATTRIBUTE].Value
       return runType
     runType = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
@@ -139,7 +139,7 @@ def GetDynamoScriptRunType(dynamoScriptFilePath):
 def GetDynamoScriptHasRunWithoutCrash(dynamoScriptFilePath):
   hasRunWithoutCrash = None
   if IsDynamoWorkspaceXmlFile(dynamoScriptFilePath):
-    def action(dynamoWorkspaceXmlNode):
+    def action(doc, dynamoWorkspaceXmlNode):
       hasRunWithoutCrash = dynamoWorkspaceXmlNode.Attributes[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE].Value
       return hasRunWithoutCrash
     hasRunWithoutCrash = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
