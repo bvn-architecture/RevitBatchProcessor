@@ -1,5 +1,7 @@
 @echo off
 
+pushd %~dp0
+
 echo.
 echo Removing BatchRvt addin for Revit 2015
 call RemoveAddin.bat 2015
@@ -26,3 +28,5 @@ call RemoveAddin.bat 2020
 
 echo Done.
 echo.
+
+popd
