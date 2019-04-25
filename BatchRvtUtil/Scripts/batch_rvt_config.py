@@ -336,31 +336,129 @@ def GetBatchRvtSettings(settingsFilePath, output):
       aborted = True
   return batchRvtSettings if not aborted else None
 
-def ConfigureBatchRvt(commandSettingsData, output):
-  aborted = False
-  
+def GetCommandSettingsOption(aborted, commandLineOptions, commandSettingsOption, output, invalidValueErrorMessage=None, missingValueErrorMessage=None):
+  # NOTE: option==None doesn't necessarily mean aborted==True. Specifically, if an optional option is not specified, option==None but aborted==False.
+  option = None
+  if CommandLineUtil.HasCommandLineOption(commandSettingsOption):
+    optionValue = commandLineOptions[commandSettingsOption]
+    if optionValue is None:
+      output()
+      if invalidValueErrorMessage is not None:
+        output(invalidValueErrorMessage)
+      else:
+        output("ERROR: Invalid " + CommandLineUtil.OptionSwitchPrefix + commandSettingsOption + " option value!")
+      aborted = True
+    else:
+      option = optionValue
+  elif CommandLineUtil.HasCommandLineOption(commandSettingsOption, False):
+    output()
+    if missingValueErrorMessage is not None:
+      output(missingValueErrorMessage)
+    else:
+      output("ERROR: Missing " + CommandLineUtil.OptionSwitchPrefix + commandSettingsOption + " option value!")
+    aborted = True
+  return option, aborted
+
+def ShowCommandLineHelp(output):
+  output()
+  output("Help:")
+  output()
+  output("\t" + "Usage (using a settings file):")
+  output()
+  output("\t\t" + "BatchRvt.exe --settings_file <SETTINGS FILE PATH> [--log_folder <LOG FOLDER PATH>]")
+  output()
+  output("\t" + "Example:")
+  output()
+  output("\t\t" + "BatchRvt.exe --settings_file BatchRvt.Settings.json --log_folder .")
+  output()
+  output()
+  output("\t" + "Usage (without a settings file):")
+  output()
+  output("\t\t" + "BatchRvt.exe --file_list <REVIT FILE LIST PATH> --task_script <TASK SCRIPT FILE PATH>")
+  output()
+  output("\t" + "(NOTE: this mode operates in batch mode only; by default operates in detach mode for central files.)")
+  output()
+  output()
+  output("\t" + "Additional command-line options:")
+  output()
+  output("\t\t" + "--revit_version <REVIT VERSION>")
+  output()
+  output("\t\t" + "--log_folder <LOG FOLDER PATH>")
+  output()
+  output("\t\t" + "--detach | --create_new_local")
+  output()
+  output("\t\t" + "--worksets <open_all | close_all>")
+  output()
+  output("\t\t" + "--audit")
+  output()
+  output("\t\t" + "--help")
+  output()
+  output()
+  output("\t" + "Examples:")
+  output()
+  output("\t\t" + "BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx")
+  output()
+  output("\t\t" + "BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx --detach --audit")
+  output()
+  output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.txt --create_new_local --worksets open_all")
+  output()
+  output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.xlsx --revit_version 2019 --detach --worksets close_all")
+  output()
+  return
+
+def ShowInvalidOptionsError(invalidOptions, output):
+  output()
+  output("ERROR: unknown command-line option(s):")
+  output()
+  for invalidOption in invalidOptions:
+    output("\t" + CommandLineUtil.OptionSwitchPrefix + invalidOption)
+  output()
+  output("See --help option for command-line usage.")
+  return
+
+def InitializeBatchRvtSettings(commandSettingsData, batchRvtConfig, revitFileListOption, taskScriptFilePathOption, output):
+  batchRvtSettings = None
+  if commandSettingsData is not None and commandSettingsData.Settings is not None:
+    # Initialize from in-memory object.
+    batchRvtSettings = commandSettingsData.Settings
+  elif batchRvtConfig.SettingsFilePath is not None:
+    # Initialize from settings file specified at the command-line.
+    batchRvtSettings = GetBatchRvtSettings(batchRvtConfig.SettingsFilePath, output)
+  elif revitFileListOption is not None and taskScriptFilePathOption is not None:
+    # Initialize settings for non-settings-file mode.
+    batchRvtSettings = BatchRvtSettings()
+    batchRvtSettings.RevitProcessingOption.SetValue(BatchRvt.RevitProcessingOption.BatchRevitFileProcessing)
+    batchRvtSettings.RevitSessionOption.SetValue(BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion) # TODO: reconsider default?
+    batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable)
+    batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(False) # TODO: reconsider default?
+    batchRvtSettings.AuditOnOpening.SetValue(False)
+    batchRvtSettings.ProcessingTimeOutInMinutes.SetValue(0)
+  else:
+    output()
+    output("ERROR: No settings file specified or settings file not found.")
+  return batchRvtSettings
+
+def InitializeBatchRvtConfig(commandSettingsData, commandLineOptions):
   batchRvtConfig = BatchRvtConfig()
-  
-  options = CommandSettings.GetCommandLineOptions()
   
   if commandSettingsData is not None:
     batchRvtConfig.SettingsFilePath = commandSettingsData.SettingsFilePath
   else:
-    batchRvtConfig.SettingsFilePath = options[CommandSettings.SETTINGS_FILE_PATH_OPTION]
+    batchRvtConfig.SettingsFilePath = commandLineOptions[CommandSettings.SETTINGS_FILE_PATH_OPTION]
 
   if commandSettingsData is not None:
     batchRvtConfig.LogFolderPath = commandSettingsData.LogFolderPath
   else:
-    batchRvtConfig.LogFolderPath = options[CommandSettings.LOG_FOLDER_PATH_OPTION]
+    batchRvtConfig.LogFolderPath = commandLineOptions[CommandSettings.LOG_FOLDER_PATH_OPTION]
 
-  batchRvtConfig.SessionId = options[CommandSettings.SESSION_ID_OPTION]
+  batchRvtConfig.SessionId = commandLineOptions[CommandSettings.SESSION_ID_OPTION]
 
   batchRvtConfig.SessionId, batchRvtConfig.SessionStartTime = ParseSessionIdAndStartTime(batchRvtConfig.SessionId)
 
   if commandSettingsData is not None:
     batchRvtConfig.TaskData = commandSettingsData.TaskData
   else:
-    batchRvtConfig.TaskData = options[CommandSettings.TASK_DATA_OPTION]
+    batchRvtConfig.TaskData = commandLineOptions[CommandSettings.TASK_DATA_OPTION]
 
   # NOTE: use of output function must occur after the log file initialization
   batchRvtConfig.LogFilePath = InitializeLogging(batchRvtConfig.LogFolderPath, batchRvtConfig.SessionStartTime)
@@ -372,20 +470,28 @@ def ConfigureBatchRvt(commandSettingsData, output):
   if commandSettingsData is not None:
     testModeFolderPath = commandSettingsData.TestModeFolderPath
   else:
-    testModeFolderPath = options[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION]
+    testModeFolderPath = commandLineOptions[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION]
 
   batchRvtConfig.TestModeFolderPath = (
       path_util.GetFullPath(testModeFolderPath)
       if not str.IsNullOrWhiteSpace(testModeFolderPath)
       else None
     )
-  global_test_mode.InitializeGlobalTestMode(batchRvtConfig.TestModeFolderPath)
 
   if commandSettingsData is not None:
     if commandSettingsData.RevitFileList is not None:
       # NOTE: list is constructed here because although the source object is an IEnumerable<string> it may not be a list.
       batchRvtConfig.RevitFileList = list(revitFilePath for revitFilePath in commandSettingsData.RevitFileList)
 
+  return batchRvtConfig
+
+def ConfigureBatchRvt(commandSettingsData, output):
+  aborted = False
+  
+  commandLineOptions = CommandSettings.GetCommandLineOptions()
+  batchRvtConfig = InitializeBatchRvtConfig(commandSettingsData, commandLineOptions)
+
+  global_test_mode.InitializeGlobalTestMode(batchRvtConfig.TestModeFolderPath)
   global_test_mode.ExportSessionId(batchRvtConfig.SessionId)
 
   output()
@@ -396,104 +502,44 @@ def ConfigureBatchRvt(commandSettingsData, output):
   output()
   output("\t" + batchRvtConfig.LogFilePath)
 
-  haveHelpOption = options[CommandSettings.HELP_OPTION]
+  haveHelpOption = commandLineOptions[CommandSettings.HELP_OPTION]
   if not CommandLineUtil.HaveArguments() or haveHelpOption:
-    output()
-    output("Help:")
-    output()
-    output("\t" + "Usage (using a settings file):")
-    output()
-    output("\t\t" + "BatchRvt.exe --settings_file <SETTINGS FILE PATH> [--log_folder <LOG FOLDER PATH>]")
-    output()
-    output("\t" + "Example:")
-    output()
-    output("\t\t" + "BatchRvt.exe --settings_file BatchRvt.Settings.json --log_folder .")
-    output()
-    output()
-    output("\t" + "Usage (without a settings file):")
-    output()
-    output("\t\t" + "BatchRvt.exe --file_list <REVIT FILE LIST PATH> --task_script <TASK SCRIPT FILE PATH>")
-    output()
-    output("\t" + "(NOTE: this mode operates in batch mode only; by default operates in detach mode for central files.)")
-    output()
-    output()
-    output("\t" + "Additional command-line options:")
-    output()
-    output("\t\t" + "--revit_version <REVIT VERSION>")
-    output()
-    output("\t\t" + "--log_folder <LOG FOLDER PATH>")
-    output()
-    output("\t\t" + "--detach | --create_new_local")
-    output()
-    output("\t\t" + "--worksets <open_all | close_all>")
-    output()
-    output("\t\t" + "--audit")
-    output()
-    output("\t\t" + "--help")
-    output()
-    output()
-    output("\t" + "Examples:")
-    output()
-    output("\t\t" + "BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx")
-    output()
-    output("\t\t" + "BatchRvt.exe --task_script MyDynamoWorkspace.dyn --file_list RevitFileList.xlsx --detach --audit")
-    output()
-    output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.txt --create_new_local --worksets open_all")
-    output()
-    output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.xlsx --revit_version 2019 --detach --worksets close_all")
-    output()
-
+    ShowCommandLineHelp(output)
     aborted = True
 
   if not aborted:
     invalidOptions = CommandSettings.GetInvalidOptions()
     if invalidOptions.Any():
-      output()
-      output("ERROR: unknown command-line option(s):")
-      output()
-      for invalidOption in invalidOptions:
-        output("\t" + CommandLineUtil.OptionSwitchPrefix + invalidOption)
-      output()
-      output("See --help option for command-line usage.")
+      ShowInvalidOptionsError(invalidOptions, output)
       aborted = True
 
-  revitVersionOption = None
-  if not aborted:  
-    if CommandLineUtil.HasCommandLineOption(CommandSettings.REVIT_VERSION_OPTION, False):
-      revitVersionOption = options[CommandSettings.REVIT_VERSION_OPTION]
-      if revitVersionOption is not None:
-        output()
-        output("Using specific Revit version: " + revitVersionOption)
-      else:
-        output()
-        output("Invalid value for " + CommandLineUtil.OptionSwitchPrefix + CommandSettings.REVIT_VERSION_OPTION + " option!")
-        aborted = True
+  revitVersionOption, aborted = GetCommandSettingsOption(
+      aborted,
+      commandLineOptions,
+      CommandSettings.REVIT_VERSION_OPTION,
+      output
+    )
+  if not aborted and revitVersionOption is not None:
+    output()
+    output("Using specific Revit version: " + RevitVersion.GetRevitVersionText(revitVersionOption))
 
-  revitFileListOption = None
-  if not aborted:
-    if CommandLineUtil.HasCommandLineOption(CommandSettings.REVIT_FILE_LIST_OPTION):
-      revitFileListOption = options[CommandSettings.REVIT_FILE_LIST_OPTION]
-      if revitFileListOption is None:
-        output()
-        output("ERROR: Revit file list not found.")
-        aborted = True
-    elif CommandLineUtil.HasCommandLineOption(CommandSettings.REVIT_FILE_LIST_OPTION, False):
-      output()
-      output("ERROR: Missing Revit file list option value!")
-      aborted = True
-
-  taskScriptFilePathOption = None
-  if not aborted:
-    if CommandLineUtil.HasCommandLineOption(CommandSettings.TASK_SCRIPT_FILE_PATH_OPTION):
-      taskScriptFilePathOption = options[CommandSettings.TASK_SCRIPT_FILE_PATH_OPTION]
-      if taskScriptFilePathOption is None:
-        output()
-        output("ERROR: Task script file not found.")
-        aborted = True
-    elif CommandLineUtil.HasCommandLineOption(CommandSettings.TASK_SCRIPT_FILE_PATH_OPTION, False):
-      output()
-      output("ERROR: Missing Task script file option value!")
-      aborted = True
+  revitFileListOption, aborted = GetCommandSettingsOption(
+      aborted,
+      commandLineOptions,
+      CommandSettings.REVIT_FILE_LIST_OPTION,
+      output,
+      invalidValueErrorMessage="ERROR: Revit file list not found.",
+      missingValueErrorMessage="ERROR: Missing Revit file list option value!"
+    )
+  
+  taskScriptFilePathOption, aborted = GetCommandSettingsOption(
+      aborted,
+      commandLineOptions,
+      CommandSettings.TASK_SCRIPT_FILE_PATH_OPTION,
+      output,
+      invalidValueErrorMessage="ERROR: Task script file not found.",
+      missingValueErrorMessage="ERROR: Missing Task script file option value!"
+    )
 
   centralFileOpenOption = None
   if not aborted:
@@ -515,29 +561,25 @@ def ConfigureBatchRvt(commandSettingsData, output):
           else BatchRvt.CentralFileOpenOption.Detach # default
         )
 
-  worksetsOption = None
-  if not aborted:
-    if CommandLineUtil.HasCommandLineOption(CommandSettings.WORKSETS_OPTION):
-      worksetsOptionValue = options[CommandSettings.WORKSETS_OPTION]
-      if worksetsOptionValue is None:
-        output()
-        output("ERROR: Invalid " + CommandLineUtil.OptionSwitchPrefix + CommandSettings.WORKSETS_OPTION + " option value!")
-        aborted = True
-      else:
-        worksetsOption = (
-            BatchRvt.WorksetConfigurationOption.OpenAllWorksets if worksetsOptionValue == CommandSettings.OPEN_ALL_WORKSETS_OPTION_VALUE
-            else BatchRvt.WorksetConfigurationOption.CloseAllWorksets # default
-          )
-    elif CommandLineUtil.HasCommandLineOption(CommandSettings.WORKSETS_OPTION, False):
-      output()
-      output("ERROR: Missing " + CommandLineUtil.OptionSwitchPrefix + CommandSettings.WORKSETS_OPTION + " option value!")
-      aborted = True
+  worksetsOption, aborted = GetCommandSettingsOption(
+      aborted,
+      commandLineOptions,
+      CommandSettings.WORKSETS_OPTION,
+      output
+    )
 
   auditOnOpeningOption = None
   if not aborted:
     haveAuditOnOpeningOption = CommandLineUtil.HasCommandLineOption(CommandSettings.AUDIT_ON_OPENING_OPTION, False)
     if haveAuditOnOpeningOption:
       auditOnOpeningOption = haveAuditOnOpeningOption
+
+  perFileTimeoutOption, aborted = GetCommandSettingsOption(
+      aborted,
+      commandLineOptions,
+      CommandSettings.PER_FILE_PROCESSING_TIMEOUT_OPTION,
+      output
+    )
 
   if (not RevitVersion.GetInstalledRevitVersions().Any()):
     output()
@@ -547,30 +589,15 @@ def ConfigureBatchRvt(commandSettingsData, output):
     aborted = True
 
   if not aborted:
-    if commandSettingsData is not None and commandSettingsData.Settings is not None:
-      batchRvtSettings = commandSettingsData.Settings
-    elif batchRvtConfig.SettingsFilePath is not None:
-      batchRvtSettings = GetBatchRvtSettings(batchRvtConfig.SettingsFilePath, output)
-      if batchRvtSettings is None:
-        aborted = True
-    elif revitFileListOption is not None and taskScriptFilePathOption is not None:
-      # Initialize appropriate defaults for non-settings-file mode.
-      batchRvtSettings = BatchRvtSettings()
-      batchRvtSettings.RevitProcessingOption.SetValue(BatchRvt.RevitProcessingOption.BatchRevitFileProcessing)
-      batchRvtSettings.RevitSessionOption.SetValue(BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion) # TODO: reconsider default?
-      batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable)
-      batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(False) # TODO: reconsider default?
-      batchRvtSettings.AuditOnOpening.SetValue(False)
-    else:
-      output()
-      output("ERROR: No settings file specified or settings file not found.")
+    batchRvtSettings = InitializeBatchRvtSettings(commandSettingsData, batchRvtConfig, revitFileListOption, taskScriptFilePathOption, output)
+    if batchRvtSettings is None:
       aborted = True
 
   if not aborted:
     # Handles command-line overrides
     if revitVersionOption is not None:
       batchRvtSettings.RevitFileProcessingOption.SetValue(BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion)
-      batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(RevitVersion.GetSupportedRevitVersion(revitVersionOption))
+      batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(revitVersionOption)
     if revitFileListOption is not None:
       batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListOption)
     if taskScriptFilePathOption is not None:
@@ -581,6 +608,8 @@ def ConfigureBatchRvt(commandSettingsData, output):
       batchRvtSettings.WorksetConfigurationOption.SetValue(worksetsOption)
     if auditOnOpeningOption is not None:
       batchRvtSettings.AuditOnOpening.SetValue(auditOnOpeningOption)
+    if perFileTimeoutOption is not None:
+      batchRvtSettings.ProcessingTimeOutInMinutes.SetValue(perFileTimeoutOption)
     aborted = ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output)
 
   return batchRvtConfig if not aborted else None

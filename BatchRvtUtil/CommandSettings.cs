@@ -38,7 +38,9 @@ namespace BatchRvtUtil
         public const string WORKSETS_OPTION = "worksets";
         public const string CLOSE_ALL_WORKSETS_OPTION_VALUE = "close_all";
         public const string OPEN_ALL_WORKSETS_OPTION_VALUE = "open_all";
+        public const string OPEN_LAST_VIEWED_WORKSETS_OPTION_VALUE = "last_viewed";
         public const string AUDIT_ON_OPENING_OPTION = "audit";
+        public const string PER_FILE_PROCESSING_TIMEOUT_OPTION = "per_file_timeout";
         public const string HELP_OPTION = "help";
         public static readonly string[] ALL_VALID_OPTONS = new [] {
                 SETTINGS_FILE_PATH_OPTION,
@@ -53,6 +55,7 @@ namespace BatchRvtUtil
                 CREATE_NEW_LOCAL_OPTION,
                 WORKSETS_OPTION,
                 AUDIT_ON_OPENING_OPTION,
+                PER_FILE_PROCESSING_TIMEOUT_OPTION,
                 HELP_OPTION
             };
 
@@ -63,13 +66,14 @@ namespace BatchRvtUtil
                 { SESSION_ID_OPTION, ParseTextOptionValue },
                 { TASK_DATA_OPTION, ParseTextOptionValue },
                 { TEST_MODE_FOLDER_PATH_OPTION, ParseTextOptionValue },
-                { REVIT_VERSION_OPTION, ParseRevitVersionOptionValue },
+                { REVIT_VERSION_OPTION, optionValue => ParseRevitVersionOptionValue(optionValue) },
                 { REVIT_FILE_LIST_OPTION, ParseExistingFilePathOptionValue },
                 { TASK_SCRIPT_FILE_PATH_OPTION, ParseExistingFilePathOptionValue },
                 { DETACH_OPTION, null },
                 { CREATE_NEW_LOCAL_OPTION, null },
-                { WORKSETS_OPTION, ParseWorksetsOptionValue },
+                { WORKSETS_OPTION, optionValue => ParseWorksetsOptionValue(optionValue) },
                 { AUDIT_ON_OPENING_OPTION, null },
+                { PER_FILE_PROCESSING_TIMEOUT_OPTION, optionValue => ParsePositiveIntegerOptionValue(optionValue) },
                 { HELP_OPTION, null }
             };
 
@@ -83,6 +87,15 @@ namespace BatchRvtUtil
             }
 
             return parsedValue;
+        }
+
+        public static int? ParsePositiveIntegerOptionValue(string integerOptionValue)
+        {
+            int parsedValue;
+
+            bool parsed = int.TryParse(integerOptionValue, out parsedValue);
+
+            return (parsed && parsedValue > 0) ? parsedValue : (int?)null;
         }
 
         public static string ParseExistingFilePathOptionValue(string filePathOptionValue)
@@ -118,46 +131,60 @@ namespace BatchRvtUtil
             return parsedValue;
         }
 
-        // TODO: figure out a way for the return type to be bool while satisfying
-        // the requirement that this function be convertible to Func<string, object> in
-        // the OPTION_PARSERS variable.
-        public static object ParseBooleanOptionValue(string booleanOptionValue)
+        public static bool? ParseBooleanOptionValue(string booleanOptionValue)
         {
-            bool parsedValue = false;
+            bool? parsedValue = null;
 
             if (!string.IsNullOrWhiteSpace(booleanOptionValue))
             {
-                parsedValue =
-                    new[] { "TRUE", "YES" }
-                    .Any(s => s.ToUpper() == booleanOptionValue.ToUpper()
-                );
+                if (new[] { "TRUE", "YES" }.Any(s => s.ToUpper() == booleanOptionValue.ToUpper()))
+                {
+                    parsedValue = true;
+                }
+                else if (new[] { "FALSE", "NO" }.Any(s => s.ToUpper() == booleanOptionValue.ToUpper()))
+                {
+                    parsedValue = false;
+                }
             }
             
             return parsedValue;
         }
 
-        public static string ParseRevitVersionOptionValue(string revitVersionOptionValue)
+        public static RevitVersion.SupportedRevitVersion? ParseRevitVersionOptionValue(string revitVersionOptionValue)
         {
-            string parsedValue = null;
+            RevitVersion.SupportedRevitVersion? revitVersion = null;
 
             if (!string.IsNullOrWhiteSpace(revitVersionOptionValue))
             {
                 if (RevitVersion.IsSupportedRevitVersionNumber(revitVersionOptionValue))
                 {
-                    parsedValue = revitVersionOptionValue;
+                    revitVersion = RevitVersion.GetSupportedRevitVersion(revitVersionOptionValue);
                 }
             }
 
-            return parsedValue;
+            return revitVersion;
         }
 
-        public static string ParseWorksetsOptionValue(string worksetsOptionValue)
+        public static BatchRvt.WorksetConfigurationOption? ParseWorksetsOptionValue(string worksetsOptionValue)
         {
+            BatchRvt.WorksetConfigurationOption? worksetsOption = null;
+
             var parsedTextOptionValue = ParseTextOptionValue(worksetsOptionValue);
 
-            var VALID_WORKSETS_OPTION_VALUES = new[] { CLOSE_ALL_WORKSETS_OPTION_VALUE, OPEN_ALL_WORKSETS_OPTION_VALUE };
+            if (parsedTextOptionValue == OPEN_ALL_WORKSETS_OPTION_VALUE)
+            {
+                worksetsOption = BatchRvt.WorksetConfigurationOption.OpenAllWorksets;
+            }
+            else if (parsedTextOptionValue == CLOSE_ALL_WORKSETS_OPTION_VALUE)
+            {
+                worksetsOption = BatchRvt.WorksetConfigurationOption.CloseAllWorksets;
+            }
+            else if (parsedTextOptionValue == OPEN_LAST_VIEWED_WORKSETS_OPTION_VALUE)
+            {
+                worksetsOption = BatchRvt.WorksetConfigurationOption.OpenLastViewed;
+            }
 
-            return VALID_WORKSETS_OPTION_VALUES.FirstOrDefault(optionValue => optionValue == parsedTextOptionValue);
+            return worksetsOption;
         }
 
         public static Dictionary<string, object> GetCommandLineOptions()
