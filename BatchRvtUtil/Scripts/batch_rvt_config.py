@@ -391,6 +391,8 @@ def ShowCommandLineHelp(output):
   output()
   output("\t\t" + "--audit")
   output()
+  output("\t\t" + "--per_file_timeout <PER-FILE PROCESSING TIMEOUT IN MINUTES>")
+  output()
   output("\t\t" + "--help")
   output()
   output()
@@ -403,6 +405,8 @@ def ShowCommandLineHelp(output):
   output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.txt --create_new_local --worksets open_all")
   output()
   output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.xlsx --revit_version 2019 --detach --worksets close_all")
+  output()
+  output("\t\t" + "BatchRvt.exe --task_script MyTask.py --file_list RevitFileList.txt --per_file_timeout 15")
   output()
   return
 
