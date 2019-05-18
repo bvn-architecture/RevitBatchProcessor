@@ -348,8 +348,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
         if nextProgressNumber is None:
           Output()
           Output("WARNING: The Revit session failed to initialize properly! No Revit files were processed in this session!")
-          progressNumber += len(scriptDatas)
-          break
+          # Leave progress number as-is (i.e. do not skip any files if the Revit session terminated before processing any files.)
         else:
           progressNumber = nextProgressNumber
 
