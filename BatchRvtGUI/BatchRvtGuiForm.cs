@@ -54,7 +54,9 @@ namespace BatchRvtGUI
         private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
         private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
 
-        private const int SETUP_HEIGHT = 642;
+        private const int OUTPUT_HEIGHT = 264;
+
+        private const int SETUP_HEIGHT = 912 - OUTPUT_HEIGHT;
         private const int SETUP_INITIAL_WIDTH = 1024;
         private const int SETUP_MINIMUM_WIDTH = 1024;
         private const int SETUP_MAXIMUM_WIDTH = 1600;
@@ -64,12 +66,10 @@ namespace BatchRvtGUI
         private readonly System.Drawing.Size SETUP_MAXIMUM_SIZE = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, SETUP_HEIGHT);
 
         private const int RUNNING_INITIAL_WIDTH = 1024;
-        private const int RUNNING_INITIAL_HEIGHT = 875;
-        private const int RUNNING_MINIMUM_HEIGHT = 875;
-        private const int RUNNING_MINIMUM_WIDTH = 1024;
+        private const int RUNNING_INITIAL_HEIGHT = 912 - OUTPUT_HEIGHT;
+        private const int RUNNING_MINIMUM_HEIGHT = 912;
 
         private readonly System.Drawing.Size RUNNING_INITIAL_SIZE = new System.Drawing.Size(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
-        private readonly System.Drawing.Size RUNNING_MINIMUM_SIZE = new System.Drawing.Size(RUNNING_MINIMUM_WIDTH, RUNNING_MINIMUM_HEIGHT);
         private readonly System.Drawing.Size RUNNING_MAXIMUM_SIZE = new System.Drawing.Size(0, 0); // no maximum size
 
         private Process batchRvtProcess;
@@ -505,7 +505,7 @@ namespace BatchRvtGUI
             this.UIConfiguration.UpdateConfig();
 
             bool validated = ValidateConfig();
-            
+
             if (validated)
             {
                 bool isSaved = SaveSettings();
@@ -513,7 +513,7 @@ namespace BatchRvtGUI
                 // TODO: show error message if save failed!!
 
                 var settingsFilePath = BatchRvtSettings.GetDefaultSettingsFilePath();
-                
+
                 this.batchRvtProcess = BatchRvt.StartBatchRvt(settingsFilePath);
 
                 this.readBatchRvtOutput_Timer = new Timer() { Interval = READ_OUTPUT_INTERVAL_IN_MS };
@@ -525,7 +525,6 @@ namespace BatchRvtGUI
                 this.startButton.Enabled = false;
                 this.startButton.Text = "Running...";
                 this.batchRvtOutputGroupBox.Visible = true;
-                this.MinimumSize = RUNNING_MINIMUM_SIZE;
                 this.MaximumSize = RUNNING_MAXIMUM_SIZE;
                 this.Size = RUNNING_INITIAL_SIZE;
                 this.MaximizeBox = true;
@@ -533,7 +532,7 @@ namespace BatchRvtGUI
                 UpdateAdvancedSettings();
 
                 AdjustWindowSizeForDisplaySetting();
-                
+
                 readBatchRvtOutput_Timer.Start();
             }
         }
@@ -1074,26 +1073,8 @@ namespace BatchRvtGUI
             this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = isChecked;
             this.preAndPostProcessingGroupBox.Visible = isChecked;
 
-            // TODO: this stuff is messy... refactor it !! Perhaps use FlowLayouyPanel or TableLayoutPanel to better manage the layout changes.
-
-            this.taskScriptGroupBox.Size = new System.Drawing.Size(this.taskScriptGroupBox.Size.Width, isChecked ? 76 : 76 - 24);
-            this.batchRevitFileProcessingGroupBox.Location = new System.Drawing.Point(this.batchRevitFileProcessingGroupBox.Location.X, isChecked ? 180 : 180 - 103);
-
-            int advancedSettingsHiddenSizeReductionAmount = 273;
-            this.settingsGroupBox.Size = new System.Drawing.Size(this.settingsGroupBox.Size.Width, isChecked ? 553 : 553 - advancedSettingsHiddenSizeReductionAmount);
-            // Lower area buttons.
-            int advancedSettingsLowerAreaButtonYLocation = 571;
-            this.importSettingsButton.Location = new System.Drawing.Point(this.importSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
-            this.exportSettingsButton.Location = new System.Drawing.Point(this.exportSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
-            this.exportSettingsButton.Location = new System.Drawing.Point(this.exportSettingsButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
-            this.startButton.Location = new System.Drawing.Point(this.startButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
-            this.closeButton.Location = new System.Drawing.Point(this.closeButton.Location.X, isChecked ? advancedSettingsLowerAreaButtonYLocation : advancedSettingsLowerAreaButtonYLocation - advancedSettingsHiddenSizeReductionAmount);
-
-            // Lower area checkboxes.
-            int advancedSettingsLowerAreaCheckBoxesYLocation = 575;
-            this.showAdvancedSettingsCheckBox.Location = new System.Drawing.Point(this.showAdvancedSettingsCheckBox.Location.X, isChecked ? advancedSettingsLowerAreaCheckBoxesYLocation : advancedSettingsLowerAreaCheckBoxesYLocation - advancedSettingsHiddenSizeReductionAmount);
-            this.alwaysOnTopCheckbox.Location = new System.Drawing.Point(this.alwaysOnTopCheckbox.Location.X, isChecked ? advancedSettingsLowerAreaCheckBoxesYLocation : advancedSettingsLowerAreaCheckBoxesYLocation - advancedSettingsHiddenSizeReductionAmount);
-
+            const int advancedSettingsHiddenSizeReductionAmount = 276;
+            
             int minimumWindowHeight = this.isBatchRvtRunning ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
             this.MinimumSize = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, isChecked ? minimumWindowHeight : minimumWindowHeight - advancedSettingsHiddenSizeReductionAmount);
 
@@ -1102,9 +1083,6 @@ namespace BatchRvtGUI
                 this.Size = new System.Drawing.Size(this.Size.Width, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
                 this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
             }
-
-            this.batchRvtOutputGroupBox.Location = new System.Drawing.Point(12, isChecked ? 600 : 600 - advancedSettingsHiddenSizeReductionAmount);
-            this.batchRvtOutputGroupBox.Size = new System.Drawing.Size(this.batchRvtOutputGroupBox.Size.Width, this.ClientSize.Height - 12 - this.batchRvtOutputGroupBox.Location.Y);
         }
 
         private void timeOutNumericUpDown_ValueChanged(object sender, EventArgs e)
