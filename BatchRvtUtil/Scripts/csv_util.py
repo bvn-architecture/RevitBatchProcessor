@@ -23,11 +23,21 @@ import System
 
 from System.Text import Encoding
 from System.IO import File
+import path_util
 
-def ReadFromCSVFile(csvFilePath, delimiter, encoding):
-  lines = File.ReadAllLines(csvFilePath, encoding)
-  rows = [[value for value in line.Split(delimiter)] for line in lines]
-  return rows
+CSV_FILE_EXTENSION = ".csv"
+
+def ReadAllLines(filePath):
+  lines = File.ReadAllLines(filePath)
+  if len(lines) > 0: # Workaround for a potential lack of detection of Unicode txt files.
+    if lines[0].Contains("\x00"):
+      lines = File.ReadAllLines(filePath, Encoding.Unicode)
+  return lines
+
+def ReadFromCSVFile(csvFilePath):
+  lines = ReadAllLines(csvFilePath)
+  return [[path] for line in lines for path in line.split(',')]
+
 
 def WriteToCSVFile(rows, csvFilePath, delimiter, encoding):
   lines = [str.Join(delimiter, [str(value) for value in row]) for row in rows]
@@ -37,3 +47,11 @@ def WriteToCSVFile(rows, csvFilePath, delimiter, encoding):
 def WriteToTabDelimitedTxtFile(rows, txtFilePath, encoding=Encoding.UTF8):
   WriteToCSVFile(rows, txtFilePath, "\t", encoding)
   return
+
+def HasCSVFileExtension(filePath):
+  return path_util.HasFileExtension(filePath, CSV_FILE_EXTENSION)
+
+def GetRowsFromCSVFile(csvFilePath):
+  # Support files listed by row or by column
+  rows = ReadFromCSVFile(csvFilePath)
+  return rows

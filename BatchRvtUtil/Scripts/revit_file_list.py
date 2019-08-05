@@ -24,6 +24,7 @@ from System import ArgumentException, NotSupportedException
 from System.IO import PathTooLongException
 
 import text_file_util
+import csv_util
 import console_util
 import path_util
 import revit_file_version
@@ -55,6 +56,10 @@ def FromText(text):
 def FromLines(lines):
   rows = text_file_util.GetRowsFromLines(lines)
   return GetCentralFileListFromRows(rows)
+
+def FromCSVFile(csvFilePath):
+    rows = csv_util.GetRowsFromCSVFile(csvFilePath)
+    return GetCentralFileListFromRows(rows)
 
 def IsExcelInstalled():
   return System.Type.GetTypeFromProgID("Excel.Application") is not None
@@ -111,6 +116,8 @@ def GetRevitFileList(settingsFilePath):
   revitFileList = None
   if text_file_util.HasTextFileExtension(settingsFilePath):
     revitFileList = FromTextFile(settingsFilePath)
+  elif csv_util.HasCSVFileExtension(settingsFilePath):
+    revitFileList = FromCSVFile(settingsFilePath)
   elif HasExcelFileExtension(settingsFilePath):
     revitFileList = FromExcelFile(settingsFilePath)
   return revitFileList

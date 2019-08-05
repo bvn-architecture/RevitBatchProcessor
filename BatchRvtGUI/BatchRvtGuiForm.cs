@@ -689,7 +689,7 @@ namespace BatchRvtGUI
             var openFileDialog = new OpenFileDialog();
 
             openFileDialog.DefaultExt = ".txt";
-            openFileDialog.Filter = "Revit File List (*.txt;*.xls;*.xlsx)|*.txt;*.xls;*.xlsx";
+            openFileDialog.Filter = "Revit File List (*.txt;*.xls;*.xlsx;*.csv)|*.txt;*.xls;*.xlsx;*.csv";
             openFileDialog.CheckFileExists = true;
             openFileDialog.ReadOnlyChecked = true;
             openFileDialog.Multiselect = false;
