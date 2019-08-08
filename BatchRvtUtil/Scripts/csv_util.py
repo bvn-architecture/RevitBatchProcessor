@@ -34,10 +34,8 @@ def ReadAllLines(filePath):
       lines = File.ReadAllLines(filePath, Encoding.Unicode)
   return lines
 
-def ReadFromCSVFile(csvFilePath):
-  lines = ReadAllLines(csvFilePath)
-  return [[path] for line in lines for path in line.split(',')]
-
+def GetRowsFromLines(lines):
+  return [line.split(',') for line in lines]
 
 def WriteToCSVFile(rows, csvFilePath, delimiter, encoding):
   lines = [str.Join(delimiter, [str(value) for value in row]) for row in rows]
@@ -52,6 +50,5 @@ def HasCSVFileExtension(filePath):
   return path_util.HasFileExtension(filePath, CSV_FILE_EXTENSION)
 
 def GetRowsFromCSVFile(csvFilePath):
-  # Support files listed by row or by column
-  rows = ReadFromCSVFile(csvFilePath)
-  return rows
+  lines = ReadAllLines(csvFilePath)
+  return GetRowsFromLines(lines)
