@@ -54,23 +54,28 @@ namespace BatchRvtGUI
         private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
         private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
 
-        private const int OUTPUT_HEIGHT = 264;
+        private const int INITIAL_WIDTH = 1040;
 
-        private const int SETUP_HEIGHT = 912 - OUTPUT_HEIGHT;
-        private const int SETUP_INITIAL_WIDTH = 1024;
-        private const int SETUP_MINIMUM_WIDTH = 1024;
+        private const int SETUP_HEIGHT = 685;
+        private const int SETUP_INITIAL_WIDTH = INITIAL_WIDTH;
+        private const int SETUP_MINIMUM_WIDTH = INITIAL_WIDTH;
         private const int SETUP_MAXIMUM_WIDTH = 1600;
 
         private readonly System.Drawing.Size SETUP_INITIAL_SIZE = new System.Drawing.Size(SETUP_INITIAL_WIDTH, SETUP_HEIGHT);
         private readonly System.Drawing.Size SETUP_MINIMUM_SIZE = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, SETUP_HEIGHT);
         private readonly System.Drawing.Size SETUP_MAXIMUM_SIZE = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, SETUP_HEIGHT);
 
-        private const int RUNNING_INITIAL_WIDTH = 1024;
-        private const int RUNNING_INITIAL_HEIGHT = 912 - OUTPUT_HEIGHT;
-        private const int RUNNING_MINIMUM_HEIGHT = 912;
+        private const int RUNNING_INITIAL_WIDTH = INITIAL_WIDTH;
+        private const int RUNNING_INITIAL_HEIGHT = 875;
+        private const int RUNNING_MINIMUM_HEIGHT = 875;
+        private const int RUNNING_MINIMUM_WIDTH = INITIAL_WIDTH;
+
+        private const int ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE = 275;
 
         private readonly System.Drawing.Size RUNNING_INITIAL_SIZE = new System.Drawing.Size(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
+        private readonly System.Drawing.Size RUNNING_MINIMUM_SIZE = new System.Drawing.Size(RUNNING_MINIMUM_WIDTH, RUNNING_MINIMUM_HEIGHT);
         private readonly System.Drawing.Size RUNNING_MAXIMUM_SIZE = new System.Drawing.Size(0, 0); // no maximum size
+        private bool isUsingRunningSize = false;
 
         private Process batchRvtProcess;
         private Timer readBatchRvtOutput_Timer;
@@ -505,7 +510,7 @@ namespace BatchRvtGUI
             this.UIConfiguration.UpdateConfig();
 
             bool validated = ValidateConfig();
-
+            
             if (validated)
             {
                 bool isSaved = SaveSettings();
@@ -513,7 +518,7 @@ namespace BatchRvtGUI
                 // TODO: show error message if save failed!!
 
                 var settingsFilePath = BatchRvtSettings.GetDefaultSettingsFilePath();
-
+                
                 this.batchRvtProcess = BatchRvt.StartBatchRvt(settingsFilePath);
 
                 this.readBatchRvtOutput_Timer = new Timer() { Interval = READ_OUTPUT_INTERVAL_IN_MS };
@@ -525,14 +530,16 @@ namespace BatchRvtGUI
                 this.startButton.Enabled = false;
                 this.startButton.Text = "Running...";
                 this.batchRvtOutputGroupBox.Visible = true;
+                this.MinimumSize = RUNNING_MINIMUM_SIZE;
                 this.MaximumSize = RUNNING_MAXIMUM_SIZE;
                 this.Size = RUNNING_INITIAL_SIZE;
                 this.MaximizeBox = true;
+                this.isUsingRunningSize = true;
 
                 UpdateAdvancedSettings();
 
                 AdjustWindowSizeForDisplaySetting();
-
+                
                 readBatchRvtOutput_Timer.Start();
             }
         }
@@ -1067,21 +1074,19 @@ namespace BatchRvtGUI
 
         private void UpdateAdvancedSettings()
         {
-            var isChecked = this.showAdvancedSettingsCheckBox.Checked;
-            this.singleRevitTaskProcessingGroupBox.Visible = isChecked;
-            this.dataExportGroupBox.Visible = isChecked;
-            this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = isChecked;
-            this.preAndPostProcessingGroupBox.Visible = isChecked;
+            var advancedSettingsIsChecked = this.showAdvancedSettingsCheckBox.Checked;
+            this.singleRevitTaskProcessingGroupBox.Visible = advancedSettingsIsChecked;
+            this.dataExportGroupBox.Visible = advancedSettingsIsChecked;
+            this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = advancedSettingsIsChecked;
+            this.preAndPostProcessingGroupBox.Visible = advancedSettingsIsChecked;
 
-            const int advancedSettingsHiddenSizeReductionAmount = 276;
-            
-            int minimumWindowHeight = this.isBatchRvtRunning ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
-            this.MinimumSize = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, isChecked ? minimumWindowHeight : minimumWindowHeight - advancedSettingsHiddenSizeReductionAmount);
+            int minimumWindowHeight = this.isUsingRunningSize ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
+            this.MinimumSize = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, advancedSettingsIsChecked ? minimumWindowHeight : minimumWindowHeight - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE);
 
-            if (!this.isBatchRvtRunning)
+            if (!this.isUsingRunningSize)
             {
-                this.Size = new System.Drawing.Size(this.Size.Width, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
-                this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, isChecked ? SETUP_HEIGHT : SETUP_HEIGHT - advancedSettingsHiddenSizeReductionAmount);
+                this.Size = new System.Drawing.Size(this.Size.Width, advancedSettingsIsChecked ? SETUP_HEIGHT : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE);
+                this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, advancedSettingsIsChecked ? SETUP_HEIGHT : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE);
             }
         }
 
