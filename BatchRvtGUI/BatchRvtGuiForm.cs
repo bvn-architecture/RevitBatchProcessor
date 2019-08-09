@@ -298,9 +298,14 @@ namespace BatchRvtGUI
             return dpiX / 96f;
         }
 
+        private static int Scale(int value, double scale)
+        {
+            return (int)(value * scale);
+        }
+
         private static System.Drawing.Size Scale(System.Drawing.Size size, double scale)
         {
-            return new System.Drawing.Size((int)(size.Width * scale), (int)(size.Height * scale));
+            return new System.Drawing.Size(Scale(size.Width, scale), Scale(size.Height, scale));
         }
 
         private void AdjustWindowSizeForDisplaySetting()
@@ -538,8 +543,6 @@ namespace BatchRvtGUI
 
                 UpdateAdvancedSettings();
 
-                AdjustWindowSizeForDisplaySetting();
-                
                 readBatchRvtOutput_Timer.Start();
             }
         }
@@ -1080,13 +1083,22 @@ namespace BatchRvtGUI
             this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = advancedSettingsIsChecked;
             this.preAndPostProcessingGroupBox.Visible = advancedSettingsIsChecked;
 
+            var displaySettingPercentage = GetDisplaySettingPercentage();
+
             int minimumWindowHeight = this.isUsingRunningSize ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
-            this.MinimumSize = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, advancedSettingsIsChecked ? minimumWindowHeight : minimumWindowHeight - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE);
+
+            this.MinimumSize = Scale(
+                    new System.Drawing.Size(Scale(SETUP_MINIMUM_WIDTH, displaySettingPercentage), advancedSettingsIsChecked ? minimumWindowHeight : minimumWindowHeight - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE),
+                    displaySettingPercentage
+                );
 
             if (!this.isUsingRunningSize)
             {
                 this.Size = new System.Drawing.Size(this.Size.Width, advancedSettingsIsChecked ? SETUP_HEIGHT : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE);
-                this.MaximumSize = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, advancedSettingsIsChecked ? SETUP_HEIGHT : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE);
+                this.MaximumSize = Scale(
+                        new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, advancedSettingsIsChecked ? SETUP_HEIGHT : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE),
+                        displaySettingPercentage
+                    );
             }
         }
 
