@@ -52,6 +52,7 @@ namespace BatchRvtUtil
             public readonly BooleanSetting AuditOnOpening = new BooleanSetting("auditOnOpening");
             public readonly IntegerSetting ProgressNumber = new IntegerSetting("progressNumber");
             public readonly IntegerSetting ProgressMax = new IntegerSetting("progressMax");
+            public readonly ListSetting<string> AssociatedData = new ListSetting<string>("associatedData");
 
             public ScriptData()
             {
@@ -74,7 +75,8 @@ namespace BatchRvtUtil
                             this.OpenInUI,
                             this.AuditOnOpening,
                             this.ProgressNumber,
-                            this.ProgressMax
+                            this.ProgressMax,
+                            this.AssociatedData
                         }
                     );
             }
