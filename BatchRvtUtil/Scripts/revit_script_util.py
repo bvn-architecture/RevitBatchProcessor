@@ -139,6 +139,9 @@ def GetProgressNumber():
 def GetProgressMax():
   return SCRIPT_DATA_CONTAINER[0].ProgressMax.GetValue()
 
+def GetAssociatedData():
+  return SCRIPT_DATA_CONTAINER[0].AssociatedData.GetValue()
+
 def GetScriptDocument():
   doc = SCRIPT_DOCUMENT_CONTAINER[0]
   return doc

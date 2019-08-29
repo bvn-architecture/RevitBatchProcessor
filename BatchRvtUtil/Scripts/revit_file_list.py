@@ -31,35 +31,39 @@ import revit_file_version
 import batch_rvt_util
 from batch_rvt_util import RevitVersion
 
-def GetNonEmptyTrimmedTextValues(textValues):
-  return list(
-      textValue.Trim() for textValue in textValues
-      if not str.IsNullOrWhiteSpace(textValue)
-    )
+class RevitFilePathData:
+  def __init__(self, revitFilePath, associatedData):
+    self.RevitFilePath = revitFilePath.Trim()
+    self.AssociatedData = [value.Trim() for value in associatedData]
+    return
 
 def FirstOrDefault(items, default=None):
   for item in items:
     return item
   return default
 
-def GetCentralFileListFromRows(rows):
-  return GetNonEmptyTrimmedTextValues(FirstOrDefault(row) for row in rows)
+def GetRevitFileListData(rows):
+  return [
+      RevitFilePathData(row[0], row[1:])
+      for row in rows
+      if not str.IsNullOrWhiteSpace(FirstOrDefault(row)) # Ignores rows where the first column's cell value is empty.
+    ]
 
 def FromTextFile(textFilePath):
   rows = text_file_util.GetRowsFromTextFile(textFilePath)
-  return GetCentralFileListFromRows(rows)
+  return GetRevitFileListData(rows)
 
 def FromText(text):
   rows = text_file_util.GetRowsFromText(text)
-  return GetCentralFileListFromRows(rows)
+  return GetRevitFileListData(rows)
 
 def FromLines(lines):
   rows = text_file_util.GetRowsFromLines(lines)
-  return GetCentralFileListFromRows(rows)
+  return GetRevitFileListData(rows)
 
 def FromCSVFile(csvFilePath):
     rows = csv_util.GetRowsFromCSVFile(csvFilePath)
-    return GetCentralFileListFromRows(rows)
+    return GetRevitFileListData(rows)
 
 def IsExcelInstalled():
   return System.Type.GetTypeFromProgID("Excel.Application") is not None
@@ -69,7 +73,7 @@ def HasExcelFileExtension(filePath):
 
 def FromExcelFile(excelFilePath):
   import excel_util
-  return GetCentralFileListFromRows(excel_util.ReadRowsTextFromWorkbook(excelFilePath))
+  return GetRevitFileListData(excel_util.ReadRowsTextFromWorkbook(excelFilePath))
 
 def FromConsole():
   return FromLines(console_util.ReadLines())
@@ -112,19 +116,20 @@ class RevitFileInfo():
   def Exists(self):
     return path_util.FileExists(self.revitFilePath)
 
-def GetRevitFileList(settingsFilePath):
-  revitFileList = None
+def FromFile(settingsFilePath):
+  revitFileListData = None
   if text_file_util.HasTextFileExtension(settingsFilePath):
-    revitFileList = FromTextFile(settingsFilePath)
+    revitFileListData = FromTextFile(settingsFilePath)
   elif csv_util.HasCSVFileExtension(settingsFilePath):
-    revitFileList = FromCSVFile(settingsFilePath)
+    revitFileListData = FromCSVFile(settingsFilePath)
   elif HasExcelFileExtension(settingsFilePath):
-    revitFileList = FromExcelFile(settingsFilePath)
-  return revitFileList
+    revitFileListData = FromExcelFile(settingsFilePath)
+  return revitFileListData
 
 class SupportedRevitFileInfo():
-  def __init__(self, revitFilePath):
-    self.revitFileInfo = RevitFileInfo(revitFilePath)
+  def __init__(self, revitFilePathData):
+    self.revitFileInfo = RevitFileInfo(revitFilePathData.RevitFilePath)
+    self.revitFilePathData = revitFilePathData
     revitVersionText = self.revitFileInfo.TryGetRevitVersionText()
     revitVersionNumber = None
     if not str.IsNullOrWhiteSpace(revitVersionText):
@@ -149,4 +154,7 @@ class SupportedRevitFileInfo():
 
   def GetRevitFileInfo(self):
     return self.revitFileInfo
+
+  def GetRevitFilePathData(self):
+    return self.revitFilePathData
 

@@ -59,6 +59,7 @@ class BatchRvtConfig:
     # Revit File List settings
     self.RevitFileListFilePath = None
     self.RevitFileList = None
+    self.RevitFileListData = None
 
     # Data Export settings
     self.EnableDataExport = None
@@ -96,13 +97,14 @@ class BatchRvtConfig:
 
     return
 
-  def ReadRevitFileList(self, output):
-    revitFileList = None
+  def ReadRevitFileListData(self, output):
+    revitFileListData = None
     if self.RevitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing:
       if self.RevitFileList is not None:
         output()
         output("Reading Revit File list from object input.")
-        revitFileList = self.RevitFileList
+        self.RevitFileListData = revit_file_list.FromLines(self.RevitFileList)
+        revitFileListData = self.RevitFileListData
       else:
         output()
         output("Reading Revit File list:")
@@ -115,17 +117,22 @@ class BatchRvtConfig:
           output()
           output("ERROR: Could not read from the Excel Revit File list. An Excel installation was not detected!")
         else:
-          revitFileList = revit_file_list.GetRevitFileList(self.RevitFileListFilePath)
-          self.RevitFileList = revitFileList  
+          revitFileListData = revit_file_list.FromFile(self.RevitFileListFilePath)
+          revitFileList = (
+              [revitFilePathData.RevitFilePath for revitFilePathData in revitFileListData]
+              if revitFileListData is not None else None
+            )
+          self.RevitFileList = revitFileList
+          self.RevitFileListData = revitFileListData
 
-      if revitFileList is None:
+      if revitFileListData is None:
         output()
         output("ERROR: Could not read the Revit File list.")
-      elif len(revitFileList) == 0:
+      elif len(revitFileListData) == 0:
         output()
         output("ERROR: Revit File list is empty.")
-        revitFileList = None
-    return revitFileList
+        revitFileListData = None
+    return revitFileListData
 
 def ParseSessionIdAndStartTime(sessionId):
   # NOTE: If the session ID looks too much like a serialized json date/time then the deserializer will

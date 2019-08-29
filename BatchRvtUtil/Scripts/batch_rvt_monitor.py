@@ -70,12 +70,12 @@ def RevitFileExists(supportedRevitFileInfo):
 def GetSupportedRevitFiles(batchRvtConfig):
   supportedRevitFileList = None
 
-  revitFileList = batchRvtConfig.ReadRevitFileList(Output)
+  revitFileListData = batchRvtConfig.ReadRevitFileListData(Output)
 
-  if revitFileList is not None:
+  if revitFileListData is not None:
     supportedRevitFileList = list(
-        revit_file_list.SupportedRevitFileInfo(revitFilePath.Trim('"'))
-        for revitFilePath in revitFileList
+        revit_file_list.SupportedRevitFileInfo(revitFilePathData)
+        for revitFilePathData in revitFileListData
       )
 
     nonExistentRevitFileList = list(
@@ -329,6 +329,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
         scriptData.AuditOnOpening.SetValue(batchRvtConfig.AuditOnOpening)
         scriptData.ProgressNumber.SetValue(progressNumber+index)
         scriptData.ProgressMax.SetValue(totalFilesCount)
+        scriptData.AssociatedData.SetValue(supportedRevitFileInfo.GetRevitFilePathData().AssociatedData.ToList[str]())
         scriptDatas.append(scriptData)
 
       batchRvtScriptsFolderPath = BatchRvt.GetBatchRvtScriptsFolderPath()
