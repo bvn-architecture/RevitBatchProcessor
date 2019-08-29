@@ -213,6 +213,41 @@ namespace BatchRvtUtil
         }
     }
 
+    public class ListSetting<T> : OptionalSetting<List<T>>
+    {
+        public ListSetting(string name)
+            : base(name, SetListPropertyValue, GetListPropertyValue, Enumerable.Empty<T>().ToList())
+        {
+        }
+
+        public override void SetValue(List<T> value)
+        {
+            base.SetValue(InitializeFromList((value)));
+        }
+
+        public override List<T> GetValue()
+        {
+            return InitializeFromList(base.GetValue());
+        }
+
+        private static List<T> GetListPropertyValue(JObject jobject, string propertyName)
+        {
+            var jarray = (jobject[propertyName] as JArray);
+
+            return InitializeFromList(jarray.Select(jvalue => jvalue.ToObject<T>()).ToList());
+        }
+
+        private static void SetListPropertyValue(JObject jobject, string propertyName, List<T> value)
+        {
+            jobject[propertyName] = new JArray(InitializeFromList(value));
+        }
+
+        private static List<T> InitializeFromList(IEnumerable<T> value)
+        {
+            return (value ?? Enumerable.Empty<T>()).ToList();
+        }
+    }
+
     public class PersistentSettings : IPersistent
     {
         private readonly IEnumerable<IPersistent> persistentSettings;
