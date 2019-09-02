@@ -68,6 +68,8 @@ Revit addins will be automatically deployed to the Addins folder for each availa
 
 The BatchRvtGUI project is the GUI that drives the underlying engine (the BatchRvt project). Once built, run BatchRvtGUI.exe to start the Revit Batch Processor GUI.
 
+When rebuilding, please make sure all Revit applications are closed before attempting the rebuild.
+
 # Requirements
 
 - At least one version of Revit installed. Currently supports Revit versions 2015 through 2020.
