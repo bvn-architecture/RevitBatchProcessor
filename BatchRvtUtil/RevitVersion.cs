@@ -66,38 +66,47 @@ namespace BatchRvtUtil
                     SupportedRevitVersion.Revit2015,
                     new [] {
                         @"C:\Program Files\Autodesk\Revit 2015",
-                        @"C:\Program Files\Autodesk\Revit Architecture 2015"
+                        @"C:\Program Files\Autodesk\Revit Architecture 2015",
+                        @"D:\Program Files\Autodesk\Revit 2015",
+                        @"D:\Program Files\Autodesk\Revit Architecture 2015"
                     }
                 },
                 {
                     SupportedRevitVersion.Revit2016,
                     new [] {
                         @"C:\Program Files\Autodesk\Revit 2016",
-                        @"C:\Program Files\Autodesk\Revit Architecture 2016"
+                        @"C:\Program Files\Autodesk\Revit Architecture 2016",
+                        @"D:\Program Files\Autodesk\Revit 2016",
+                        @"D:\Program Files\Autodesk\Revit Architecture 2016",
                     }
                 },
                 {
                     SupportedRevitVersion.Revit2017,
                     new [] {
-                        @"C:\Program Files\Autodesk\Revit 2017"
+                        @"C:\Program Files\Autodesk\Revit 2017",
+                        @"D:\Program Files\Autodesk\Revit 2017"
                     }
                 },
                 {
                     SupportedRevitVersion.Revit2018,
                     new [] {
-                        @"C:\Program Files\Autodesk\Revit 2018"
+                        @"C:\Program Files\Autodesk\Revit 2018",
+                        @"D:\Program Files\Autodesk\Revit 2018"
                     }
                 },
                 {
                     SupportedRevitVersion.Revit2019,
                     new [] {
-                        @"C:\Program Files\Autodesk\Revit 2019"
+                        @"C:\Program Files\Autodesk\Revit 2019",
+                        @"D:\Program Files\Autodesk\Revit 2019"
+
                     }
                 },
                 {
                     SupportedRevitVersion.Revit2020,
                     new [] {
-                        @"C:\Program Files\Autodesk\Revit 2020"
+                        @"C:\Program Files\Autodesk\Revit 2020",
+                        @"D:\Program Files\Autodesk\Revit 2020"
                     }
                 }
             };
