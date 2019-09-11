@@ -1152,6 +1152,7 @@ namespace BatchRvtGUI
 
                         bool expandNetworkPaths = revitFileScanningOptionsUI.ExpandNetworkPaths();
                         bool extractRevitVersionInfo = revitFileScanningOptionsUI.ExtractRevitVersionInfo();
+                        bool ignoreRevitBackupFiles = revitFileScanningOptionsUI.IgnoreRevitBackupFiles();
 
                         var rows = Enumerable.Empty<IEnumerable<string>>();
 
@@ -1163,6 +1164,7 @@ namespace BatchRvtGUI
                                     selectedRevitFileType,
                                     expandNetworkPaths,
                                     extractRevitVersionInfo,
+                                    ignoreRevitBackupFiles,
                                     progressReporter
                                 );
                             };
