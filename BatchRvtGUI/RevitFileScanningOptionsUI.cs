@@ -71,5 +71,10 @@ namespace BatchRvtGUI
         {
             return this.detectRevitFileVersionCheckBox.Checked;
         }
+
+        public bool IgnoreRevitBackupFiles()
+        {
+            return this.ignoreBackupFilesCheckBox.Checked;
+        }
     }
 }

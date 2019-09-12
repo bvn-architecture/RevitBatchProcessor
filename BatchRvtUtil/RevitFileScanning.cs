@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace BatchRvtUtil
 {
@@ -41,6 +42,7 @@ namespace BatchRvtUtil
                 RevitFileType revitFileType,
                 bool expandNetworkPaths,
                 bool extractRevitVersionInfo,
+                bool ignoreRevitBackupFiles,
                 Func<string, bool> progressReporter
             )
         {
@@ -48,7 +50,7 @@ namespace BatchRvtUtil
 
             progressReporter("Scanning for Revit files ...");
 
-            var revitFilePaths = FindRevitFiles(baseFolderPath, searchOption, revitFileType, progressReporter);
+            var revitFilePaths = FindRevitFiles(baseFolderPath, searchOption, revitFileType, ignoreRevitBackupFiles, progressReporter);
 
             int numberOfRevitFilePaths = revitFilePaths.Count();
 
@@ -119,6 +121,7 @@ namespace BatchRvtUtil
                 string folderPath,
                 SearchOption searchOption,
                 RevitFileType revitFileType,
+                bool ignoreRevitBackups,
                 Func<string, bool> progressReporter
             )
         {
@@ -164,35 +167,70 @@ namespace BatchRvtUtil
 
                 revitFilePaths.AddRange(
                         PathUtil.SafeEnumerateFiles(folderToScan, searchFilePattern, SearchOption.TopDirectoryOnly)
-                        .Where(filePath => HasRevitFileExtension(filePath))
+                        .Where(filePath => HasRevitFileExtension(filePath, ignoreRevitBackups))
                     );
             }
 
             return revitFilePaths;
         }
 
-        public static bool HasRevitProjectFileExtension(string filePath)
+        public static bool HasRevitProjectFileExtension(string filePath, bool ignoreRevitBackups)
         {
             var extension = Path.GetExtension(filePath).ToLower();
 
-            return extension.ToLower() == REVIT_PROJECT_FILE_EXTENSION;
+            if (ignoreRevitBackups && IsBackupFile(filePath))
+            {
+                return false;
+            }
+            else
+            {
+                return extension.ToLower() == REVIT_PROJECT_FILE_EXTENSION;
+            }
         }
 
-        public static bool HasRevitFamilyFileExtension(string filePath)
+        public static bool HasRevitFamilyFileExtension(string filePath, bool ignoreRevitBackups)
         {
             var extension = Path.GetExtension(filePath).ToLower();
 
-            return extension.ToLower() == REVIT_FAMILY_FILE_EXTENSION;
+            if (ignoreRevitBackups && IsBackupFile(filePath))
+            {
+                return false;
+            }
+            else
+            {
+                return extension.ToLower() == REVIT_FAMILY_FILE_EXTENSION;
+            }
         }
 
-        public static bool HasRevitFileExtension(string filePath)
+        public static bool HasRevitFileExtension(string filePath, bool ignoreRevitBackups)
         {
             var extension = Path.GetExtension(filePath).ToLower();
 
-            return new[] {
+            if (ignoreRevitBackups && IsBackupFile(filePath))
+            {
+                return false;
+            }
+            else
+            {
+                return new[] {
                     REVIT_PROJECT_FILE_EXTENSION,
                     REVIT_FAMILY_FILE_EXTENSION
                 }.Any(revitExtension => extension == revitExtension.ToLower());
+            }
+        }
+
+        private static bool IsBackupFile(string filePath)
+        {
+            string pattern = "\\.\\d\\d\\d\\d\\.(rvt|rfa)$";
+            if (Regex.IsMatch(filePath, pattern))
+            {
+                // This is a backup version of the file (ie. .0001.rvt/rfa) so skip it.
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

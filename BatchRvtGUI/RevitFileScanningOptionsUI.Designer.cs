@@ -32,6 +32,7 @@
             this.startScanButton = new System.Windows.Forms.Button();
             this.optionsGroupBox = new System.Windows.Forms.GroupBox();
             this.otherOptionsGroupBox = new System.Windows.Forms.GroupBox();
+            this.ignoreBackupFilesCheckBox = new System.Windows.Forms.CheckBox();
             this.asteriskNoteLabel = new System.Windows.Forms.Label();
             this.detectRevitFileVersionCheckBox = new System.Windows.Forms.CheckBox();
             this.expandNetworkPathsCheckBox = new System.Windows.Forms.CheckBox();
@@ -49,7 +50,7 @@
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(309, 171);
+            this.cancelButton.Location = new System.Drawing.Point(308, 185);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 2;
@@ -60,7 +61,7 @@
             // 
             this.startScanButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.startScanButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.startScanButton.Location = new System.Drawing.Point(165, 171);
+            this.startScanButton.Location = new System.Drawing.Point(164, 185);
             this.startScanButton.Name = "startScanButton";
             this.startScanButton.Size = new System.Drawing.Size(138, 23);
             this.startScanButton.TabIndex = 1;
@@ -73,28 +74,41 @@
             this.optionsGroupBox.Controls.Add(this.revitFileTypesGroupBox);
             this.optionsGroupBox.Location = new System.Drawing.Point(12, 12);
             this.optionsGroupBox.Name = "optionsGroupBox";
-            this.optionsGroupBox.Size = new System.Drawing.Size(372, 148);
+            this.optionsGroupBox.Size = new System.Drawing.Size(372, 163);
             this.optionsGroupBox.TabIndex = 0;
             this.optionsGroupBox.TabStop = false;
             this.optionsGroupBox.Text = "Options";
             // 
             // otherOptionsGroupBox
             // 
+            this.otherOptionsGroupBox.Controls.Add(this.ignoreBackupFilesCheckBox);
             this.otherOptionsGroupBox.Controls.Add(this.asteriskNoteLabel);
             this.otherOptionsGroupBox.Controls.Add(this.detectRevitFileVersionCheckBox);
             this.otherOptionsGroupBox.Controls.Add(this.expandNetworkPathsCheckBox);
             this.otherOptionsGroupBox.Controls.Add(this.includeSubfoldersCheckBox);
             this.otherOptionsGroupBox.Location = new System.Drawing.Point(165, 19);
             this.otherOptionsGroupBox.Name = "otherOptionsGroupBox";
-            this.otherOptionsGroupBox.Size = new System.Drawing.Size(194, 117);
+            this.otherOptionsGroupBox.Size = new System.Drawing.Size(194, 134);
             this.otherOptionsGroupBox.TabIndex = 1;
             this.otherOptionsGroupBox.TabStop = false;
             this.otherOptionsGroupBox.Text = "Additional Options";
             // 
+            // ignoreBackupFilesCheckBox
+            // 
+            this.ignoreBackupFilesCheckBox.AutoSize = true;
+            this.ignoreBackupFilesCheckBox.Checked = true;
+            this.ignoreBackupFilesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ignoreBackupFilesCheckBox.Location = new System.Drawing.Point(6, 88);
+            this.ignoreBackupFilesCheckBox.Name = "ignoreBackupFilesCheckBox";
+            this.ignoreBackupFilesCheckBox.Size = new System.Drawing.Size(167, 17);
+            this.ignoreBackupFilesCheckBox.TabIndex = 4;
+            this.ignoreBackupFilesCheckBox.Text = "Ignore backup files (.0001.rvt)";
+            this.ignoreBackupFilesCheckBox.UseVisualStyleBackColor = true;
+            // 
             // asteriskNoteLabel
             // 
             this.asteriskNoteLabel.AutoSize = true;
-            this.asteriskNoteLabel.Location = new System.Drawing.Point(21, 90);
+            this.asteriskNoteLabel.Location = new System.Drawing.Point(22, 108);
             this.asteriskNoteLabel.Name = "asteriskNoteLabel";
             this.asteriskNoteLabel.Size = new System.Drawing.Size(162, 13);
             this.asteriskNoteLabel.TabIndex = 3;
@@ -137,7 +151,7 @@
             this.revitFileTypesGroupBox.Controls.Add(this.familyFilesRadioButton);
             this.revitFileTypesGroupBox.Location = new System.Drawing.Point(6, 19);
             this.revitFileTypesGroupBox.Name = "revitFileTypesGroupBox";
-            this.revitFileTypesGroupBox.Size = new System.Drawing.Size(153, 117);
+            this.revitFileTypesGroupBox.Size = new System.Drawing.Size(153, 134);
             this.revitFileTypesGroupBox.TabIndex = 0;
             this.revitFileTypesGroupBox.TabStop = false;
             this.revitFileTypesGroupBox.Text = "Revit File Types";
@@ -178,7 +192,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(396, 206);
+            this.ClientSize = new System.Drawing.Size(395, 220);
             this.Controls.Add(this.optionsGroupBox);
             this.Controls.Add(this.startScanButton);
             this.Controls.Add(this.cancelButton);
@@ -209,6 +223,7 @@
         private System.Windows.Forms.CheckBox includeSubfoldersCheckBox;
         private System.Windows.Forms.GroupBox otherOptionsGroupBox;
         private System.Windows.Forms.CheckBox detectRevitFileVersionCheckBox;
+        private System.Windows.Forms.CheckBox ignoreBackupFilesCheckBox;
         private System.Windows.Forms.Label asteriskNoteLabel;
     }
 }
