@@ -221,7 +221,7 @@ namespace BatchRvtUtil
 
         private static bool IsBackupFile(string filePath)
         {
-            string pattern = "\\.\\d\\d\\d\\d.(rvt|rfa)$";
+            string pattern = "\\.\\d\\d\\d\\d\\.(rvt|rfa)$";
             if (Regex.IsMatch(filePath, pattern))
             {
                 // This is a backup version of the file (ie. .0001.rvt/rfa) so skip it.
