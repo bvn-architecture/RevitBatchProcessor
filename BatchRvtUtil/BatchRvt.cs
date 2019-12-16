@@ -118,6 +118,22 @@ namespace BatchRvtUtil
             return batchRvtProcess;
         }
 
+        public static Process StartOpenCloud()
+        {
+            var baseDirectory = GetBatchRvtFolderPath();
+            var psi = new ProcessStartInfo(Path.Combine(baseDirectory, "OpenCloudModel.exe"))
+            {
+                UseShellExecute = true,
+                CreateNoWindow = true,
+                WorkingDirectory = baseDirectory,
+                WindowStyle = ProcessWindowStyle.Minimized
+            };
+
+            var openCloudtProcess = Process.Start(psi);
+
+            return openCloudtProcess;
+        }
+
         public static void ExecuteMonitorScript(
                 string batchRvtFolderPath,
                 CommandSettings.Data commandSettingsData = null

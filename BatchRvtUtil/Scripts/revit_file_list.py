@@ -29,6 +29,7 @@ import console_util
 import path_util
 import revit_file_version
 import batch_rvt_util
+import cloud_util
 from batch_rvt_util import RevitVersion
 
 class RevitFilePathData:
@@ -114,7 +115,7 @@ class RevitFileInfo():
     return revitVersionText
 
   def Exists(self):
-    return path_util.FileExists(self.revitFilePath)
+    return path_util.FileExists(self.revitFilePath) or cloud_util.IsCloudPath(self.revitFilePath)
 
 def FromFile(settingsFilePath):
   revitFileListData = None
