@@ -47,6 +47,7 @@ import script_util
 import revit_dynamo
 import revit_dynamo_error
 import revit_process_host
+import cloud_util
 from batch_rvt_util import BatchRvt, RevitVersion
 from revit_script_util import ScriptDataUtil
 
@@ -121,7 +122,7 @@ def RunBatchTaskScript(scriptFilePath):
       output()
       output("\t" + dataExportFolderPath)
     aborted = True
-  elif not path_util.FileExists(centralFilePath):
+  elif not path_util.FileExists(centralFilePath) and not cloud_util.IsCloudPath(centralFilePath):
     output()
     output("ERROR: Revit project file does not exist!")
     if not str.IsNullOrWhiteSpace(centralFilePath):
@@ -248,6 +249,10 @@ def RunBatchTaskScript(scriptFilePath):
               processDocument,
               output
             )
+        elif cloud_util.IsCloudPath(centralFilePath):
+            output()
+            output("Attempting to process a cloud document")
+            result = revit_script_util.RunCloudDocumentAction(uiapp, centralFilePath, auditOnOpening, processDocument, output)
         else:
           result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, auditOnOpening, processDocument, output)
     except Exception, e:
