@@ -77,7 +77,7 @@ When rebuilding, please make sure all Revit applications are closed before attem
 
 This project is licensed under the terms of [The GNU General Public License v3.0](https://www.gnu.org/licenses/gpl.html)
 
-Copyright (c) 2019  Daniel Rumery, BVN
+Copyright (c) 2020  Daniel Rumery, BVN
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

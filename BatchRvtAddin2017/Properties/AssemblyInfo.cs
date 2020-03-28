@@ -1,7 +1,7 @@
 ﻿//
 // Revit Batch Processor
 //
-// Copyright (c) 2019  Daniel Rumery, BVN
+// Copyright (c) 2020  Daniel Rumery, BVN
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BatchRvtAddin2017")]
-[assembly: AssemblyCopyright("Copyright © 2019")]
+[assembly: AssemblyCopyright("Copyright © 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
