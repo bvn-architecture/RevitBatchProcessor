@@ -81,13 +81,21 @@ def GetSupportedRevitFiles(batchRvtConfig):
         nonExistentRevitFileList = list(
                 supportedRevitFileInfo
                 for supportedRevitFileInfo in supportedRevitFileList
-                if not RevitFileExists(supportedRevitFileInfo)
+                if (
+                        not supportedRevitFileInfo.IsCloudModelDescriptor()
+                        and
+                        not RevitFileExists(supportedRevitFileInfo)
+                    )
             )
 
         supportedRevitFileList = list(
                 supportedRevitFileInfo
                 for supportedRevitFileInfo in supportedRevitFileList
-                if RevitFileExists(supportedRevitFileInfo)
+                if (
+                        supportedRevitFileInfo.IsCloudModelDescriptor()
+                        or
+                        RevitFileExists(supportedRevitFileInfo)
+                   )
             )
 
         unsupportedRevitFileList = list(
@@ -100,6 +108,8 @@ def GetSupportedRevitFiles(batchRvtConfig):
                 supportedRevitFileInfo
                 for supportedRevitFileInfo in supportedRevitFileList
                 if (
+                        not supportedRevitFileInfo.IsCloudModelDescriptor()
+                        and
                         not HasSupportedRevitFilePath(supportedRevitFileInfo)
                     )
             )
@@ -108,13 +118,28 @@ def GetSupportedRevitFiles(batchRvtConfig):
                 supportedRevitFileInfo
                 for supportedRevitFileInfo in supportedRevitFileList
                 if (
-                        RevitFileExists(supportedRevitFileInfo)
+                        (
+                            supportedRevitFileInfo.IsCloudModelDescriptor()
+                            or
+                            RevitFileExists(supportedRevitFileInfo)
+                        )
                         and
-                        HasAllowedRevitVersion(batchRvtConfig, supportedRevitFileInfo)
+                        (
+                            HasAllowedRevitVersion(batchRvtConfig, supportedRevitFileInfo)
+                        )
                         and
-                        HasSupportedRevitFilePath(supportedRevitFileInfo)
+                        (
+                            supportedRevitFileInfo.IsCloudModelDescriptor()
+                            or
+                            HasSupportedRevitFilePath(supportedRevitFileInfo)
+                        )
                     )
-            ).OrderBy(lambda supportedRevitFileInfo: GetRevitFileSize(supportedRevitFileInfo)).ToList()
+            ).OrderBy(
+                    lambda supportedRevitFileInfo:
+                        GetRevitFileSize(supportedRevitFileInfo)
+                        if not supportedRevitFileInfo.IsCloudModelDescriptor()
+                        else 0 # dummy file size value for Cloud model descriptors
+                ).ToList()
 
         nonExistentCount = len(nonExistentRevitFileList)
         unsupportedCount = len(unsupportedRevitFileList)
