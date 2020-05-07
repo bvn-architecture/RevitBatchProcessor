@@ -20,6 +20,8 @@
 
 import clr
 import System
+clr.AddReference("System.Core")
+clr.ImportExtensions(System.Linq)
 from System import ArgumentException, NotSupportedException, StringSplitOptions, Guid
 from System.IO import PathTooLongException
 
