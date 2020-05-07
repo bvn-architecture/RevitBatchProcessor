@@ -138,7 +138,7 @@ def GetSupportedRevitFiles(batchRvtConfig):
                     lambda supportedRevitFileInfo:
                         GetRevitFileSize(supportedRevitFileInfo)
                         if not supportedRevitFileInfo.IsCloudModelDescriptor()
-                        else 0 # dummy file size value for Cloud model descriptors
+                        else System.Int64(0) # dummy file size value for Cloud model descriptors
                 ).ToList()
 
         nonExistentCount = len(nonExistentRevitFileList)

@@ -47,9 +47,9 @@ def ShowSupportedRevitFileInfo(supportedRevitFileInfo, output):
     output()
     if supportedRevitFileInfo.IsCloudModelDescriptor():
         revitCloudModelInfo = supportedRevitFileInfo.GetRevitCloudModelInfo()
-        projectGuidText = revitCloudModelInfo.GetProjectGuid()
-        modelGuidText = revitCloudModelInfo.GetModelGuid()
-        output("\t" + "[Cloud Model Descriptor]")
+        projectGuidText = revitCloudModelInfo.GetProjectGuid().ToString()
+        modelGuidText = revitCloudModelInfo.GetModelGuid().ToString()
+        output("\t" + "[ Cloud Model Descriptor ]")
         output("\t" + "Project GUID: " + projectGuidText)
         output("\t" + "Model GUID: " + modelGuidText)
         revitVersionText = supportedRevitFileInfo.TryGetRevitVersionText()

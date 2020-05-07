@@ -192,20 +192,20 @@ class SupportedRevitFileInfo():
         else:
             self.revitVersionText = self.revitFileInfo.TryGetRevitVersionText()
         revitVersionNumber = None
-        if not str.IsNullOrWhiteSpace(revitVersionText):
-            if any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2015):
+        if not str.IsNullOrWhiteSpace(self.revitVersionText):
+            if any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2015):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2015
-            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2016):
+            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2016):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2016
-            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2017):
+            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2017):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2017
-            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2018):
+            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2018):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2018
-            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2019):
+            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2019):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2019
-            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2020):
+            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2020):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2020
-            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2021):
+            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2021):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2021
 
         self.revitVersionNumber = revitVersionNumber
