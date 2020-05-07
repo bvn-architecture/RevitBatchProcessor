@@ -56,7 +56,7 @@ def ReportFailureWarning(failure, failureDefinition, output):
     if len(failingElementIds) > 0:
       output()
       output("\t" + "Failing element ids: " + ElementIdsToSemicolonDelimitedText(failingElementIds))
-    additionalElementIds = failure.GetAdditionalElementIds()    
+    additionalElementIds = failure.GetAdditionalElementIds()
     if len(additionalElementIds) > 0:
       output()
       output("\t" + "Additional element ids: " + ElementIdsToSemicolonDelimitedText(additionalElementIds))

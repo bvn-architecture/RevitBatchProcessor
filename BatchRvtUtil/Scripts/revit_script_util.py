@@ -286,7 +286,7 @@ def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets,
         documentAction,
         output
       )
-    return result    
+    return result
   result = WithErrorReportingAndHandling(uiapp, revitAction, output)
   return result
 
@@ -302,7 +302,7 @@ def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, b
         documentAction,
         output
       )
-    return result    
+    return result
   result = WithErrorReportingAndHandling(uiapp, revitAction, output)
   return result
 

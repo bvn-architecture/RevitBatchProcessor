@@ -45,7 +45,7 @@ def GetLinesFromText(text):
     line = reader.ReadLine()
     while line is not None:
       lines.append(line)
-      line = reader.ReadLine()    
+      line = reader.ReadLine()
   finally:
     reader.Dispose()
   return lines

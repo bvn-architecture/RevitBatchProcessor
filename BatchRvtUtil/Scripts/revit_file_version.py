@@ -92,7 +92,7 @@ def GetRevitVersionText_OldMethod(revitFilePath):
   start = unicodeString.IndexOf("Autodesk Revit")
   end = unicodeString.IndexOf("\x00", start)
   versionText = unicodeString.Substring(start, end - start)
-  return versionText.Substring(0, versionText.LastIndexOf(")") + 1) 
+  return versionText.Substring(0, versionText.LastIndexOf(")") + 1)
 
 def GetBasicFileInfoBytes(revitFilePath):
   storageRoot = GetStorageRoot(revitFilePath)

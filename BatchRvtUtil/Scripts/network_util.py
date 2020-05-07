@@ -40,7 +40,7 @@ def IsSpecialAddress(address):
 
 def GetGatewayAddresses():
   return list(
-      address for address in 
+      address for address in
       Network.GetGatewayAddresses()
       .Where(lambda a: not IsSpecialAddress(a))
       .Select(lambda a: a.ToString())
@@ -50,7 +50,7 @@ def GetGatewayAddresses():
 
 def GetIPAddresses():
   return list(
-      address for address in 
+      address for address in
       Network.GetIPAddresses()
       .Where(lambda a: not IsSpecialAddress(a))
       .Select(lambda a: a.ToString())
