@@ -33,135 +33,135 @@ BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__PROCESS_UNIQ
 BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = r"BATCHRVT__TEST_MODE_FOLDER_PATH"
 
 def GetEnvironmentVariable(environmentVariables, variableName):
-  return environmentVariables.Item[variableName]
+    return environmentVariables.Item[variableName]
 
 def SetEnvironmentVariable(environmentVariables, variableName, value):
-  environmentVariables.Item[variableName] = value
-  return
+    environmentVariables.Item[variableName] = value
+    return
 
 def SetBatchRvtScriptsFolderPath(environmentVariables, batchRvtScriptsFolderPath):
-  SetEnvironmentVariable(
-      environmentVariables,
-      BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME,
-      batchRvtScriptsFolderPath
-    )
-  return
+    SetEnvironmentVariable(
+            environmentVariables,
+            BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME,
+            batchRvtScriptsFolderPath
+        )
+    return
 
 def SetScriptFilePath(environmentVariables, scriptFilePath):
-  SetEnvironmentVariable(
-      environmentVariables,
-      SCRIPT_FILE_PATH__ENVIRONMENT_VARIABLE_NAME,
-      scriptFilePath
-    )
-  return
+    SetEnvironmentVariable(
+            environmentVariables,
+            SCRIPT_FILE_PATH__ENVIRONMENT_VARIABLE_NAME,
+            scriptFilePath
+        )
+    return
 
 def SetScriptDataFilePath(environmentVariables, scriptDataFilePath):
-  SetEnvironmentVariable(
-      environmentVariables,
-      SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME,
-      scriptDataFilePath
-    )
-  return
+    SetEnvironmentVariable(
+            environmentVariables,
+            SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME,
+            scriptDataFilePath
+        )
+    return
 
 def SetProgressNumber(environmentVariables, progressNumber):
-  SetEnvironmentVariable(
-      environmentVariables,
-      PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME,
-      str(progressNumber)
-    )
+    SetEnvironmentVariable(
+            environmentVariables,
+            PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME,
+            str(progressNumber)
+        )
 
 def SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandleString):
-  SetEnvironmentVariable(
-      environmentVariables,
-      SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME,
-      scriptOutputPipeHandleString
-    )
-  return
+    SetEnvironmentVariable(
+            environmentVariables,
+            SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME,
+            scriptOutputPipeHandleString
+        )
+    return
 
 def SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId):
-  SetEnvironmentVariable(
-      environmentVariables,
-      BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME,
-      batchRvtProcessUniqueId
-    )
-  return
+    SetEnvironmentVariable(
+            environmentVariables,
+            BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME,
+            batchRvtProcessUniqueId
+        )
+    return
 
 def SetTestModeFolderPath(environmentVariables, testModeFolderPath):
-  SetEnvironmentVariable(
-      environmentVariables,
-      BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME,
-      testModeFolderPath
-    )
-  return
+    SetEnvironmentVariable(
+            environmentVariables,
+            BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME,
+            testModeFolderPath
+        )
+    return
 
 def GetBatchRvtScriptsFolderPath(environmentVariables):
-  return GetEnvironmentVariable(
-      environmentVariables,
-      BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME
-    )
+    return GetEnvironmentVariable(
+            environmentVariables,
+            BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME
+        )
 
 def GetScriptFilePath(environmentVariables):
-  return GetEnvironmentVariable(
-      environmentVariables,
-      SCRIPT_FILE_PATH__ENVIRONMENT_VARIABLE_NAME
-    )
+    return GetEnvironmentVariable(
+            environmentVariables,
+            SCRIPT_FILE_PATH__ENVIRONMENT_VARIABLE_NAME
+        )
 
 def GetScriptDataFilePath(environmentVariables):
-  return GetEnvironmentVariable(
-      environmentVariables,
-      SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME
-    )
+    return GetEnvironmentVariable(
+            environmentVariables,
+            SCRIPT_DATA_FILE_PATH__ENVIRONMENT_VARIABLE_NAME
+        )
 
 def GetProgressNumber(environmentVariables):
-  progressNumber = GetEnvironmentVariable(
-      environmentVariables,
-      PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME
-    )
-  return int(progressNumber)
+    progressNumber = GetEnvironmentVariable(
+            environmentVariables,
+            PROGRESS_NUMBER__ENVIRONMENT_VARIABLE_NAME
+        )
+    return int(progressNumber)
 
 def GetScriptOutputPipeHandleString(environmentVariables):
-  return GetEnvironmentVariable(
-        environmentVariables,
-        SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME
-      )
+    return GetEnvironmentVariable(
+                environmentVariables,
+                SCRIPT_OUTPUT_PIPE_HANDLE_STRING__ENVIRONMENT_VARIABLE_NAME
+            )
 
 def GetBatchRvtProcessUniqueId(environmentVariables):
-  return GetEnvironmentVariable(
-        environmentVariables,
-        BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME
-      )
+    return GetEnvironmentVariable(
+                environmentVariables,
+                BATCHRVT_PROCESS_UNIQUE_ID__ENVIRONMENT_VARIABLE_NAME
+            )
 
 def GetTestModeFolderPath(environmentVariables):
-  return GetEnvironmentVariable(
-      environmentVariables,
-      BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME
-    )
+    return GetEnvironmentVariable(
+            environmentVariables,
+            BATCHRVT_TEST_MODE_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME
+        )
 
 def InitEnvironmentVariables(
-    environmentVariables,
-    batchRvtScriptsFolderPath,
-    scriptFilePath,
-    scriptDataFilePath,
-    progressNumber,
-    scriptOutputPipeHandleString,
-    batchRvtProcessUniqueId,
-    testModeFolderPath
-  ):
-  SetBatchRvtScriptsFolderPath(environmentVariables, batchRvtScriptsFolderPath)
-  SetScriptFilePath(environmentVariables, scriptFilePath)
-  SetScriptDataFilePath(environmentVariables, scriptDataFilePath)
-  SetProgressNumber(environmentVariables, progressNumber)
-  SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandleString)
-  SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId)
-  SetTestModeFolderPath(environmentVariables, testModeFolderPath)
-  return
+        environmentVariables,
+        batchRvtScriptsFolderPath,
+        scriptFilePath,
+        scriptDataFilePath,
+        progressNumber,
+        scriptOutputPipeHandleString,
+        batchRvtProcessUniqueId,
+        testModeFolderPath
+    ):
+    SetBatchRvtScriptsFolderPath(environmentVariables, batchRvtScriptsFolderPath)
+    SetScriptFilePath(environmentVariables, scriptFilePath)
+    SetScriptDataFilePath(environmentVariables, scriptDataFilePath)
+    SetProgressNumber(environmentVariables, progressNumber)
+    SetScriptOutputPipeHandleString(environmentVariables, scriptOutputPipeHandleString)
+    SetBatchRvtProcessUniqueId(environmentVariables, batchRvtProcessUniqueId)
+    SetTestModeFolderPath(environmentVariables, testModeFolderPath)
+    return
 
 def GetEnvironmentVariables():
-  environmentVariables = None
-  # NOTE: Have encountered (at least once) a NullReferenceException upon accessing the EnvironmentVariables property!
-  try:
-    environmentVariables = Process.GetCurrentProcess().StartInfo.EnvironmentVariables
-  except NullReferenceException, e:
     environmentVariables = None
-  return environmentVariables
+    # NOTE: Have encountered (at least once) a NullReferenceException upon accessing the EnvironmentVariables property!
+    try:
+        environmentVariables = Process.GetCurrentProcess().StartInfo.EnvironmentVariables
+    except NullReferenceException, e:
+        environmentVariables = None
+    return environmentVariables
 

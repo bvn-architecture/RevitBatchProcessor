@@ -23,23 +23,23 @@ import System
 from System import Console, ConsoleKey
 
 def WaitForSpaceBarKeyPress():
-  while True:
-    keyInfo = Console.ReadKey(True)
-    if keyInfo.Key == ConsoleKey.Spacebar:
-      break
-  return
+    while True:
+        keyInfo = Console.ReadKey(True)
+        if keyInfo.Key == ConsoleKey.Spacebar:
+            break
+    return
 
 def IsInputRedirected():
-  return Console.IsInputRedirected
+    return Console.IsInputRedirected
 
 def ReadLine():
-  return Console.ReadLine()
+    return Console.ReadLine()
 
 def ReadLines():
-  lines = []
-  line = Console.ReadLine()
-  while line is not None:
-    lines.append(line)
+    lines = []
     line = Console.ReadLine()
-  return lines
+    while line is not None:
+        lines.append(line)
+        line = Console.ReadLine()
+    return lines
 

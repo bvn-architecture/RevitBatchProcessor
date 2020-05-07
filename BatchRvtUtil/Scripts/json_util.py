@@ -28,21 +28,21 @@ from Newtonsoft.Json import JsonConvert, Formatting
 from Newtonsoft.Json.Linq import JObject, JArray, JValue
 
 def GetValueFromJValue(jvalue):
-  return JValue.Value.GetValue(jvalue)
+    return JValue.Value.GetValue(jvalue)
 
 def ToJObject(pythonObject):
-  return JObject.FromObject(pythonObject)
+    return JObject.FromObject(pythonObject)
 
 def DeserializeToJObject(text):
-  return JsonConvert.DeserializeObject(text)
+    return JsonConvert.DeserializeObject(text)
 
 def ToString(jobject, prettyPrint=False):
-  return (
-      JObject.ToString(jobject)
-      if prettyPrint else
-      JObject.ToString(jobject, Formatting.None)
-    )
+    return (
+            JObject.ToString(jobject)
+            if prettyPrint else
+            JObject.ToString(jobject, Formatting.None)
+        )
 
 def SerializeObject(pythonObject, prettyPrint=False):
-  return ToString(ToJObject(pythonObject), prettyPrint)
+    return ToString(ToJObject(pythonObject), prettyPrint)
 

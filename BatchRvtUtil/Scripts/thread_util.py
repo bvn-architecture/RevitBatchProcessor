@@ -23,14 +23,14 @@ import System
 import System.Threading as Threading
 
 def GetManagedThreadId():
-  managedThreadId = Threading.Thread.CurrentThread.ManagedThreadId
-  return managedThreadId
+    managedThreadId = Threading.Thread.CurrentThread.ManagedThreadId
+    return managedThreadId
 
 def SleepForMilliseconds(milliseconds):
-  Threading.Thread.CurrentThread.Join(milliseconds)
-  return
+    Threading.Thread.CurrentThread.Join(milliseconds)
+    return
 
 def SleepForSeconds(seconds):
-  SleepForMilliseconds(seconds * 1000)
-  return
+    SleepForMilliseconds(seconds * 1000)
+    return
 

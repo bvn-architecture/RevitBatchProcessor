@@ -33,24 +33,24 @@ REMOTE_NAME_MAX_LENGTH = 1024
 NO_ERROR = 0
 
 WNetGetConnectionWinApiFunc = win32_pinvoke.GetWinApiFunctionUnicode(
-    WNETGETCONNECTION_FUNCTION_NAME,
-    MPR_MODULE_NAME,
-    System.Int32, # Return value
-    System.String, # [in] lpLocalName
-    System.Text.StringBuilder, # [out] lpRemoteName
-    System.IntPtr # [in, out] lpnLength
-  )
+        WNETGETCONNECTION_FUNCTION_NAME,
+        MPR_MODULE_NAME,
+        System.Int32, # Return value
+        System.String, # [in] lpLocalName
+        System.Text.StringBuilder, # [out] lpRemoteName
+        System.IntPtr # [in, out] lpnLength
+    )
 
 def WNetGetConnection(localName):
-  remoteName = None
-  length = REMOTE_NAME_MAX_LENGTH
-  remoteNameBuffer = System.Text.StringBuilder(REMOTE_NAME_MAX_LENGTH)
-  pLength = Interop.Marshal.AllocHGlobal(Interop.Marshal.SizeOf(length))
-  Interop.Marshal.StructureToPtr(length, pLength, False)
-  result = WNetGetConnectionWinApiFunc(localName, remoteNameBuffer, pLength)
-  outLength = Interop.Marshal.PtrToStructure[int](pLength)
-  Interop.Marshal.FreeHGlobal(pLength)
-  if result == NO_ERROR:
-    remoteName = remoteNameBuffer.ToString()
-  return remoteName
+    remoteName = None
+    length = REMOTE_NAME_MAX_LENGTH
+    remoteNameBuffer = System.Text.StringBuilder(REMOTE_NAME_MAX_LENGTH)
+    pLength = Interop.Marshal.AllocHGlobal(Interop.Marshal.SizeOf(length))
+    Interop.Marshal.StructureToPtr(length, pLength, False)
+    result = WNetGetConnectionWinApiFunc(localName, remoteNameBuffer, pLength)
+    outLength = Interop.Marshal.PtrToStructure[int](pLength)
+    Interop.Marshal.FreeHGlobal(pLength)
+    if result == NO_ERROR:
+        remoteName = remoteNameBuffer.ToString()
+    return remoteName
 

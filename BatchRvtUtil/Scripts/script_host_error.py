@@ -34,35 +34,35 @@ BATCH_RVT_ERROR_WINDOW_TITLE = "BatchRvt Script Error"
 SCRIPT_HOST_ERROR_DATA_VARIABLE = "revit_script_host"
 
 def SetDataInCurrentDomain(name, data):
-  AppDomain.CurrentDomain.SetData(name, data)
-  return
+    AppDomain.CurrentDomain.SetData(name, data)
+    return
 
 def ShowScriptErrorMessageBox(errorMessage):
-  mainWindowHandle = winforms_util.WindowHandleWrapper.GetMainWindowHandle()
-  MessageBox.Show(mainWindowHandle, errorMessage, BATCH_RVT_ERROR_WINDOW_TITLE)
-  return
+    mainWindowHandle = winforms_util.WindowHandleWrapper.GetMainWindowHandle()
+    MessageBox.Show(mainWindowHandle, errorMessage, BATCH_RVT_ERROR_WINDOW_TITLE)
+    return
 
 def WithErrorHandling(action, errorMessage, output=None, showErrorMessageBox=False):
-  result = None
+    result = None
 
-  try:
-    result = action()
+    try:
+        result = action()
 
-  except Exception, e:
+    except Exception, e:
 
-    if output is not None:
-      output()
-      output(errorMessage)
-      exception_util.LogOutputErrorDetails(e, output)
+        if output is not None:
+            output()
+            output(errorMessage)
+            exception_util.LogOutputErrorDetails(e, output)
 
-    if showErrorMessageBox:
-      fullErrorMessage = StringBuilder()
-      fullErrorMessage.AppendLine(errorMessage)
-      fullErrorMessage.AppendLine()
-      fullErrorMessage.AppendLine(exception_util.GetExceptionDetails(e))
-      ShowScriptErrorMessageBox(fullErrorMessage.ToString())
+        if showErrorMessageBox:
+            fullErrorMessage = StringBuilder()
+            fullErrorMessage.AppendLine(errorMessage)
+            fullErrorMessage.AppendLine()
+            fullErrorMessage.AppendLine(exception_util.GetExceptionDetails(e))
+            ShowScriptErrorMessageBox(fullErrorMessage.ToString())
 
-    SetDataInCurrentDomain(SCRIPT_HOST_ERROR_DATA_VARIABLE, e)
+        SetDataInCurrentDomain(SCRIPT_HOST_ERROR_DATA_VARIABLE, e)
 
-  return result
+    return result
 

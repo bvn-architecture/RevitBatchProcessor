@@ -25,17 +25,17 @@ import System
 # is allowed to run outside of a Revit application.
 
 def GetRevitVersionNumber(uiapp):
-  return uiapp.Application.VersionNumber
+    return uiapp.Application.VersionNumber
 
 def GetSessionUIApplication():
-  uiapp = None
-  try:
-    uiapp = __revit__
-  except NameError, e:
-    pass
-  return uiapp
+    uiapp = None
+    try:
+        uiapp = __revit__
+    except NameError, e:
+        pass
+    return uiapp
 
 def GetSessionRevitVersionNumber():
-  uiapp = GetSessionUIApplication()
-  revitVersionNumber = GetRevitVersionNumber(uiapp) if uiapp is not None else None
-  return revitVersionNumber
+    uiapp = GetSessionUIApplication()
+    revitVersionNumber = GetRevitVersionNumber(uiapp) if uiapp is not None else None
+    return revitVersionNumber

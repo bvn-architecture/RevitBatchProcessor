@@ -32,25 +32,25 @@ ORIGINAL_STDOUT = sys.stdout
 ORIGINAL_STDERR = sys.stderr
 
 def RedirectScriptOutput(output):
-  sys.stdout.flush()
-  sys.stderr.flush()
-  sys.stdout = output
-  sys.stderr = output
-  return
+    sys.stdout.flush()
+    sys.stderr.flush()
+    sys.stdout = output
+    sys.stderr = output
+    return
 
 def RestoreScriptOutput():
-  sys.stderr.flush()
-  sys.stdout.flush()
-  sys.stderr = ORIGINAL_STDOUT
-  sys.stdout = ORIGINAL_STDERR
-  return
+    sys.stderr.flush()
+    sys.stdout.flush()
+    sys.stderr = ORIGINAL_STDOUT
+    sys.stdout = ORIGINAL_STDERR
+    return
 
 def Output(m="", msgId=""):
-  timestamp = time_util.GetDateTimeNow().ToString("HH:mm:ss")
-  message = timestamp + " : " + (("[" + str(msgId) + "]" + " ") if msgId != "" else "") + m + "\n"
-  if SHOW_OUTPUT:
-    ORIGINAL_STDOUT.write(message)
-  if logging_util.LOG_FILE[0] is not None:
-    logging_util.LOG_FILE[0].WriteMessage({ "msgId" : msgId, "message" : m })
-  return
+    timestamp = time_util.GetDateTimeNow().ToString("HH:mm:ss")
+    message = timestamp + " : " + (("[" + str(msgId) + "]" + " ") if msgId != "" else "") + m + "\n"
+    if SHOW_OUTPUT:
+        ORIGINAL_STDOUT.write(message)
+    if logging_util.LOG_FILE[0] is not None:
+        logging_util.LOG_FILE[0].WriteMessage({ "msgId" : msgId, "message" : m })
+    return
 

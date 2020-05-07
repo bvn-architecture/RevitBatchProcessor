@@ -23,27 +23,27 @@ import System
 from System.IO import StringReader
 
 def Try(f):
-  result = None
-  try:
-    result = f()
-  except:
     result = None
-  return result
+    try:
+        result = f()
+    except:
+        result = None
+    return result
 
 def FindAllIndicesOf(text, value):
-  indices = []
-  currentIndex = 0
-  index = text.IndexOf(value)
-  while index != -1:
-    indices.append(index)
-    index = text.IndexOf(value, index+1)
-  return indices
+    indices = []
+    currentIndex = 0
+    index = text.IndexOf(value)
+    while index != -1:
+        indices.append(index)
+        index = text.IndexOf(value, index+1)
+    return indices
 
 def ReadLinesFromText(text):
-  lines = []
-  with StringReader(text) as reader:
-    line = reader.ReadLine()
-    while line is not None:
-      lines.append(line)
-      line = reader.ReadLine()
-  return lines
+    lines = []
+    with StringReader(text) as reader:
+        line = reader.ReadLine()
+        while line is not None:
+            lines.append(line)
+            line = reader.ReadLine()
+    return lines

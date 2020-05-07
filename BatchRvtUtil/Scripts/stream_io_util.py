@@ -26,78 +26,78 @@ from System.IO import StreamReader, StreamWriter, FileStream, FileMode, FileAcce
 from System.Threading.Tasks import TaskStatus
 
 def WithIgnoredIOException(action):
-  result = None
-  try:
-    result = action()
-  except IOException, e:
-    pass
-  return result
+    result = None
+    try:
+        result = action()
+    except IOException, e:
+        pass
+    return result
 
 def GetSafeWriteLine(streamWriter):
-  def safeWriteLine(msg):
-    WithIgnoredIOException(lambda: streamWriter.WriteLine(msg))
-    return
-  return safeWriteLine
+    def safeWriteLine(msg):
+        WithIgnoredIOException(lambda: streamWriter.WriteLine(msg))
+        return
+    return safeWriteLine
 
 def ReadAvailableLines(streamReader, pendingReadLineTask=None):
-  nextPendingReadLineTask = None
-  lines = []
-  
-  if pendingReadLineTask is not None:
-    readLineTask = pendingReadLineTask
-  else:
-    readLineTask = streamReader.ReadLineAsync()
+    nextPendingReadLineTask = None
+    lines = []
     
-  reachedEndOfStream = False
-    
-  while readLineTask.Status == TaskStatus.RanToCompletion and not reachedEndOfStream:
-    line = readLineTask.Result
-    if line is not None:
-      lines.append(line)
-      readLineTask = streamReader.ReadLineAsync()
+    if pendingReadLineTask is not None:
+        readLineTask = pendingReadLineTask
     else:
-      reachedEndOfStream = True
+        readLineTask = streamReader.ReadLineAsync()
+        
+    reachedEndOfStream = False
+        
+    while readLineTask.Status == TaskStatus.RanToCompletion and not reachedEndOfStream:
+        line = readLineTask.Result
+        if line is not None:
+            lines.append(line)
+            readLineTask = streamReader.ReadLineAsync()
+        else:
+            reachedEndOfStream = True
 
-  if reachedEndOfStream:
-    nextPendingReadLineTask = None
-  elif readLineTask.Status == TaskStatus.Faulted:
-    nextPendingReadLineTask = None
-  elif readLineTask.Status == TaskStatus.Canceled:
-    nextPendingReadLineTask = None
-  else:
-    nextPendingReadLineTask = readLineTask
+    if reachedEndOfStream:
+        nextPendingReadLineTask = None
+    elif readLineTask.Status == TaskStatus.Faulted:
+        nextPendingReadLineTask = None
+    elif readLineTask.Status == TaskStatus.Canceled:
+        nextPendingReadLineTask = None
+    else:
+        nextPendingReadLineTask = readLineTask
 
-  return lines, nextPendingReadLineTask
+    return lines, nextPendingReadLineTask
 
 def GetStreamReader(stream):
-  reader = StreamReader(stream)
-  return reader
+    reader = StreamReader(stream)
+    return reader
 
 def GetStreamWriter(stream, autoFlush=True):
-  writer = StreamWriter(stream)
-  writer.AutoFlush = autoFlush
-  return writer
+    writer = StreamWriter(stream)
+    writer.AutoFlush = autoFlush
+    return writer
 
 def UsingStream(stream, action):
-  result = None
-  try:
-    result = action()
-  finally:
-    def safeCloseAndDispose():
-      stream.Close()
-      stream.Dispose()
-      return
-    # NOTE: the reason for using WithIgnoredIOException() here is that Close() can throw an IOException (Pipe is broken).
-    WithIgnoredIOException(safeCloseAndDispose)
-  return result
+    result = None
+    try:
+        result = action()
+    finally:
+        def safeCloseAndDispose():
+            stream.Close()
+            stream.Dispose()
+            return
+        # NOTE: the reason for using WithIgnoredIOException() here is that Close() can throw an IOException (Pipe is broken).
+        WithIgnoredIOException(safeCloseAndDispose)
+    return result
 
 def CreateFile(filePath, overwrite=False):
-  fileMode = FileMode.Create if overwrite else FileMode.CreateNew
-  fileStream = FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)
-  return fileStream
+    fileMode = FileMode.Create if overwrite else FileMode.CreateNew
+    fileStream = FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)
+    return fileStream
 
 def OpenFile(filePath, readonly=True):
-  fileAccess = FileAccess.Read if readonly else FileAccess.ReadWrite
-  fileStream = FileStream(filePath, FileMode.Open, fileAccess, FileShare.ReadWrite)
-  return fileStream
+    fileAccess = FileAccess.Read if readonly else FileAccess.ReadWrite
+    fileStream = FileStream(filePath, FileMode.Open, fileAccess, FileShare.ReadWrite)
+    return fileStream
 

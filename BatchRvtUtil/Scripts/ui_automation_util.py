@@ -26,35 +26,35 @@ import win32_user32
 DIALOG_WINDOW_CLASS_NAME = "#32770"
 
 class WindowInfo:
-  def __init__(self, hwnd):
-    self.Hwnd = hwnd
-    self.IsWindowEnabled = win32_user32.IsWindowEnabled(hwnd)
-    self.OwnerWindow = win32_user32.GetOwnerWindow(hwnd)
-    self.ParentWindow = win32_user32.GetParentWindow(hwnd)
-    self.DialogControlId = win32_user32.GetDialogControlId(hwnd)
-    self.WindowClassName = win32_user32.GetWindowClassName(hwnd)
-    self.WindowText = win32_user32.GetWindowText(hwnd)
-    return
+    def __init__(self, hwnd):
+        self.Hwnd = hwnd
+        self.IsWindowEnabled = win32_user32.IsWindowEnabled(hwnd)
+        self.OwnerWindow = win32_user32.GetOwnerWindow(hwnd)
+        self.ParentWindow = win32_user32.GetParentWindow(hwnd)
+        self.DialogControlId = win32_user32.GetDialogControlId(hwnd)
+        self.WindowClassName = win32_user32.GetWindowClassName(hwnd)
+        self.WindowText = win32_user32.GetWindowText(hwnd)
+        return
 
 def GetEnabledDialogsInfo(processId):
-  return list(
-      WindowInfo(hwnd)
-      for hwnd in win32_user32.GetTopLevelWindows(DIALOG_WINDOW_CLASS_NAME, None, processId)
-      if win32_user32.IsWindowEnabled(hwnd)
-    )
+    return list(
+            WindowInfo(hwnd)
+            for hwnd in win32_user32.GetTopLevelWindows(DIALOG_WINDOW_CLASS_NAME, None, processId)
+            if win32_user32.IsWindowEnabled(hwnd)
+        )
 
 def TextWithoutAmpersands(text):
-  return text.Replace("&", str.Empty).Replace(u"&", str.Empty)
+    return text.Replace("&", str.Empty).Replace(u"&", str.Empty)
 
 def GetButtonText(buttonInfo):
-  buttonText = buttonInfo.WindowText
-  return TextWithoutAmpersands(buttonText)
+    buttonText = buttonInfo.WindowText
+    return TextWithoutAmpersands(buttonText)
 
 def FilterControlsByText(controls, controlText):
-  targetControls = list(
-      control
-      for control in controls
-      if TextWithoutAmpersands(control.WindowText).Trim().ToLower() == controlText.Trim().ToLower()
-    )
-  return targetControls
+    targetControls = list(
+            control
+            for control in controls
+            if TextWithoutAmpersands(control.WindowText).Trim().ToLower() == controlText.Trim().ToLower()
+        )
+    return targetControls
 

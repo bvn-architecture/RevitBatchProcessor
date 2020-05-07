@@ -37,47 +37,47 @@ SESSION_DATA_FOLDER_PATH_CONTAINER = [None]
 REVIT_FILE_LIST_FILE_PATH_CONTAINER = [None]
 
 def SetSessionId(batchRvtConfig):
-  SESSION_ID_CONTAINER[0] = batchRvtConfig.SessionId
-  return
+    SESSION_ID_CONTAINER[0] = batchRvtConfig.SessionId
+    return
 
 def SetTaskData(batchRvtConfig):
-  TASK_DATA_CONTAINER[0] = batchRvtConfig.TaskData
-  return
+    TASK_DATA_CONTAINER[0] = batchRvtConfig.TaskData
+    return
 
 def SetExportFolderPath(batchRvtConfig):
-  EXPORT_FOLDER_PATH_CONTAINER[0] = batchRvtConfig.DataExportFolderPath
-  return
+    EXPORT_FOLDER_PATH_CONTAINER[0] = batchRvtConfig.DataExportFolderPath
+    return
 
 def SetSessionDataFolderPath(batchRvtConfig):
-  SESSION_DATA_FOLDER_PATH_CONTAINER[0] = batchRvtConfig.SessionDataFolderPath
-  return
+    SESSION_DATA_FOLDER_PATH_CONTAINER[0] = batchRvtConfig.SessionDataFolderPath
+    return
 
 def SetRevitFileListFilePath(batchRvtConfig):
-  REVIT_FILE_LIST_FILE_PATH_CONTAINER[0] = batchRvtConfig.RevitFileListFilePath
-  return
+    REVIT_FILE_LIST_FILE_PATH_CONTAINER[0] = batchRvtConfig.RevitFileListFilePath
+    return
 
 def GetSessionId():
-  sessionId = SESSION_ID_CONTAINER[0]
-  return sessionId
+    sessionId = SESSION_ID_CONTAINER[0]
+    return sessionId
 
 def GetTaskData():
-  taskData = TASK_DATA_CONTAINER[0]
-  return taskData
+    taskData = TASK_DATA_CONTAINER[0]
+    return taskData
 
 def GetExportFolderPath():
-  exportFolderPath = EXPORT_FOLDER_PATH_CONTAINER[0]
-  return exportFolderPath
+    exportFolderPath = EXPORT_FOLDER_PATH_CONTAINER[0]
+    return exportFolderPath
 
 def GetSessionDataFolderPath():
-  sessionDataFolderPath = SESSION_DATA_FOLDER_PATH_CONTAINER[0]
-  return sessionDataFolderPath
+    sessionDataFolderPath = SESSION_DATA_FOLDER_PATH_CONTAINER[0]
+    return sessionDataFolderPath
 
 def GetRevitFileListFilePath():
-  revitFileListFilePath = REVIT_FILE_LIST_FILE_PATH_CONTAINER[0]
-  return revitFileListFilePath
+    revitFileListFilePath = REVIT_FILE_LIST_FILE_PATH_CONTAINER[0]
+    return revitFileListFilePath
 
 def ExecuteScript(scriptFilePath):
-  path_util.AddSearchPath(Path.GetDirectoryName(scriptFilePath))
-  scriptGlobals = {}
-  execfile(scriptFilePath, scriptGlobals)
-  return
+    path_util.AddSearchPath(Path.GetDirectoryName(scriptFilePath))
+    scriptGlobals = {}
+    execfile(scriptFilePath, scriptGlobals)
+    return

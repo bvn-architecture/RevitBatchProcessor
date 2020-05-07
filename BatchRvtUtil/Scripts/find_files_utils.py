@@ -31,53 +31,53 @@ DIR_COMMAND_FILES = "dir /a-d /b /on"
 #       when invoked from this script. Otherwise it always uses the current directory, for whatever reason.
 #       note that setting the ProcessStartInfo.WorkingDirectory property doesn't alleviate this problem!
 def GetDirFoldersCommand(baseFolderPath, folderPattern, includeSubfolders):
-  return (
-      'pushd "' + baseFolderPath + '" && ' + # '&&' is used so that the command fails if the folder doesn't exist.
-      DIR_COMMAND_DIRECTORIES + (' /s' if includeSubfolders else '') + ' "' + folderPattern + '" & ' +
-      'popd'
-    )
+    return (
+            'pushd "' + baseFolderPath + '" && ' + # '&&' is used so that the command fails if the folder doesn't exist.
+            DIR_COMMAND_DIRECTORIES + (' /s' if includeSubfolders else '') + ' "' + folderPattern + '" & ' +
+            'popd'
+        )
 
 # NOTE: the pushd/popd commands are needed in order for dir command to respect relative base folder paths
 #       when invoked from this script. Otherwise it always uses the current directory, for whatever reason.
 #       note that setting the ProcessStartInfo.WorkingDirectory property doesn't alleviate this problem!
 def GetDirFilesCommand(baseFolderPath, filePattern, includeSubfolders):
-  return (
-      'pushd "' + baseFolderPath + '" && ' + # '&&' is used so that the command fails if the folder doesn't exist.
-      DIR_COMMAND_FILES + (' /s' if includeSubfolders else '') + ' "' + filePattern + '" & ' +
-      'popd'
-    )
+    return (
+            'pushd "' + baseFolderPath + '" && ' + # '&&' is used so that the command fails if the folder doesn't exist.
+            DIR_COMMAND_FILES + (' /s' if includeSubfolders else '') + ' "' + filePattern + '" & ' +
+            'popd'
+        )
 
 def StartCmdProcess(commandLine):
-  # NOTE: do not call Process.WaitForExit() until redirected streams have been entirely read from / closed.
-  #       doing so can lead to a deadlock when the child process is waiting on being able to write to output / error
-  #       stream and the parent process is waiting for the child to exit! See Microsoft's documentation for more info.
-  # NOTE: if redirecting both output and error streams, one should be read asynchronously to avoid a deadlock where
-  #       the child process is waiting to write to one of the streams and the parent is waiting for data from the other
-  #       stream. See Microsoft's documentation for more info.
-  psi = ProcessStartInfo('cmd.exe', '/U /S /C " ' + commandLine + ' "')
-  psi.UseShellExecute = False
-  psi.CreateNoWindow = True
-  psi.RedirectStandardInput = False
-  psi.RedirectStandardError = False # See notes above if enabling this alongside redirect output stream.
-  psi.RedirectStandardOutput = True
-  psi.StandardOutputEncoding = Encoding.Unicode
-  p = Process.Start(psi)
-  return p
+    # NOTE: do not call Process.WaitForExit() until redirected streams have been entirely read from / closed.
+    #       doing so can lead to a deadlock when the child process is waiting on being able to write to output / error
+    #       stream and the parent process is waiting for the child to exit! See Microsoft's documentation for more info.
+    # NOTE: if redirecting both output and error streams, one should be read asynchronously to avoid a deadlock where
+    #       the child process is waiting to write to one of the streams and the parent is waiting for data from the other
+    #       stream. See Microsoft's documentation for more info.
+    psi = ProcessStartInfo('cmd.exe', '/U /S /C " ' + commandLine + ' "')
+    psi.UseShellExecute = False
+    psi.CreateNoWindow = True
+    psi.RedirectStandardInput = False
+    psi.RedirectStandardError = False # See notes above if enabling this alongside redirect output stream.
+    psi.RedirectStandardOutput = True
+    psi.StandardOutputEncoding = Encoding.Unicode
+    p = Process.Start(psi)
+    return p
 
 def ReadProcessOutputLines(process):
-  output = process.StandardOutput
-  line = output.ReadLine()
-  while line is not None:
-    yield line
+    output = process.StandardOutput
     line = output.ReadLine()
-  return
+    while line is not None:
+        yield line
+        line = output.ReadLine()
+    return
 
 def FindFiles(baseFolderPath, filePattern, includeSubfolders=False):
-  cmd = GetDirFilesCommand(baseFolderPath, filePattern, includeSubfolders)
-  p = StartCmdProcess(cmd)
-  return ReadProcessOutputLines(p)
+    cmd = GetDirFilesCommand(baseFolderPath, filePattern, includeSubfolders)
+    p = StartCmdProcess(cmd)
+    return ReadProcessOutputLines(p)
 
 def FindFolders(baseFolderPath, folderPattern, includeSubfolders=False):
-  cmd = GetDirFoldersCommand(baseFolderPath, folderPattern, includeSubfolders)
-  p = StartCmdProcess(cmd)
-  return ReadProcessOutputLines(p)
+    cmd = GetDirFoldersCommand(baseFolderPath, folderPattern, includeSubfolders)
+    p = StartCmdProcess(cmd)
+    return ReadProcessOutputLines(p)

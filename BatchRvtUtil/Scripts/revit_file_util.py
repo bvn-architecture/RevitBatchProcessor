@@ -29,289 +29,289 @@ clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 
 class CentralLockedCallback(ICentralLockedCallback):
-  def __init__(self, shouldWaitForLockAvailabilityCallback):
-    self.ShouldWaitForLockAvailabilityCallback = shouldWaitForLockAvailabilityCallback
-    return
-  def ShouldWaitForLockAvailability(self):
-    return self.ShouldWaitForLockAvailabilityCallback()
+    def __init__(self, shouldWaitForLockAvailabilityCallback):
+        self.ShouldWaitForLockAvailabilityCallback = shouldWaitForLockAvailabilityCallback
+        return
+    def ShouldWaitForLockAvailability(self):
+        return self.ShouldWaitForLockAvailabilityCallback()
 
 def CreateTransactWithCentralOptions(shouldWaitForLockAvailabilityCallback=None):
-  transactWithCentralOptions = TransactWithCentralOptions()
-  if shouldWaitForLockAvailabilityCallback is not None:
-    centralLockedCallback = CentralLockedCallback(shouldWaitForLockAvailabilityCallback)
-    transactWithCentralOptions.SetLockCallback(centralLockedCallback)
-  return transactWithCentralOptions
+    transactWithCentralOptions = TransactWithCentralOptions()
+    if shouldWaitForLockAvailabilityCallback is not None:
+        centralLockedCallback = CentralLockedCallback(shouldWaitForLockAvailabilityCallback)
+        transactWithCentralOptions.SetLockCallback(centralLockedCallback)
+    return transactWithCentralOptions
 
 def CreateSynchronizeWithCentralOptions(
-    comment=str.Empty,
-    compact=True,
-    saveLocalBefore=True,
-    saveLocalAfter=True,
-    relinquishOptions=None
-  ):
-  syncOptions = SynchronizeWithCentralOptions()
-  syncOptions.Comment = comment
-  syncOptions.Compact = compact
-  syncOptions.SaveLocalBefore = saveLocalBefore
-  syncOptions.SaveLocalAfter = saveLocalAfter
-  if relinquishOptions is None:
-    relinquishOptions = RelinquishOptions(relinquishEverything=True)
-  syncOptions.SetRelinquishOptions(relinquishOptions)
-  return syncOptions
+        comment=str.Empty,
+        compact=True,
+        saveLocalBefore=True,
+        saveLocalAfter=True,
+        relinquishOptions=None
+    ):
+    syncOptions = SynchronizeWithCentralOptions()
+    syncOptions.Comment = comment
+    syncOptions.Compact = compact
+    syncOptions.SaveLocalBefore = saveLocalBefore
+    syncOptions.SaveLocalAfter = saveLocalAfter
+    if relinquishOptions is None:
+        relinquishOptions = RelinquishOptions(relinquishEverything=True)
+    syncOptions.SetRelinquishOptions(relinquishOptions)
+    return syncOptions
 
 def SynchronizeWithCentral(doc, comment=str.Empty):
-  transactOptions = CreateTransactWithCentralOptions()
-  syncOptions = CreateSynchronizeWithCentralOptions(comment=comment)
-  doc.SynchronizeWithCentral(transactOptions, syncOptions)
-  return
+    transactOptions = CreateTransactWithCentralOptions()
+    syncOptions = CreateSynchronizeWithCentralOptions(comment=comment)
+    doc.SynchronizeWithCentral(transactOptions, syncOptions)
+    return
 
 def ReloadLastest(doc):
-  doc.ReloadLatest(ReloadLatestOptions())
-  return
+    doc.ReloadLatest(ReloadLatestOptions())
+    return
 
 def CopyModel(app, sourceModelPath, destinationFilePath, overwrite=True):
-  sourceModelPath = ToModelPath(sourceModelPath)
-  app.CopyModel(
-      sourceModelPath,
-      destinationFilePath,
-      overwrite
-    )
-  return
+    sourceModelPath = ToModelPath(sourceModelPath)
+    app.CopyModel(
+            sourceModelPath,
+            destinationFilePath,
+            overwrite
+        )
+    return
 
 def CreateNewProjectFile(app, revitFilePath):
-  newDoc = app.NewProjectDocument(app.DefaultProjectTemplate)
-  saveAsOptions = SaveAsOptions()
-  saveAsOptions.OverwriteExistingFile = True
-  newDoc.SaveAs(revitFilePath, saveAsOptions)
-  return newDoc
+    newDoc = app.NewProjectDocument(app.DefaultProjectTemplate)
+    saveAsOptions = SaveAsOptions()
+    saveAsOptions.OverwriteExistingFile = True
+    newDoc.SaveAs(revitFilePath, saveAsOptions)
+    return newDoc
 
 def OpenAndActivateBatchRvtTemporaryDocument(uiApplication):
-  application = uiApplication.Application
-  BATCHRVT_TEMPORARY_REVIT_FILE_PATH = Path.Combine(
-      Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-      "BatchRvt",
-      "TemporaryProject." + application.VersionNumber + ".rvt"
-    )
-  if not path_util.FileExists(BATCHRVT_TEMPORARY_REVIT_FILE_PATH):
-    path_util.CreateDirectoryForFilePath(BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
-    newDoc = CreateNewProjectFile(application, BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
-    newDoc.Close(False)
-  uiDoc = uiApplication.OpenAndActivateDocument(BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
-  return uiDoc
+    application = uiApplication.Application
+    BATCHRVT_TEMPORARY_REVIT_FILE_PATH = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "BatchRvt",
+            "TemporaryProject." + application.VersionNumber + ".rvt"
+        )
+    if not path_util.FileExists(BATCHRVT_TEMPORARY_REVIT_FILE_PATH):
+        path_util.CreateDirectoryForFilePath(BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
+        newDoc = CreateNewProjectFile(application, BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
+        newDoc.Close(False)
+    uiDoc = uiApplication.OpenAndActivateDocument(BATCHRVT_TEMPORARY_REVIT_FILE_PATH)
+    return uiDoc
 
 def ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig):
-  worksetConfig = (
-      worksetConfig if worksetConfig is not None else
-      WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
-      if closeAllWorksets else
-      WorksetConfiguration()
-    )
-  return worksetConfig
+    worksetConfig = (
+            worksetConfig if worksetConfig is not None else
+            WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets)
+            if closeAllWorksets else
+            WorksetConfiguration()
+        )
+    return worksetConfig
 
 def ToModelPath(modelPath):
-  if isinstance(modelPath, str):
-    modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
-  return modelPath
+    if isinstance(modelPath, str):
+        modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(modelPath)
+    return modelPath
 
 def ToUserVisiblePath(modelPath):
-  if isinstance(modelPath, ModelPath):
-    modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
-  return modelPath
+    if isinstance(modelPath, ModelPath):
+        modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+    return modelPath
 
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
-  modelPath = ToModelPath(modelPath)
-  localModelPath = ToModelPath(localModelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
-  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
-  openOptions.SetOpenWorksetsConfiguration(worksetConfig)
-  WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
-  if audit:
-    openOptions.Audit = True
-  return application.OpenDocumentFile(localModelPath, openOptions)
+    modelPath = ToModelPath(modelPath)
+    localModelPath = ToModelPath(localModelPath)
+    openOptions = OpenOptions()
+    openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
+    worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
+    openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+    WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
+    if audit:
+        openOptions.Audit = True
+    return application.OpenDocumentFile(localModelPath, openOptions)
 
 def OpenAndActivateNewLocal(uiApplication, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
-  modelPath = ToModelPath(modelPath)
-  localModelPath = ToModelPath(localModelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
-  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
-  openOptions.SetOpenWorksetsConfiguration(worksetConfig)
-  WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
-  if audit:
-    openOptions.Audit = True
-  return uiApplication.OpenAndActivateDocument(localModelPath, openOptions, False)
+    modelPath = ToModelPath(modelPath)
+    localModelPath = ToModelPath(localModelPath)
+    openOptions = OpenOptions()
+    openOptions.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach
+    worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
+    openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+    WorksharingUtils.CreateNewLocal(modelPath, localModelPath)
+    if audit:
+        openOptions.Audit = True
+    return uiApplication.OpenAndActivateDocument(localModelPath, openOptions, False)
 
 def OpenDetachAndPreserveWorksets(application, modelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
-  modelPath = ToModelPath(modelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
-  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
-  openOptions.SetOpenWorksetsConfiguration(worksetConfig)
-  if audit:
-    openOptions.Audit = True
-  return application.OpenDocumentFile(modelPath, openOptions)
+    modelPath = ToModelPath(modelPath)
+    openOptions = OpenOptions()
+    openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
+    worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
+    openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+    if audit:
+        openOptions.Audit = True
+    return application.OpenDocumentFile(modelPath, openOptions)
 
 def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
-  modelPath = ToModelPath(modelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
-  worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
-  openOptions.SetOpenWorksetsConfiguration(worksetConfig)
-  if audit:
-    openOptions.Audit = True
-  return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
+    modelPath = ToModelPath(modelPath)
+    openOptions = OpenOptions()
+    openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
+    worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
+    openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+    if audit:
+        openOptions.Audit = True
+    return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
 def OpenDetachAndDiscardWorksets(application, modelPath, audit=False):
-  modelPath = ToModelPath(modelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
-  if audit:
-    openOptions.Audit = True
-  return application.OpenDocumentFile(modelPath, openOptions)
+    modelPath = ToModelPath(modelPath)
+    openOptions = OpenOptions()
+    openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
+    if audit:
+        openOptions.Audit = True
+    return application.OpenDocumentFile(modelPath, openOptions)
 
 def OpenAndActivateDetachAndDiscardWorksets(uiApplication, modelPath, audit=False):
-  modelPath = ToModelPath(modelPath)
-  openOptions = OpenOptions()
-  openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
-  if audit:
-    openOptions.Audit = True
-  return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
+    modelPath = ToModelPath(modelPath)
+    openOptions = OpenOptions()
+    openOptions.DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets
+    if audit:
+        openOptions.Audit = True
+    return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
 def OpenDocumentFile(application, modelPath, audit=False):
-  doc = None
-  if audit:
-    openOptions = OpenOptions()
-    openOptions.Audit = True
-    modelPath = ToModelPath(modelPath) # OpenDocumentFile() overload requires a ModelPath
-    doc = application.OpenDocumentFile(modelPath, openOptions)
-  else:
-    modelPath = ToUserVisiblePath(modelPath) # OpenDocumentFile() overload requires a string
-    doc = application.OpenDocumentFile(modelPath)
-  return doc
+    doc = None
+    if audit:
+        openOptions = OpenOptions()
+        openOptions.Audit = True
+        modelPath = ToModelPath(modelPath) # OpenDocumentFile() overload requires a ModelPath
+        doc = application.OpenDocumentFile(modelPath, openOptions)
+    else:
+        modelPath = ToUserVisiblePath(modelPath) # OpenDocumentFile() overload requires a string
+        doc = application.OpenDocumentFile(modelPath)
+    return doc
 
 def OpenAndActivateDocumentFile(uiApplication, modelPath, audit=False):
-  uidoc = None
-  if audit:
-    openOptions = OpenOptions()
-    openOptions.Audit = True
-    modelPath = ToModelPath(modelPath) # OpenAndActivateDocument() overload requires a ModelPath
-    uidoc = uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
-  else:
-    modelPath = ToUserVisiblePath(modelPath) # OpenAndActivateDocument() overload requires a string
-    uidoc = uiApplication.OpenAndActivateDocument(modelPath)
-  return uidoc
+    uidoc = None
+    if audit:
+        openOptions = OpenOptions()
+        openOptions.Audit = True
+        modelPath = ToModelPath(modelPath) # OpenAndActivateDocument() overload requires a ModelPath
+        uidoc = uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
+    else:
+        modelPath = ToUserVisiblePath(modelPath) # OpenAndActivateDocument() overload requires a string
+        uidoc = uiApplication.OpenAndActivateDocument(modelPath)
+    return uidoc
 
 def RelinquishAll(doc, shouldWaitForLockAvailabilityCallback=None):
-  relinquishOptions = RelinquishOptions(True)
-  transactWithCentralOptions = CreateTransactWithCentralOptions(shouldWaitForLockAvailabilityCallback)
-  relinquishedItems = WorksharingUtils.RelinquishOwnership(doc, relinquishOptions, transactWithCentralOptions)
-  return relinquishedItems
+    relinquishOptions = RelinquishOptions(True)
+    transactWithCentralOptions = CreateTransactWithCentralOptions(shouldWaitForLockAvailabilityCallback)
+    relinquishedItems = WorksharingUtils.RelinquishOwnership(doc, relinquishOptions, transactWithCentralOptions)
+    return relinquishedItems
 
 def SaveAsNewCentral(doc, modelPath, overwrite=True, clearTransmitted=False):
-  saveAsOptions = SaveAsOptions()
-  saveAsOptions.Compact = True
-  saveAsOptions.OverwriteExistingFile = overwrite
-  saveAsOptions.MaximumBackups = 1 # Can't set this to 0, unfortunately.
-  worksharingSaveAsOptions = WorksharingSaveAsOptions()
-  worksharingSaveAsOptions.SaveAsCentral = True
-  worksharingSaveAsOptions.ClearTransmitted = clearTransmitted
-  saveAsOptions.SetWorksharingOptions(worksharingSaveAsOptions)
-  doc.SaveAs(modelPath, saveAsOptions)
-  return
+    saveAsOptions = SaveAsOptions()
+    saveAsOptions.Compact = True
+    saveAsOptions.OverwriteExistingFile = overwrite
+    saveAsOptions.MaximumBackups = 1 # Can't set this to 0, unfortunately.
+    worksharingSaveAsOptions = WorksharingSaveAsOptions()
+    worksharingSaveAsOptions.SaveAsCentral = True
+    worksharingSaveAsOptions.ClearTransmitted = clearTransmitted
+    saveAsOptions.SetWorksharingOptions(worksharingSaveAsOptions)
+    doc.SaveAs(modelPath, saveAsOptions)
+    return
 
 def CloseWithSave(doc):
-  doc.Close(True)
-  return
+    doc.Close(True)
+    return
 
 def CloseWithoutSave(doc):
-  doc.Close(False)
-  return
+    doc.Close(False)
+    return
 
 def Save(doc, compact=False, previewViewId=None):
-  saveOptions = SaveOptions()
-  saveOptions.Compact = compact
-  if previewViewId is not None:
-    saveOptions.PreviewViewId = previewViewId
-  doc.Save(saveOptions)
-  return
+    saveOptions = SaveOptions()
+    saveOptions.Compact = compact
+    if previewViewId is not None:
+        saveOptions.PreviewViewId = previewViewId
+    doc.Save(saveOptions)
+    return
 
 def SaveAs(
-      doc,
-      modelPath,
-      overwriteExisting=False,
-      compact=False,
-      previewViewId=None,
-      worksharingSaveAsOptions=None,
-      maximumBackups=None
-    ):
-  modelPath = ToModelPath(modelPath)
-  saveAsOptions = SaveAsOptions()
-  saveAsOptions.Compact = compact
-  saveAsOptions.OverwriteExistingFile = overwriteExisting
-  if previewViewId is not None:
-    saveAsOptions.PreviewViewId = previewViewId
-  if worksharingSaveAsOptions is not None:
-    saveAsOptions.SetWorksharingOptions(worksharingSaveAsOptions)
-  if maximumBackups is not None:
-    saveAsOptions.MaximumBackups = maximumBackups
-  doc.SaveAs(modelPath, saveAsOptions)
-  return
+            doc,
+            modelPath,
+            overwriteExisting=False,
+            compact=False,
+            previewViewId=None,
+            worksharingSaveAsOptions=None,
+            maximumBackups=None
+        ):
+    modelPath = ToModelPath(modelPath)
+    saveAsOptions = SaveAsOptions()
+    saveAsOptions.Compact = compact
+    saveAsOptions.OverwriteExistingFile = overwriteExisting
+    if previewViewId is not None:
+        saveAsOptions.PreviewViewId = previewViewId
+    if worksharingSaveAsOptions is not None:
+        saveAsOptions.SetWorksharingOptions(worksharingSaveAsOptions)
+    if maximumBackups is not None:
+        saveAsOptions.MaximumBackups = maximumBackups
+    doc.SaveAs(modelPath, saveAsOptions)
+    return
 
 def CreateWorksharingSaveAsOptions(saveAsCentral=False, openWorksetsDefault=SimpleWorksetConfiguration.AskUserToSpecify, clearTransmitted=False):
-  worksharingSaveAsOptions = WorksharingSaveAsOptions()
-  worksharingSaveAsOptions.OpenWorksetsDefault = openWorksetsDefault
-  worksharingSaveAsOptions.ClearTransmitted = clearTransmitted
-  worksharingSaveAsOptions.SaveAsCentral = saveAsCentral
-  return worksharingSaveAsOptions
+    worksharingSaveAsOptions = WorksharingSaveAsOptions()
+    worksharingSaveAsOptions.OpenWorksetsDefault = openWorksetsDefault
+    worksharingSaveAsOptions.ClearTransmitted = clearTransmitted
+    worksharingSaveAsOptions.SaveAsCentral = saveAsCentral
+    return worksharingSaveAsOptions
 
 def DetachAndSaveModel(app, centralModelFilePath, detachedModelFilePath, audit=False):
-  centralModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(centralModelFilePath)
-  CopyModel(app, centralModelPath, detachedModelFilePath)
-  detachedModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(detachedModelFilePath)
-  doc = OpenDetachAndPreserveWorksets(app, detachedModelPath, audit=audit)
-  SaveAsNewCentral(doc, detachedModelPath)
-  # Relinquish ownership (Saving the new central file takes ownership of worksets so relinquishing must be done
-  # after it, if at all)
-  RelinquishAll(doc)
-  return doc
+    centralModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(centralModelFilePath)
+    CopyModel(app, centralModelPath, detachedModelFilePath)
+    detachedModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(detachedModelFilePath)
+    doc = OpenDetachAndPreserveWorksets(app, detachedModelPath, audit=audit)
+    SaveAsNewCentral(doc, detachedModelPath)
+    # Relinquish ownership (Saving the new central file takes ownership of worksets so relinquishing must be done
+    # after it, if at all)
+    RelinquishAll(doc)
+    return doc
 
 def TryGetBasicFileInfo(revitFilePath):
-  basicFileInfo = None
-  try:
-    basicFileInfo = BasicFileInfo.Extract(revitFilePath)
-  except Exception, e:
-    basicfileInfo = None
-  return basicFileInfo
+    basicFileInfo = None
+    try:
+        basicFileInfo = BasicFileInfo.Extract(revitFilePath)
+    except Exception, e:
+        basicfileInfo = None
+    return basicFileInfo
 
 def GetRevitFileVersion(revitFilePath):
-  basicFileInfo = TryGetBasicFileInfo(revitFilePath)
-  savedInVersion = basicFileInfo.SavedInVersion if basicFileInfo is not None else None
-  return savedInVersion
+    basicFileInfo = TryGetBasicFileInfo(revitFilePath)
+    savedInVersion = basicFileInfo.SavedInVersion if basicFileInfo is not None else None
+    return savedInVersion
 
 def IsLocalModel(revitFilePath):
-  isLocalModel = False
-  basicFileInfo = TryGetBasicFileInfo(revitFilePath)
-  if basicFileInfo is not None:
-    isWorkshared = basicFileInfo.IsWorkshared
-    if isWorkshared:
-      # NOTE: see: https://forums.autodesk.com/t5/revit-api-forum/basicfileinfo-iscreatedlocal-property-outputting-unexpected/td-p/7111503
-      isLocalModel = (basicFileInfo.IsCreatedLocal or basicFileInfo.IsLocal)
-  return isLocalModel
+    isLocalModel = False
+    basicFileInfo = TryGetBasicFileInfo(revitFilePath)
+    if basicFileInfo is not None:
+        isWorkshared = basicFileInfo.IsWorkshared
+        if isWorkshared:
+            # NOTE: see: https://forums.autodesk.com/t5/revit-api-forum/basicfileinfo-iscreatedlocal-property-outputting-unexpected/td-p/7111503
+            isLocalModel = (basicFileInfo.IsCreatedLocal or basicFileInfo.IsLocal)
+    return isLocalModel
 
 def IsCentralModel(revitFilePath):
-  isCentralModel = False
-  basicFileInfo = TryGetBasicFileInfo(revitFilePath)
-  if basicFileInfo is not None:
-    isWorkshared = basicFileInfo.IsWorkshared
-    if isWorkshared:
-      isCentralModel = basicFileInfo.IsCentral
-  return isCentralModel
+    isCentralModel = False
+    basicFileInfo = TryGetBasicFileInfo(revitFilePath)
+    if basicFileInfo is not None:
+        isWorkshared = basicFileInfo.IsWorkshared
+        if isWorkshared:
+            isCentralModel = basicFileInfo.IsCentral
+    return isCentralModel
 
 def IsWorkshared(revitFilePath):
-  isWorkshared = False
-  basicFileInfo = TryGetBasicFileInfo(revitFilePath)
-  if basicFileInfo is not None:
-    isWorkshared = basicFileInfo.IsWorkshared
-  return isWorkshared
+    isWorkshared = False
+    basicFileInfo = TryGetBasicFileInfo(revitFilePath)
+    if basicFileInfo is not None:
+        isWorkshared = basicFileInfo.IsWorkshared
+    return isWorkshared
 

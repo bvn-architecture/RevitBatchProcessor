@@ -33,44 +33,44 @@ PROCESS_UNIQUE_ID_DELIMITER = "|"
 
 
 def GetUniqueIdForProcess(process):
-  return str.Join(
-      PROCESS_UNIQUE_ID_DELIMITER,
-      process.Id.ToString(),
-      time_util.GetISO8601FormattedUtcDate(process.StartTime)
-    )
+    return str.Join(
+            PROCESS_UNIQUE_ID_DELIMITER,
+            process.Id.ToString(),
+            time_util.GetISO8601FormattedUtcDate(process.StartTime)
+        )
 
 def IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
-  def IsBatchRvtProcess(process):
-    isTargetProcess = False
-    try:
-      isTargetProcess = (GetUniqueIdForProcess(process) == batchRvtProcessUniqueId)
-    except Exception, e:
-      isTargetProcess = False
-    return isTargetProcess
-  batchRvtProcess = Process.GetProcesses().FirstOrDefault(IsBatchRvtProcess)
-  return (batchRvtProcess is not None)
+    def IsBatchRvtProcess(process):
+        isTargetProcess = False
+        try:
+            isTargetProcess = (GetUniqueIdForProcess(process) == batchRvtProcessUniqueId)
+        except Exception, e:
+            isTargetProcess = False
+        return isTargetProcess
+    batchRvtProcess = Process.GetProcesses().FirstOrDefault(IsBatchRvtProcess)
+    return (batchRvtProcess is not None)
 
 def StartHostRevitProcess(
-    revitVersion,
-    batchRvtScriptsFolderPath,
-    scriptFilePath,
-    scriptDataFilePath,
-    progressNumber,
-    scriptOutputPipeHandleString,
-    testModeFolderPath
-  ):
-  batchRvtProcessUniqueId = GetUniqueIdForProcess(Process.GetCurrentProcess())
-  def initEnvironmentVariables(environmentVariables):
-    script_environment.InitEnvironmentVariables(
-        environmentVariables,
+        revitVersion,
         batchRvtScriptsFolderPath,
         scriptFilePath,
         scriptDataFilePath,
         progressNumber,
         scriptOutputPipeHandleString,
-        batchRvtProcessUniqueId,
         testModeFolderPath
-      )
-    return
-  return revit_process.StartRevitProcess(revitVersion, initEnvironmentVariables)
+    ):
+    batchRvtProcessUniqueId = GetUniqueIdForProcess(Process.GetCurrentProcess())
+    def initEnvironmentVariables(environmentVariables):
+        script_environment.InitEnvironmentVariables(
+                environmentVariables,
+                batchRvtScriptsFolderPath,
+                scriptFilePath,
+                scriptDataFilePath,
+                progressNumber,
+                scriptOutputPipeHandleString,
+                batchRvtProcessUniqueId,
+                testModeFolderPath
+            )
+        return
+    return revit_process.StartRevitProcess(revitVersion, initEnvironmentVariables)
 

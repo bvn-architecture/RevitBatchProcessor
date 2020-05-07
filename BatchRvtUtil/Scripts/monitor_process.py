@@ -29,61 +29,61 @@ import time_util
 
 
 def IsProcessResponding(process):
-  isResponding = False
-  try:
-    isResponding = process.Responding
-  except Exception, e:
-    pass
-  return isResponding
+    isResponding = False
+    try:
+        isResponding = process.Responding
+    except Exception, e:
+        pass
+    return isResponding
 
 def MonitorProcess(
-    process,
-    monitoringAction,
-    monitorIntervalInSeconds,
-    unresponsiveThreshholdInSeconds,
-    onBeginUnresponsive,
-    onEndUnresponsive
-  ):
+        process,
+        monitoringAction,
+        monitorIntervalInSeconds,
+        unresponsiveThreshholdInSeconds,
+        onBeginUnresponsive,
+        onEndUnresponsive
+    ):
 
-  wasResponding = True
-  isResponding = True
-  unresponsiveStartTime = None
-  haveNotifiedBeginUnresponsive = False
-
-  process.Refresh()
-
-  while not process.HasExited:
-
-    wasResponding = isResponding
-    isResponding = IsProcessResponding(process)
-
-    if wasResponding and not isResponding: # responsive -> unresponsive
-      unresponsiveStartTime = time_util.GetDateTimeNow()
-      haveNotifiedBeginUnresponsive = False
-
-    elif isResponding and not wasResponding: # unresponsive -> responsive
-      if haveNotifiedBeginUnresponsive: # notify end of unresponsiveness
-        onEndUnresponsive(time_util.GetSecondsElapsedSince(unresponsiveStartTime))
-        haveNotifiedBeginUnresponsive = False
-
-    elif not isResponding and not wasResponding: # continuing unresponsiveness
-      if not haveNotifiedBeginUnresponsive: # notify unresponsiveness beyond threshold
-        if time_util.GetSecondsElapsedSince(unresponsiveStartTime) >= unresponsiveThreshholdInSeconds:
-          onBeginUnresponsive()
-          haveNotifiedBeginUnresponsive = True
-
-    thread_util.SleepForSeconds(monitorIntervalInSeconds)
-    
-    WinForms.Application.DoEvents()
-    
-    monitoringAction()
+    wasResponding = True
+    isResponding = True
+    unresponsiveStartTime = None
+    haveNotifiedBeginUnresponsive = False
 
     process.Refresh()
 
-  # Was notified of beginning of unresponsiveness, therefore need to notify end of unresponsiveness.
-  if haveNotifiedBeginUnresponsive:
-    onEndUnresponsive(time_util.GetSecondsElapsedSince(unresponsiveStartTime))
-    haveNotifiedBeginUnresponsive = False
+    while not process.HasExited:
 
-  return
+        wasResponding = isResponding
+        isResponding = IsProcessResponding(process)
+
+        if wasResponding and not isResponding: # responsive -> unresponsive
+            unresponsiveStartTime = time_util.GetDateTimeNow()
+            haveNotifiedBeginUnresponsive = False
+
+        elif isResponding and not wasResponding: # unresponsive -> responsive
+            if haveNotifiedBeginUnresponsive: # notify end of unresponsiveness
+                onEndUnresponsive(time_util.GetSecondsElapsedSince(unresponsiveStartTime))
+                haveNotifiedBeginUnresponsive = False
+
+        elif not isResponding and not wasResponding: # continuing unresponsiveness
+            if not haveNotifiedBeginUnresponsive: # notify unresponsiveness beyond threshold
+                if time_util.GetSecondsElapsedSince(unresponsiveStartTime) >= unresponsiveThreshholdInSeconds:
+                    onBeginUnresponsive()
+                    haveNotifiedBeginUnresponsive = True
+
+        thread_util.SleepForSeconds(monitorIntervalInSeconds)
+        
+        WinForms.Application.DoEvents()
+        
+        monitoringAction()
+
+        process.Refresh()
+
+    # Was notified of beginning of unresponsiveness, therefore need to notify end of unresponsiveness.
+    if haveNotifiedBeginUnresponsive:
+        onEndUnresponsive(time_util.GetSecondsElapsedSince(unresponsiveStartTime))
+        haveNotifiedBeginUnresponsive = False
+
+    return
 

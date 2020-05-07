@@ -29,22 +29,22 @@ BATCH_RVT_UTIL_ASSEMBLY_NAME = "BatchRvtUtil"
 BATCH_RVT_SCRIPT_HOST_ASSEMBLY_NAME = "BatchRvtScriptHost"
 
 def GetExistingLoadedAssembly(assemblyName):
-  return (
-      AppDomain.CurrentDomain.GetAssemblies()
-      .FirstOrDefault(lambda assembly: assembly.GetName().Name == assemblyName)
-    )
+    return (
+            AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(lambda assembly: assembly.GetName().Name == assemblyName)
+        )
 
 def AddBatchRvtUtilAssemblyReference():
-  try:
-    clr.AddReference(BATCH_RVT_UTIL_ASSEMBLY_NAME)
-  except IOException, e: # Can occur if PyRevit is installed. Need to use AddReferenceToFileAndPath() in this case.
-    batchRvtScriptHostAssembly = GetExistingLoadedAssembly(BATCH_RVT_SCRIPT_HOST_ASSEMBLY_NAME)
-    clr.AddReference(batchRvtScriptHostAssembly)
-    from BatchRvt.ScriptHost import ScriptHostUtil
-    environmentVariables = ScriptHostUtil.GetEnvironmentVariables()
-    batchRvtFolderPath = ScriptHostUtil.GetBatchRvtFolderPath(environmentVariables)
-    clr.AddReferenceToFileAndPath(Path.Combine(batchRvtFolderPath, BATCH_RVT_UTIL_ASSEMBLY_NAME))
-  return
+    try:
+        clr.AddReference(BATCH_RVT_UTIL_ASSEMBLY_NAME)
+    except IOException, e: # Can occur if PyRevit is installed. Need to use AddReferenceToFileAndPath() in this case.
+        batchRvtScriptHostAssembly = GetExistingLoadedAssembly(BATCH_RVT_SCRIPT_HOST_ASSEMBLY_NAME)
+        clr.AddReference(batchRvtScriptHostAssembly)
+        from BatchRvt.ScriptHost import ScriptHostUtil
+        environmentVariables = ScriptHostUtil.GetEnvironmentVariables()
+        batchRvtFolderPath = ScriptHostUtil.GetBatchRvtFolderPath(environmentVariables)
+        clr.AddReferenceToFileAndPath(Path.Combine(batchRvtFolderPath, BATCH_RVT_UTIL_ASSEMBLY_NAME))
+    return
 
 AddBatchRvtUtilAssemblyReference()
 

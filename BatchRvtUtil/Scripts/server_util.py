@@ -34,32 +34,32 @@ IN = Pipes.PipeDirection.In
 OUT = Pipes.PipeDirection.Out
 
 def CreateNamedPipeServer(pipeName):
-  worldsid = Principal.SecurityIdentifier(Principal.WellKnownSidType.WorldSid, None)
-  localsid = Principal.SecurityIdentifier(Principal.WellKnownSidType.LocalSid, None)
-  worldpr = Pipes.PipeAccessRule(worldsid, Pipes.PipeAccessRights.ReadWrite, AccessControl.AccessControlType.Allow)
-  localpr = Pipes.PipeAccessRule(localsid, Pipes.PipeAccessRights.FullControl, AccessControl.AccessControlType.Allow)
+    worldsid = Principal.SecurityIdentifier(Principal.WellKnownSidType.WorldSid, None)
+    localsid = Principal.SecurityIdentifier(Principal.WellKnownSidType.LocalSid, None)
+    worldpr = Pipes.PipeAccessRule(worldsid, Pipes.PipeAccessRights.ReadWrite, AccessControl.AccessControlType.Allow)
+    localpr = Pipes.PipeAccessRule(localsid, Pipes.PipeAccessRights.FullControl, AccessControl.AccessControlType.Allow)
 
-  ps = Pipes.PipeSecurity()
-  ps.AddAccessRule(worldpr)
-  ps.AddAccessRule(localpr)
+    ps = Pipes.PipeSecurity()
+    ps.AddAccessRule(worldpr)
+    ps.AddAccessRule(localpr)
 
-  return Pipes.NamedPipeServerStream(
-      pipeName,
-      Pipes.PipeDirection.InOut,
-      MAX_NUMBER_OF_INSTANCES,
-      Pipes.PipeTransmissionMode.Byte,
-      Pipes.PipeOptions.Asynchronous,
-      PIPE_IO_BUFFER_SIZE,
-      PIPE_IO_BUFFER_SIZE,
-      ps
-    )
+    return Pipes.NamedPipeServerStream(
+            pipeName,
+            Pipes.PipeDirection.InOut,
+            MAX_NUMBER_OF_INSTANCES,
+            Pipes.PipeTransmissionMode.Byte,
+            Pipes.PipeOptions.Asynchronous,
+            PIPE_IO_BUFFER_SIZE,
+            PIPE_IO_BUFFER_SIZE,
+            ps
+        )
 
 def CreateAnonymousPipeServer(pipeDirection, handleInheritability=None):
-  handleInheritability = handleInheritability if handleInheritability is not None else HandleInheritability.None
-  outputPipeServer = Pipes.AnonymousPipeServerStream(
-      pipeDirection,
-      handleInheritability,
-      PIPE_IO_BUFFER_SIZE
-    )
-  return outputPipeServer
+    handleInheritability = handleInheritability if handleInheritability is not None else HandleInheritability.None
+    outputPipeServer = Pipes.AnonymousPipeServerStream(
+            pipeDirection,
+            handleInheritability,
+            PIPE_IO_BUFFER_SIZE
+        )
+    return outputPipeServer
 

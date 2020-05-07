@@ -28,14 +28,14 @@ IN = Pipes.PipeDirection.In
 OUT = Pipes.PipeDirection.Out
 
 def CreateNamedPipeClient(node, pipeName):
-  return Pipes.NamedPipeClientStream(
-    node,
-    pipeName,
-    Pipes.PipeDirection.InOut,
-    Pipes.PipeOptions.Asynchronous
-  )
+    return Pipes.NamedPipeClientStream(
+        node,
+        pipeName,
+        Pipes.PipeDirection.InOut,
+        Pipes.PipeOptions.Asynchronous
+    )
 
 def CreateAnonymousPipeClient(pipeDirection, pipeHandleString):
-  pipeClient = Pipes.AnonymousPipeClientStream(pipeDirection, pipeHandleString)
-  return pipeClient
+    pipeClient = Pipes.AnonymousPipeClientStream(pipeDirection, pipeHandleString)
+    return pipeClient
 

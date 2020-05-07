@@ -23,8 +23,8 @@ import System
 from System import Environment
 
 def GetMachineName():
-  return Environment.MachineName
+    return Environment.MachineName
 
 def GetUserName():
-  return Environment.UserName
+    return Environment.UserName
 

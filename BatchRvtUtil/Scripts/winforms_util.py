@@ -29,14 +29,14 @@ clr.AddReference("System.Drawing")
 from System.Drawing import Point
 
 class WindowHandleWrapper(IWin32Window):
-  def __init__(self, hwnd):
-    self.hwnd = hwnd
-  def get_Handle(self):
-    return self.hwnd
-  @staticmethod
-  def GetMainWindowHandle():
-    return WindowHandleWrapper(Process.GetCurrentProcess().MainWindowHandle)
+    def __init__(self, hwnd):
+        self.hwnd = hwnd
+    def get_Handle(self):
+        return self.hwnd
+    @staticmethod
+    def GetMainWindowHandle():
+        return WindowHandleWrapper(Process.GetCurrentProcess().MainWindowHandle)
 
 def SetMousePosition(x, y):
-  Cursor.Position = Point(x, y)
-  return
+    Cursor.Position = Point(x, y)
+    return
