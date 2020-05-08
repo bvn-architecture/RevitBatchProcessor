@@ -74,6 +74,11 @@ namespace BatchRvtUtil
             return new FileInfo(filePath).Directory.Name;
         }
 
+        public static bool HasExtension(string filePath, string extension)
+        {
+            return Path.GetExtension(filePath).ToLower() == extension.ToLower();
+        }
+
         private static void IgnoringPathExceptions(Action action)
         {
             IgnoringPathExceptions(

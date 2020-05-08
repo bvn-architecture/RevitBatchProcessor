@@ -99,7 +99,7 @@ namespace BatchRvtGUI
                     // General Task Script settings
                     new UIConfigItem(
                             () => {
-                                this.taskScriptTextBox.Text = this.Settings.TaskScriptFilePath.GetValue();
+                                UpdateTaskScript(this.Settings.TaskScriptFilePath.GetValue());
                                 this.showMessageBoxOnTaskScriptErrorCheckBox.Checked = this.Settings.ShowMessageBoxOnTaskScriptError.GetValue();
                             },
                             () => {
@@ -198,6 +198,10 @@ namespace BatchRvtGUI
                                 this.perFileProcessingTimeOutCheckBox.Checked = processingTimeOutInMinutes > 0;
                                 this.timeOutNumericUpDown.Value = processingTimeOutInMinutes;
                                 UpdateRevitSessionControls();
+                                
+                                // NOTE: This is done so that the Revit session option is updated according to the script file type.
+                                // NOTE: This is a bit hacky!
+                                UpdateTaskScript(this.taskScriptTextBox.Text);
                             },
                             () => {
                                 this.Settings.RevitSessionOption.SetValue(
@@ -289,6 +293,26 @@ namespace BatchRvtGUI
                 };
 
             return iuConfigItems;
+        }
+
+        private void UpdateTaskScript(string scriptFilePath)
+        {
+            this.taskScriptTextBox.Text = scriptFilePath;
+            
+            var scriptType = GetScriptType(scriptFilePath);
+
+            if (scriptType == ScriptType.Dynamo)
+            {
+                this.useSeparateRevitSessionRadioButton.Checked = true;
+                this.useSameRevitSessionRadioButton.Checked = false;
+                this.useSeparateRevitSessionRadioButton.Enabled = false;
+                this.useSameRevitSessionRadioButton.Enabled = false;
+            }
+            else
+            {
+                this.useSeparateRevitSessionRadioButton.Enabled = true;
+                this.useSameRevitSessionRadioButton.Enabled = true;
+            }
         }
 
         private double GetDisplaySettingPercentage()
@@ -468,7 +492,7 @@ namespace BatchRvtGUI
             }
             else if (!File.Exists(this.Settings.TaskScriptFilePath.GetValue()))
             {
-                ShowErrorMessageBox("ERROR: You must select an existing Task Python script!");
+                ShowErrorMessageBox("ERROR: You must select an existing Task script!");
             }
             else if (
                     (this.Settings.RevitProcessingOption.GetValue() == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing)
@@ -601,8 +625,8 @@ namespace BatchRvtGUI
         private void browseScriptButton_Click(object sender, EventArgs e)
         {
             BrowseForExistingScriptFile(
-                    "Select Task Python script",
-                    scriptFilePath => { this.taskScriptTextBox.Text = scriptFilePath; },
+                    "Select Task script",
+                    scriptFilePath => { UpdateTaskScript(scriptFilePath); },
                     ScriptType.Any,
                     PathUtil.GetExistingFileDirectoryPath(this.taskScriptTextBox.Text)
                 );
@@ -814,6 +838,17 @@ namespace BatchRvtGUI
             UpdateRevitProcessingControls();
         }
 
+        private static ScriptType GetScriptType(string scriptFilePath)
+        {
+            return (
+                    PathUtil.HasExtension(scriptFilePath, PYTHON_SCRIPT_EXTENSION) ?
+                    ScriptType.Python :
+                    PathUtil.HasExtension(scriptFilePath, DYNAMO_SCRIPT_EXTENSION) ?
+                    ScriptType.Dynamo :
+                    ScriptType.Any
+                );
+        }
+
         private void UpdateRevitProcessingControls()
         {
             bool batchTaskEnabled = this.enableBatchProcessingCheckBox.Checked;
@@ -959,7 +994,7 @@ namespace BatchRvtGUI
 
                         if (isSaved)
                         {
-                            this.taskScriptTextBox.Text = scriptFilePath;
+                            UpdateTaskScript(scriptFilePath);
                         }
                         else
                         {
