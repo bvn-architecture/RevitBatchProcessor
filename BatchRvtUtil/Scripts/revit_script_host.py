@@ -162,7 +162,7 @@ def RunBatchTaskScript(scriptFilePath):
         try:
             if isCloudModel:
                 output()
-                output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + "[ CLOUD MODEL ]")
+                output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + "CLOUD MODEL")
                 output()
                 output("\t" + "Project ID: " + cloudProjectId)
                 output("\t" + "Model ID: " + cloudModelId)
@@ -245,7 +245,7 @@ def RunBatchTaskScript(scriptFilePath):
                             processDocument,
                             output
                         )
-                if openCreateNewLocal:
+                elif openCreateNewLocal:
                     revitVersion = RevitVersion.GetSupportedRevitVersion(revit_session.GetSessionRevitVersionNumber())
                     localFilePath = RevitVersion.GetRevitLocalFilePath(revitVersion, centralFilePath)
                     try:

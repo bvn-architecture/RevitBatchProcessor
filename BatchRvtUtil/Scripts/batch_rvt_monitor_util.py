@@ -49,7 +49,7 @@ def ShowSupportedRevitFileInfo(supportedRevitFileInfo, output):
         revitCloudModelInfo = supportedRevitFileInfo.GetRevitCloudModelInfo()
         projectGuidText = revitCloudModelInfo.GetProjectGuid().ToString()
         modelGuidText = revitCloudModelInfo.GetModelGuid().ToString()
-        output("\t" + "[ CLOUD MODEL ]")
+        output("\t" + "CLOUD MODEL")
         output("\t" + "Project ID: " + projectGuidText)
         output("\t" + "Model ID: " + modelGuidText)
         revitVersionText = supportedRevitFileInfo.TryGetRevitVersionText()
