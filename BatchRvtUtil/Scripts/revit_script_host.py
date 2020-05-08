@@ -165,7 +165,7 @@ def RunBatchTaskScript(scriptFilePath):
                 output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + "[ CLOUD MODEL ]")
                 output()
                 output("\t" + "Project ID: " + cloudProjectId)
-                output("\t" + "Model ID: " + cloudProjectId)
+                output("\t" + "Model ID: " + cloudModelId)
             else:
                 output()
                 output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + centralFilePath)
