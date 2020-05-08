@@ -52,13 +52,23 @@ def GetRevitFileVersionDetails(revitFilePath):
     revitFileVersionDetails = revitFileInfo.TryGetRevitVersionText()
     return revitFileVersionDetails
 
-def GetSnapshotFolderPath(dataExportFolderPath, revitFilePath, timestamp):
-    projectFolderName = path_util.GetProjectFolderNameFromRevitProjectFilePath(revitFilePath)
-    if projectFolderName is None:
-        projectFolderName = GetUnknownProjectUniqueFolderName()
-    modelName = GetRevitModelName(revitFilePath)
+def GetSnapshotFolderPath(
+        dataExportFolderPath,
+        revitFilePath,
+        isCloudModel,
+        cloudProjectId,
+        cloudModelId,
+        timestamp
+    ):
     snapshotFolderName = GetSnapshotFolderName(timestamp.ToLocalTime())
-    snapshotFolderPath = Path.Combine(dataExportFolderPath, projectFolderName, modelName, snapshotFolderName)
+    if isCloudModel:
+        snapshotFolderPath = Path.Combine(dataExportFolderPath, cloudProjectId, cloudModelId, snapshotFolderName)
+    else:
+        projectFolderName = path_util.GetProjectFolderNameFromRevitProjectFilePath(revitFilePath)
+        if projectFolderName is None:
+            projectFolderName = GetUnknownProjectUniqueFolderName()
+        modelName = GetRevitModelName(revitFilePath)
+        snapshotFolderPath = Path.Combine(dataExportFolderPath, projectFolderName, modelName, snapshotFolderName)
     return snapshotFolderPath
 
 def GetSnapshotDataFilePath(snapshotDataFolderPath):

@@ -37,6 +37,9 @@ namespace BatchRvtUtil
 
             public readonly StringSetting SessionId = new StringSetting("sessionId");
             public readonly StringSetting RevitFilePath = new StringSetting("revitFilePath");
+            public readonly BooleanSetting IsCloudModel = new BooleanSetting("isCloudModel");
+            public readonly StringSetting CloudProjectId = new StringSetting("cloudProjectId");
+            public readonly StringSetting CloudModelId = new StringSetting("cloudModelId");
             public readonly BooleanSetting EnableDataExport = new BooleanSetting("enableDataExport");
             public readonly StringSetting TaskScriptFilePath = new StringSetting("taskScriptFilePath");
             public readonly StringSetting TaskData = new StringSetting("taskData");
@@ -61,6 +64,9 @@ namespace BatchRvtUtil
                         {
                             this.SessionId,
                             this.RevitFilePath,
+                            this.IsCloudModel,
+                            this.CloudProjectId,
+                            this.CloudModelId,
                             this.EnableDataExport,
                             this.TaskScriptFilePath,
                             this.TaskData,

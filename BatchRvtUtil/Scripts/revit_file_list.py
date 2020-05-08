@@ -99,13 +99,10 @@ class RevitCloudModelInfo:
             self.modelGuid = self.SafeParseGuidText(otherParts[1])
             if RevitVersion.IsSupportedRevitVersionNumber(revitVersionPart):
                 self.revitVersionText = revitVersionPart
-            # TODO: consider if ommitting the cloud model's Revit version should be supported.
             self.isValid = (
                     self.projectGuid is not None
                     and
                     self.modelGuid is not None
-                    and
-                    self.revitVersionText is not None
                 )
         return
 
@@ -144,7 +141,7 @@ class RevitFileInfo():
         self.pathException = pathException
         return
 
-    def IsCloudModelDescriptor(self):
+    def IsCloudModel(self):
         return self.GetRevitCloudModelInfo().IsValid()
 
     def GetRevitCloudModelInfo(self):
@@ -187,27 +184,29 @@ class SupportedRevitFileInfo():
     def __init__(self, revitFilePathData):
         self.revitFileInfo = RevitFileInfo(revitFilePathData.RevitFilePath)
         self.revitFilePathData = revitFilePathData
-        if self.revitFileInfo.IsCloudModelDescriptor():
-            self.revitVersionText = self.revitFileInfo.GetRevitCloudModelInfo().GetRevitVersionText()
-        else:
-            self.revitVersionText = self.revitFileInfo.TryGetRevitVersionText()
+        revitVersionText = None
         revitVersionNumber = None
-        if not str.IsNullOrWhiteSpace(self.revitVersionText):
-            if any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2015):
+        if self.revitFileInfo.IsCloudModel():
+            revitVersionText = self.revitFileInfo.GetRevitCloudModelInfo().GetRevitVersionText()
+        else:
+            revitVersionText = self.revitFileInfo.TryGetRevitVersionText()
+        if not str.IsNullOrWhiteSpace(revitVersionText):
+            if any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2015):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2015
-            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2016):
+            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2016):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2016
-            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2017):
+            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2017):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2017
-            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2018):
+            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2018):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2018
-            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2019):
+            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2019):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2019
-            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2020):
+            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2020):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2020
-            elif any(self.revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2021):
+            elif any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2021):
                 revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2021
 
+        self.revitVersionText = revitVersionText
         self.revitVersionNumber = revitVersionNumber
         return
 
@@ -223,8 +222,8 @@ class SupportedRevitFileInfo():
     def GetRevitFilePathData(self):
         return self.revitFilePathData
 
-    def IsCloudModelDescriptor(self):
-        return self.GetRevitFileInfo().IsCloudModelDescriptor()
+    def IsCloudModel(self):
+        return self.GetRevitFileInfo().IsCloudModel()
 
     def GetRevitCloudModelInfo(self):
         return self.GetRevitFileInfo().GetRevitCloudModelInfo()

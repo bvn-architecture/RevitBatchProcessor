@@ -100,7 +100,15 @@ def RunBatchTaskScript(scriptFilePath):
 
     uiapp = revit_session.GetSessionUIApplication()
     sessionId = revit_script_util.GetSessionId()
-    centralFilePath = revit_script_util.GetRevitFilePath()
+    centralFilePath = None
+    cloudProjectId = None
+    cloudModelId = None
+    isCloudModel = revit_script_util.IsCloudModel()
+    if isCloudModel:
+        cloudProjectId = revit_script_util.GetCloudProjectId()
+        cloudModelId = revit_script_util.GetCloudModelId()
+    else:
+        centralFilePath = revit_script_util.GetRevitFilePath()
     openInUI = revit_script_util.GetOpenInUI()
     enableDataExport = revit_script_util.GetEnableDataExport()
     dataExportFolderPath = revit_script_util.GetDataExportFolderPath()
@@ -121,7 +129,7 @@ def RunBatchTaskScript(scriptFilePath):
             output()
             output("\t" + dataExportFolderPath)
         aborted = True
-    elif not path_util.FileExists(centralFilePath):
+    elif not isCloudModel and not path_util.FileExists(centralFilePath):
         output()
         output("ERROR: Revit project file does not exist!")
         if not str.IsNullOrWhiteSpace(centralFilePath):
@@ -137,6 +145,9 @@ def RunBatchTaskScript(scriptFilePath):
             snapshotData = snapshot_data_exporter.ExportTemporarySnapshotData(
                     sessionId,
                     centralFilePath,
+                    isCloudModel,
+                    cloudProjectId,
+                    cloudModelId,
                     snapshotStartTime,
                     snapshotEndTime,
                     dataExportFolderPath,
@@ -149,8 +160,15 @@ def RunBatchTaskScript(scriptFilePath):
         isCentralModel = False
         isLocalModel = False
         try:
-            output()
-            output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + centralFilePath)
+            if isCloudModel:
+                output()
+                output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + "[ CLOUD MODEL ]")
+                output()
+                output("\t" + "Project ID: " + cloudProjectId)
+                output("\t" + "Model ID: " + cloudProjectId)
+            else:
+                output()
+                output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + centralFilePath)
 
             if revit_file_util.IsWorkshared(centralFilePath):
                 if revit_file_util.IsLocalModel(centralFilePath):
@@ -272,6 +290,9 @@ def RunBatchTaskScript(scriptFilePath):
                 snapshotData = snapshot_data_exporter.ExportSnapshotData(
                         sessionId,
                         centralFilePath,
+                        isCloudModel,
+                        cloudProjectId,
+                        cloudModelId,
                         snapshotStartTime,
                         snapshotEndTime,
                         dataExportFolderPath,

@@ -34,23 +34,40 @@ import network_util
 def GetSnapshotData(
             sessionId,
             revitFilePath,
+            isCloudModel,
+            cloudProjectId,
+            cloudModelId,
             snapshotStartTime,
             snapshotEndTime,
             snapshotFolderPath,
             revitJournalFilePath,
             snapshotError
         ):
-    projectFolderName = path_util.GetProjectFolderNameFromRevitProjectFilePath(revitFilePath)
-    projectModelFolderPath = Path.GetDirectoryName(revitFilePath)
-    modelName = snapshot_data_util.GetRevitModelName(revitFilePath)
-    modelFileLastModified = path_util.GetLastWriteTimeUtc(revitFilePath)
-    modelFileSize = path_util.GetFileSize(revitFilePath)
-    modelRevitVersion = revit_file_util.GetRevitFileVersion(revitFilePath)
-    modelRevitVersionDetails = snapshot_data_util.GetRevitFileVersionDetails(revitFilePath)
+    if isCloudModel:
+        projectFolderName = None
+        projectModelFolderPath = None
+        modelFolder = None
+        modelName = None
+        modelFileLastModified = None
+        modelFileSize = None
+        modelRevitVersion = None
+        modelRevitVersionDetails = None
+    else:
+        projectFolderName = path_util.GetProjectFolderNameFromRevitProjectFilePath(revitFilePath)
+        projectModelFolderPath = Path.GetDirectoryName(revitFilePath)
+        modelFolder = path_util.ExpandedFullNetworkPath(projectModelFolderPath)
+        modelName = snapshot_data_util.GetRevitModelName(revitFilePath)
+        modelFileLastModified = path_util.GetLastWriteTimeUtc(revitFilePath)
+        modelFileSize = path_util.GetFileSize(revitFilePath)
+        modelRevitVersion = revit_file_util.GetRevitFileVersion(revitFilePath)
+        modelRevitVersionDetails = snapshot_data_util.GetRevitFileVersionDetails(revitFilePath)
     
     snapshotData = {
+            "isCloudModel" : isCloudModel,
+            "cloudProjectId" : cloudProjectId,
+            "cloudModelId" : cloudModelId,
             "projectFolderName" : projectFolderName,
-            "modelFolder" : path_util.ExpandedFullNetworkPath(projectModelFolderPath),
+            "modelFolder" : modelFolder,
             "modelName" : modelName,
             "modelFileLastModified" : (
                     time_util.GetTimestampObject(modelFileLastModified)
@@ -83,6 +100,9 @@ def ExportSnapshotDataInternal(
         snapshotDataFilePath,
         sessionId,
         revitProjectFilePath,
+        isCloudModel,
+        cloudProjectId,
+        cloudModelId,
         snapshotStartTime,
         snapshotEndTime,
         dataExportFolderPath,
@@ -92,6 +112,9 @@ def ExportSnapshotDataInternal(
     snapshotData = GetSnapshotData(
             sessionId,
             revitProjectFilePath,
+            isCloudModel,
+            cloudProjectId,
+            cloudModelId,
             snapshotStartTime,
             snapshotEndTime,
             dataExportFolderPath,
@@ -105,6 +128,9 @@ def ExportSnapshotDataInternal(
 def ExportSnapshotData(
         sessionId,
         revitProjectFilePath,
+        isCloudModel,
+        cloudProjectId,
+        cloudModelId,
         snapshotStartTime,
         snapshotEndTime,
         dataExportFolderPath,
@@ -115,6 +141,9 @@ def ExportSnapshotData(
             snapshot_data_util.GetSnapshotDataFilePath(dataExportFolderPath),
             sessionId,
             revitProjectFilePath,
+            isCloudModel,
+            cloudProjectId,
+            cloudModelId,
             snapshotStartTime,
             snapshotEndTime,
             dataExportFolderPath,
@@ -126,6 +155,9 @@ def ExportSnapshotData(
 def ExportTemporarySnapshotData(
         sessionId,
         revitProjectFilePath,
+        isCloudModel,
+        cloudProjectId,
+        cloudModelId,
         snapshotStartTime,
         snapshotEndTime,
         dataExportFolderPath,
@@ -136,6 +168,9 @@ def ExportTemporarySnapshotData(
             snapshot_data_util.GetTemporarySnapshotDataFilePath(dataExportFolderPath),
             sessionId,
             revitProjectFilePath,
+            isCloudModel,
+            cloudProjectId,
+            cloudModelId,
             snapshotStartTime,
             snapshotEndTime,
             dataExportFolderPath,

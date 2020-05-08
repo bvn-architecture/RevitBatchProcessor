@@ -81,6 +81,15 @@ def SetCurrentScriptData(scriptData):
     SCRIPT_DATA_CONTAINER[0] = scriptData
     return
 
+def IsCloudModel():
+    return SCRIPT_DATA_CONTAINER[0].IsCloudModel.GetValue()
+
+def GetCloudProjectId():
+    return SCRIPT_DATA_CONTAINER[0].CloudProjectId.GetValue()
+
+def GetCloudModelId():
+    return SCRIPT_DATA_CONTAINER[0].CloudModelId.GetValue()
+
 def GetRevitFilePath():
     return SCRIPT_DATA_CONTAINER[0].RevitFilePath.GetValue()
 

@@ -82,7 +82,7 @@ def GetSupportedRevitFiles(batchRvtConfig):
                 supportedRevitFileInfo
                 for supportedRevitFileInfo in supportedRevitFileList
                 if (
-                        not supportedRevitFileInfo.IsCloudModelDescriptor()
+                        not supportedRevitFileInfo.IsCloudModel()
                         and
                         not RevitFileExists(supportedRevitFileInfo)
                     )
@@ -92,7 +92,7 @@ def GetSupportedRevitFiles(batchRvtConfig):
                 supportedRevitFileInfo
                 for supportedRevitFileInfo in supportedRevitFileList
                 if (
-                        supportedRevitFileInfo.IsCloudModelDescriptor()
+                        supportedRevitFileInfo.IsCloudModel()
                         or
                         RevitFileExists(supportedRevitFileInfo)
                    )
@@ -108,7 +108,7 @@ def GetSupportedRevitFiles(batchRvtConfig):
                 supportedRevitFileInfo
                 for supportedRevitFileInfo in supportedRevitFileList
                 if (
-                        not supportedRevitFileInfo.IsCloudModelDescriptor()
+                        not supportedRevitFileInfo.IsCloudModel()
                         and
                         not HasSupportedRevitFilePath(supportedRevitFileInfo)
                     )
@@ -119,7 +119,7 @@ def GetSupportedRevitFiles(batchRvtConfig):
                 for supportedRevitFileInfo in supportedRevitFileList
                 if (
                         (
-                            supportedRevitFileInfo.IsCloudModelDescriptor()
+                            supportedRevitFileInfo.IsCloudModel()
                             or
                             RevitFileExists(supportedRevitFileInfo)
                         )
@@ -129,7 +129,7 @@ def GetSupportedRevitFiles(batchRvtConfig):
                         )
                         and
                         (
-                            supportedRevitFileInfo.IsCloudModelDescriptor()
+                            supportedRevitFileInfo.IsCloudModel()
                             or
                             HasSupportedRevitFilePath(supportedRevitFileInfo)
                         )
@@ -137,8 +137,8 @@ def GetSupportedRevitFiles(batchRvtConfig):
             ).OrderBy(
                     lambda supportedRevitFileInfo:
                         GetRevitFileSize(supportedRevitFileInfo)
-                        if not supportedRevitFileInfo.IsCloudModelDescriptor()
-                        else System.Int64(0) # dummy file size value for Cloud model descriptors
+                        if not supportedRevitFileInfo.IsCloudModel()
+                        else System.Int64(0) # dummy file size value for Cloud models
                 ).ToList()
 
         nonExistentCount = len(nonExistentRevitFileList)
@@ -323,23 +323,40 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
             Output("Starting Revit " + RevitVersion.GetRevitVersionText(revitVersion) + " session...")
 
             for index, supportedRevitFileInfo in enumerate(sessionRevitFiles):
+
+                isCloudModel = supportedRevitFileInfo.IsCloudModel()
+
+                if isCloudModel:
+                    revitFilePath = str.Empty
+                    revitCloudModelInfo = supportedRevitFileInfo.GetRevitCloudModelInfo()
+                    cloudProjectId = revitCloudModelInfo.GetProjectGuid().ToString()
+                    cloudModelId = revitCloudModelInfo.GetModelGuid().ToString()
+                else:
+                    revitFilePath = supportedRevitFileInfo.GetRevitFileInfo().GetFullPath()
+                    cloudProjectId = str.Empty
+                    cloudModelId = str.Empty
+
                 snapshotDataExportFolderPath = str.Empty
-                revitFilePath = supportedRevitFileInfo.GetRevitFileInfo().GetFullPath()
                 
                 if batchRvtConfig.EnableDataExport:
                     snapshotDataExportFolderPath = snapshot_data_util.GetSnapshotFolderPath(
                             batchRvtConfig.DataExportFolderPath,
                             revitFilePath,
+                            isCloudModel,
+                            cloudProjectId,
+                            cloudModelId,
                             batchRvtConfig.SessionStartTime
                         )
                     path_util.CreateDirectory(snapshotDataExportFolderPath)
                     snapshotDataExportFolderPaths.append(snapshotDataExportFolderPath)
 
-                revitFilePath = supportedRevitFileInfo.GetRevitFileInfo().GetFullPath()
                 scriptData = ScriptDataUtil.ScriptData()
                 scriptData.SessionId.SetValue(batchRvtConfig.SessionId)
                 scriptData.TaskScriptFilePath.SetValue(batchRvtConfig.ScriptFilePath)
                 scriptData.RevitFilePath.SetValue(revitFilePath)
+                scriptData.IsCloudModel.SetValue(isCloudModel)
+                scriptData.CloudProjectId.SetValue(cloudProjectId)
+                scriptData.CloudModelId.SetValue(cloudModelId)
                 scriptData.TaskData.SetValue(batchRvtConfig.TaskData)
                 scriptData.OpenInUI.SetValue(batchRvtConfig.OpenInUI)
                 scriptData.EnableDataExport.SetValue(batchRvtConfig.EnableDataExport)
