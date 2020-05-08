@@ -170,7 +170,10 @@ def RunBatchTaskScript(scriptFilePath):
                 output()
                 output("Processing file (" + str(progressNumber) + " of " + str(progressMax) + "): " + centralFilePath)
 
-            if revit_file_util.IsWorkshared(centralFilePath):
+            if isCloudModel:
+                output()
+                output("The file is a Cloud Model.")
+            elif revit_file_util.IsWorkshared(centralFilePath):
                 if revit_file_util.IsLocalModel(centralFilePath):
                     output()
                     output("WARNING: the file being processed appears to be a Workshared Local file!")
@@ -231,6 +234,17 @@ def RunBatchTaskScript(scriptFilePath):
             if activeDoc is not None:
                 result = processDocument(activeDoc)
             else:
+                if isCloudModel:
+                    result = revit_script_util.RunCloudDocumentAction(
+                            uiapp,
+                            openInUI,
+                            cloudProjectId,
+                            cloudModelId,
+                            worksetConfigurationOption,
+                            auditOnOpening,
+                            processDocument,
+                            output
+                        )
                 if openCreateNewLocal:
                     revitVersion = RevitVersion.GetSupportedRevitVersion(revit_session.GetSessionRevitVersionNumber())
                     localFilePath = RevitVersion.GetRevitLocalFilePath(revitVersion, centralFilePath)
@@ -273,7 +287,9 @@ def RunBatchTaskScript(scriptFilePath):
             snapshotError = exception_util.GetExceptionDetails(e)
             raise
         finally:
-            if openCreateNewLocal and deleteLocalAfter:
+            if isCloudModel:
+                pass # explicitly do nothing for cloud-based models
+            elif openCreateNewLocal and deleteLocalAfter:
                 try:
                     if File.Exists(localFilePath):
                         output()

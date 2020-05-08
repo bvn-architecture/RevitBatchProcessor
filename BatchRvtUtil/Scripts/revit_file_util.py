@@ -118,6 +118,15 @@ def ToUserVisiblePath(modelPath):
         modelPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
     return modelPath
 
+def ToGuid(guidOrGuidText):
+    return System.Guid(guidOrGuidText) if not isinstance(guidOrGuidText, System.Guid) else guidOrGuidText
+
+def ToCloudPath(cloudProjectId, cloudModelId):
+    cloudProjectGuid = ToGuid(cloudProjectId)
+    cloudModelGuid = ToGuid(cloudModelId)
+    cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(cloudProjectGuid, cloudModelGuid)
+    return cloudPath
+
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
     modelPath = ToModelPath(modelPath)
     localModelPath = ToModelPath(localModelPath)
@@ -161,6 +170,24 @@ def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllW
     if audit:
         openOptions.Audit = True
     return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
+
+def OpenCloudDocument(application, cloudProjectId, cloudModelId, closeAllWorksets=False, worksetConfig=None, audit=False):
+    cloudPath = ToCloudPath(cloudProjectId, cloudModelId)
+    openOptions = OpenOptions()
+    worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
+    openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+    if audit:
+        openOptions.Audit = True
+    return application.OpenDocumentFile(cloudPath, openOptions)
+
+def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, closeAllWorksets=False, worksetConfig=None, audit=False):
+    cloudPath = ToCloudPath(cloudProjectId, cloudModelId)
+    openOptions = OpenOptions()
+    worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
+    openOptions.SetOpenWorksetsConfiguration(worksetConfig)
+    if audit:
+        openOptions.Audit = True
+    return uiApplication.OpenAndActivateDocument(cloudPath, openOptions, False)
 
 def OpenDetachAndDiscardWorksets(application, modelPath, audit=False):
     modelPath = ToModelPath(modelPath)

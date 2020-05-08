@@ -266,6 +266,26 @@ def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, 
             raise
     return result
 
+def WithOpenedCloudDocument(uiapp, openInUI, cloudProjectId, cloudModelId, worksetConfig, audit, documentAction, output):
+    app = uiapp.Application
+    result = None
+    output()
+    output("Opening cloud model.")
+    closeAllWorksets = worksetConfig is None
+    if openInUI:
+        uidoc = revit_file_util.OpenAndActivateCloudDocument(uiapp, cloudProjectId, cloudModelId, closeAllWorksets, worksetConfig, audit)
+        doc = uidoc.Document
+    else:
+        doc = revit_file_util.OpenCloudDocument(app, cloudProjectId, cloudModelId, closeAllWorksets, worksetConfig, audit)
+    try:
+        cloudModelPathText = ModelPathUtils.ConvertModelPathToUserVisiblePath(doc.GetCloudModelPath())
+        output()
+        output("Cloud model path is: " + cloudModelPathText)
+        result = documentAction(doc)
+    finally:
+        SafeCloseWithoutSave(doc, openInUI, "Closed cloud model.", output)
+    return result
+
 def WithOpenedDocument(uiapp, openInUI, revitFilePath, audit, documentAction, output):
     app = uiapp.Application
     result = None
@@ -306,6 +326,22 @@ def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, b
                 openInUI,
                 centralFilePath,
                 localFilePath,
+                CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
+                auditOnOpening,
+                documentAction,
+                output
+            )
+        return result
+    result = WithErrorReportingAndHandling(uiapp, revitAction, output)
+    return result
+
+def RunCloudDocumentAction(uiapp, openInUI, cloudProjectId, cloudModelId, batchRvtWorksetConfigurationOption, auditOnOpening, documentAction, output):
+    def revitAction():
+        result = WithOpenedCloudDocument(
+                uiapp,
+                openInUI,
+                cloudProjectId,
+                cloudModelId,
                 CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
                 auditOnOpening,
                 documentAction,
