@@ -581,7 +581,10 @@ namespace BatchRvtGUI
                     continue;
                 }
 
-                this.batchRvtOutputTextBox.AppendText("[ REVIT ERROR MESSAGE ] : " + line + Environment.NewLine);
+                if (this.Settings.ShowRevitProcessErrorMessages.GetValue() == true)
+                {
+                    this.batchRvtOutputTextBox.AppendText("[ REVIT ERROR MESSAGE ] : " + line + Environment.NewLine);
+                }
             }
 
             if (isBatchRvtRunning)

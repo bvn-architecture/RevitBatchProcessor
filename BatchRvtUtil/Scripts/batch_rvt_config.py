@@ -50,6 +50,7 @@ class BatchRvtConfig:
         self.TaskData = None
         self.TestModeFolderPath = None
         self.SessionDataFolderPath = None
+        self.ShowRevitProcessErrorMessages = False
 
         # General Task Script settings
         self.ScriptFilePath = None
@@ -162,6 +163,7 @@ def ConfigureBatchRvtSettings(batchRvtConfig, batchRvtSettings, output):
     batchRvtConfig.ScriptFilePath = batchRvtSettings.TaskScriptFilePath.GetValue()
     batchRvtConfig.ShowMessageBoxOnTaskError = batchRvtSettings.ShowMessageBoxOnTaskScriptError.GetValue()
     batchRvtConfig.ProcessingTimeOutInMinutes = batchRvtSettings.ProcessingTimeOutInMinutes.GetValue()
+    batchRvtConfig.ShowRevitProcessErrorMessages = batchRvtSettings.ShowRevitProcessErrorMessages.GetValue()
 
     # Revit File List settings
     batchRvtConfig.RevitFileListFilePath = batchRvtSettings.RevitFileListFilePath.GetValue()

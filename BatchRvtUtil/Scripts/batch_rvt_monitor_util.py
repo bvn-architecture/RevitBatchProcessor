@@ -93,13 +93,13 @@ def ShowRevitProcessOutput(processOutputStream, output, pendingReadLineTask=None
                 output("\t" + "- [ REVIT MESSAGE ] : " + line)
     return pendingReadLineTask
 
-def ShowRevitProcessError(processErrorStream, output, pendingReadLineTask=None):
+def ShowRevitProcessError(processErrorStream, showRevitProcessErrorMessages, output, pendingReadLineTask=None):
     outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(processErrorStream, pendingReadLineTask)
     if outputLines.Any():
         for line in outputLines:
             if line.StartsWith("log4cplus:"): # ignore pesky log4cplus messages (an Autodesk thing?)
                 pass
-            else:
+            elif showRevitProcessErrorMessages:
                 output("\t" + "- [ REVIT ERROR MESSAGE ] : " + line)
     return pendingReadLineTask
 
@@ -119,6 +119,7 @@ def RunScriptedRevitSession(
         scriptDatas,
         progressNumber,
         processingTimeOutInMinutes,
+        showRevitProcessErrorMessages,
         testModeFolderPath,
         output
     ):
@@ -172,7 +173,7 @@ def RunScriptedRevitSession(
 
             def monitoringAction():
                 pendingProcessOutputReadLineTask[0] = ShowRevitProcessOutput(hostRevitProcess.StandardOutput, output, pendingProcessOutputReadLineTask[0])
-                pendingProcessErrorReadLineTask[0] = ShowRevitProcessError(hostRevitProcess.StandardError, output, pendingProcessErrorReadLineTask[0])
+                pendingProcessErrorReadLineTask[0] = ShowRevitProcessError(hostRevitProcess.StandardError, showRevitProcessErrorMessages, output, pendingProcessErrorReadLineTask[0])
                 pendingReadLineTask[0] = ShowRevitScriptOutput(scriptOutputStreamReader, output, pendingReadLineTask[0])
                 
                 if time_util.GetSecondsElapsedSinceUtc(progressRecordCheckTimeUtc[0]) > REVIT_PROGRESS_CHECK_INTERVAL_IN_SECONDS:
