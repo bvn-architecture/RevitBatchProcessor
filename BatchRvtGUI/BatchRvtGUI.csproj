@@ -140,10 +140,6 @@
       <Project>{c877620c-de32-455c-bf21-8f3e73e9df68}</Project>
       <Name>BatchRvt</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OpenCloudModel\OpenCloudModel.csproj">
-      <Project>{7d708b1a-46bf-4b86-a231-46781c9855ed}</Project>
-      <Name>OpenCloudModel</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\BVN32new.ico" />

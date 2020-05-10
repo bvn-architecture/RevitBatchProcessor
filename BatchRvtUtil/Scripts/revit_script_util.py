@@ -302,7 +302,7 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, audit, documentAction, ou
     finally:
         SafeCloseWithoutSave(doc, openInUI, "Closed file: " + revitFilePath, output)
     return result
-    
+
 def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, batchRvtWorksetConfigurationOption, auditOnOpening, documentAction, output):
     def revitAction():
         result = WithOpenedDetachedDocument(
@@ -332,13 +332,6 @@ def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, b
                 output
             )
         return result
-  result = WithErrorReportingAndHandling(uiapp, revitAction, output)
-  return result
-
-def RunCloudDocumentAction(uiapp, revitFilePath, auditOnOpening, documentAction, output):
-  def revitAction():
-    result = WithCloudOpenedDocument(uiapp, revitFilePath, auditOnOpening, documentAction, output)
-    return result
     result = WithErrorReportingAndHandling(uiapp, revitAction, output)
     return result
 

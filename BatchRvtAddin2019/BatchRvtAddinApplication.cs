@@ -38,8 +38,6 @@ namespace BatchRvt.Addin.Revit2019
     [Description("BatchRvtAddin")]
     public class BatchRvtAddinApplication : IExternalApplication
     {
-        private static Queue<CloudTask> IdlingQueue = new Queue<CloudTask>();
-
         private static void SetupBatchScriptHost(ControlledApplication controlledApplication)
         {
             var pluginFolderPath = Path.GetDirectoryName(typeof(BatchRvtAddinApplication).Assembly.Location);
@@ -49,47 +47,11 @@ namespace BatchRvt.Addin.Revit2019
             batchRvtExternalEventHandler.Raise();
         }
 
-        private static void SetupCloudScriptHost(UIControlledApplication uiApp, string rvtPath)
-        {
-            //var keepRunning = !CloudUtil.IsLastFileInBatch();
-            var keepRunning = true;
-            IdlingQueue.Enqueue(new CloudTask(_uiApp => { CloudUtil.OpenWithWhite(rvtPath, keepRunning); }));
-            IdlingQueue.Enqueue(new CloudTask(_uiApp => { SetupBatchScriptHost(uiApp.ControlledApplication); }, true));
-            uiApp.Idling += IdleTaskExecution;
-        }
-
         public Result OnStartup(UIControlledApplication uiApplication)
         {
-            CloudUtil.GetScriptDataValue<string>("revitFilePath", out var rvtPath);
-
-            if (rvtPath != null && CloudUtil.IsCloudPath(rvtPath))
-               SetupCloudScriptHost(uiApplication, rvtPath);
-            else
-                SetupBatchScriptHost(uiApplication.ControlledApplication);
+            SetupBatchScriptHost(uiApplication.ControlledApplication);
 
             return Result.Succeeded;
-        }
-
-        private static void IdleTaskExecution(object sender, Autodesk.Revit.UI.Events.IdlingEventArgs e)
-        {
-            if (!IdlingQueue.Any())
-                return;
-
-            var uiApp = sender as UIApplication;
-            var task = IdlingQueue.Dequeue();
-            if (!task.IsDocumentAction)
-                task.Execute(uiApp);
-            else
-            {
-                var doc = uiApp.ActiveUIDocument?.Document;
-                if (doc == null && task.Tries > 0)
-                {
-                    task.Tries--;
-                    IdlingQueue.Enqueue(task);
-                    return;
-                }
-                task.Execute(uiApp);
-            }
         }
 
         public Result OnShutdown(UIControlledApplication application)
@@ -129,24 +91,6 @@ namespace BatchRvt.Addin.Revit2019
         public ExternalEventRequest Raise()
         {
             return this.externalEvent_.Raise();
-        }
-    }
-
-    public class CloudTask
-    {
-        public Action<UIApplication> Action;
-        public bool IsDocumentAction;
-        public int Tries = 3000;
-
-        public CloudTask(Action<UIApplication> act, bool isDocAct = false)
-        {
-            Action = act;
-            IsDocumentAction = isDocAct;
-        }
-
-        public void Execute(UIApplication uiApp)
-        {
-            Action.Invoke(uiApp);
         }
     }
 }

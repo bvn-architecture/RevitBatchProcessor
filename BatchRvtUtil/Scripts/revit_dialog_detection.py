@@ -28,7 +28,6 @@ import global_test_mode
 
 REVIT_DIALOG_MESSAGE_HANDLER_PREFIX = "[ REVIT DIALOG BOX HANDLER ]"
 
-OPEN_FILE_WINDOW_TITLE = "Open"
 MODEL_UPGRADE_WINDOW_TITLE = "Model Upgrade"
 LOAD_LINK_WINDOW_TITLE = "Load Link"
 CHANGES_NOT_SAVED_TITLE = "Changes Not Saved"
@@ -132,8 +131,6 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
             revitDialog = RevitDialogInfo(enabledDialog.Hwnd)
             buttons = revitDialog.Buttons
             win32Buttons = revitDialog.Win32Buttons
-      if enabledDialog.WindowText == OPEN_FILE_WINDOW_TITLE:
-        continue
             if enabledDialog.WindowText == MODEL_UPGRADE_WINDOW_TITLE and len(buttons) == 0:
                 pass # Do nothing for model upgrade dialog box. It has no buttons and will go away on its own.
             elif (
