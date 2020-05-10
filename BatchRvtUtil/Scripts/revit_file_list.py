@@ -125,6 +125,9 @@ class RevitCloudModelInfo:
         parsed, guid = Guid.TryParse(guidText)
         return guid if parsed else None
 
+    def GetCloudModelDescriptor(self):
+        return self.cloudModelDescriptor
+
 class RevitFileInfo():
     def __init__(self, revitFilePath):
         self.cloudModelInfo = RevitCloudModelInfo(revitFilePath)
@@ -154,7 +157,11 @@ class RevitFileInfo():
         return isinstance(self.pathException, PathTooLongException)
 
     def GetFullPath(self):
-        return self.revitFilePath
+        return (
+                self.revitFilePath if not self.IsCloudModel()
+                else
+                self.GetRevitCloudModelInfo().GetCloudModelDescriptor()
+            )
 
     def GetFileSize(self):
         return path_util.GetFileSize(self.revitFilePath)

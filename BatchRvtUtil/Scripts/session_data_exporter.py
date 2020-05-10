@@ -64,7 +64,15 @@ def ExportSessionData(sessionId, sessionStartTime, sessionEndTime, sessionDataFo
 def GetSessionFilesData(sessionId, sessionFiles):
     sessionFilesData = {
             "sessionId" : sessionId,
-            "sessionFiles" : [path_util.ExpandedFullNetworkPath(filePath) for filePath in sessionFiles]
+            "sessionFiles" : [
+                    (
+                        path_util.ExpandedFullNetworkPath(filePath)
+                        if Path.IsPathRooted(filePath)
+                        # Cloud models 'paths' are not normal file paths so this accounts for that.
+                        else filePath
+                    )
+                    for filePath in sessionFiles
+                ]
         }
     
     return sessionFilesData
