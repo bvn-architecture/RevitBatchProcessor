@@ -311,9 +311,19 @@ def TryGetBasicFileInfo(revitFilePath):
         basicfileInfo = None
     return basicFileInfo
 
+def GetSavedInVersion(basicFileInfo):
+    savedInVersion = None
+    try:
+        # <= Revit 2019
+        savedInVersion = basicFileInfo.SavedInVersion
+    except System.MissingMemberException, e:
+        # Revit 2020+
+        savedInVersion = basicFileInfo.Format
+    return savedInVersion
+
 def GetRevitFileVersion(revitFilePath):
     basicFileInfo = TryGetBasicFileInfo(revitFilePath)
-    savedInVersion = basicFileInfo.SavedInVersion if basicFileInfo is not None else None
+    savedInVersion = GetSavedInVersion(basicFileInfo) if basicFileInfo is not None else None
     return savedInVersion
 
 def IsLocalModel(revitFilePath):
