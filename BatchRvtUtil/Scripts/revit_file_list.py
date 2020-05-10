@@ -31,6 +31,7 @@ import console_util
 import path_util
 import revit_file_version
 import batch_rvt_util
+import cloud_util
 from batch_rvt_util import RevitVersion
 
 class RevitFilePathData:

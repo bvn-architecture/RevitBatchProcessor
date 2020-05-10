@@ -56,11 +56,16 @@
       <HintPath>..\References\IronPython-2.7.3\Microsoft.Scripting.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NewtonSoft.Json">
+      <HintPath>..\..\..\Program Files\Autodesk\Revit 2019\NewtonSoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Util\CloudUtil.cs" />
     <Compile Include="Util\ScriptHostUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\ScriptUtil.cs" />

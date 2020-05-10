@@ -84,6 +84,8 @@ namespace BatchRvtGUI
         private Task<string> pendingOutputReadLineTask;
         private Task<string> pendingErrorReadLineTask;
 
+        private Process openCloudProcess = null;
+
         public BatchRvtGuiForm()
         {
             InitializeComponent();
@@ -406,6 +408,8 @@ namespace BatchRvtGUI
 
         private void BatchRvtGuiForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (openCloudProcess != null && !openCloudProcess.HasExited)
+                this.openCloudProcess.Kill();
             if (this.isBatchRvtRunning)
             {
                 var message = new StringBuilder();
@@ -549,6 +553,7 @@ namespace BatchRvtGUI
                 var settingsFilePath = BatchRvtSettings.GetDefaultSettingsFilePath();
                 
                 this.batchRvtProcess = BatchRvt.StartBatchRvt(settingsFilePath);
+                this.openCloudProcess = BatchRvt.StartOpenCloud();
 
                 this.readBatchRvtOutput_Timer = new Timer() { Interval = READ_OUTPUT_INTERVAL_IN_MS };
                 this.readBatchRvtOutput_Timer.Tick += readBatchRvtOutput_Timer_Tick;
