@@ -105,6 +105,7 @@ Daniel Rumery [@DanRumery](https://github.com/DanRumery) (Original / Primary Aut
 
 - Vincent Cadoret [@vinnividivicci](https://github.com/vinnividivicci)
 - Ryan Schwartz [@RyanSchw](https://github.com/RyanSchw)
+- Dimitar Venkov [@dimven](https://github.com/dimven)
 
 # Usage
 
