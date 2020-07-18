@@ -3,15 +3,11 @@
 
 Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
 
-## Latest version
+## Latest version (NEW)
 
-[Installer for Revit Batch Processor v1.5.3](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.5.3/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.6.0](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.6.0/RevitBatchProcessorSetup.exe)
 
-See the [Releases](https://github.com/bvn-architecture/RevitBatchProcessor/releases) page for more information.
-
-## New beta version available for testing
-
-Version 1.6.0-beta release is available, bringing support for **Revit 2021** and limited support for processing BIM360 cloud models!
+Version 1.6.0 release is available, bringing support for **Revit 2021** and limited support for processing BIM360 cloud models!
 
 See the [Releases](https://github.com/bvn-architecture/RevitBatchProcessor/releases) page for more information.
 
