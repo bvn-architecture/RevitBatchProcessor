@@ -54,7 +54,7 @@ This tool enables you to do things with Revit files on a very large scale. Becau
 
 ## Installer
 
-[Installer for Revit Batch Processor v1.5.3](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.5.3/RevitBatchProcessorSetup.exe)
+[Installer for Revit Batch Processor v1.6.0](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.6.0-beta/RevitBatchProcessorSetup.exe)
 
 The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
 
@@ -121,6 +121,22 @@ The ***two ingredients*** you will need in order to use the Revit Batch Processo
   ```
 
   NOTE: you can generate this list in .txt format using the *New List* button in the GUI. It will prompt you for a folder to scan for Revit files. Optionally you can specify the type of Revit files to scan for and also whether to include subfolders in the scan.
+
+  *New in version 1.6+*
+
+  There is limited support for processing files in BIM360. For BIM360-hosted files, use the following format instead:
+
+  `<Revit version> <Project Guid> <Model Guid>`
+  
+  *Note: these three components must be separated by space(s) (not tabs!).*
+
+  For example:
+  ```
+  2020 75b6464c-ba0f-4529-b049-0de9e473c2d6 0d54b8cc-3837-4df2-8c8e-0a94f4828868
+  2020 c0dc2fda-fd34-42fe-8bb7-bd9f43841dbf d9f011d6-d52c-4c9f-9d7b-eb8388bd3ed0
+  ```
+
+  RBP is not able to detect the Revit version of cloud models hence why the Revit version is specified explicitly.
 
 - A **Dynamo (.dyn)** or **Python (.py)** task script. This script will be executed once for each file in the list.
 
