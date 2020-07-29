@@ -11,6 +11,12 @@ Version 1.6.0 release is available, bringing support for **Revit 2021** and limi
 
 See the [Releases](https://github.com/bvn-architecture/RevitBatchProcessor/releases) page for more information.
 
+## RBP Sample Scripts
+
+[Click here for some sample RBP python scripts maintained by Jan Christel (@jchristel)](https://github.com/jchristel/SampleCodeRevitBatchProcessor/)
+
+Many thanks to Jan for authoring and making these RBP sample scripts public!
+
 ## FAQ
 
 See the [Revit Batch Processor FAQ](https://github.com/bvn-architecture/RevitBatchProcessor/wiki/Revit-Batch-Processor-FAQ).
