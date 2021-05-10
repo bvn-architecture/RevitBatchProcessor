@@ -1,4 +1,7 @@
 
+<span style="color:green; font-size:16px"> ATTENTION: Due to other commitments I'm unable to support RBP for the near future. For questions please seek help from the community such as the Dynamo and Revit API forums.
+</span>
+
 # Revit Batch Processor (RBP)
 
 Fully automated batch processing of Revit files with your own Python or Dynamo task scripts!
