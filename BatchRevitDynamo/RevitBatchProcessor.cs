@@ -167,7 +167,7 @@ namespace BatchRevitDynamo
         /// <param name="logFolderPath"></param>
         /// <param name="fileProcessingTimeOutInMinutes"></param>
         /// <param name="fallbackToMinimumAvailableRevitVersion"></param>
-        /// 
+        ///
         /// <returns></returns>
         public static string RunTaskOnListFile(
                 bool toggleToExecute, // TODO: reconsider if this is needed here.
@@ -209,7 +209,8 @@ namespace BatchRevitDynamo
                 Revit2018 = 4,
                 Revit2019 = 5,
                 Revit2020 = 6,
-                Revit2021 = 7
+                Revit2021 = 7,
+                Revit2022 = 8
         }
         public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1 }
         public enum CentralFileOpenOption { Detach = 0, CreateNewLocal = 1 }
