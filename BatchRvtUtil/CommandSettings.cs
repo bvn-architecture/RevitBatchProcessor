@@ -80,7 +80,7 @@ namespace BatchRvtUtil
         public static string ParseTextOptionValue(string textOptionValue)
         {
             string parsedValue = null;
-            
+
             if (!string.IsNullOrWhiteSpace(textOptionValue))
             {
                 parsedValue = textOptionValue.Trim();
@@ -105,7 +105,7 @@ namespace BatchRvtUtil
             if (!string.IsNullOrWhiteSpace(filePathOptionValue))
             {
                 var fullFilePath = PathUtil.GetFullPath(filePathOptionValue);
-                
+
                 if (PathUtil.FileExists(fullFilePath))
                 {
                     parsedValue = fullFilePath;
@@ -146,7 +146,7 @@ namespace BatchRvtUtil
                     parsedValue = false;
                 }
             }
-            
+
             return parsedValue;
         }
 

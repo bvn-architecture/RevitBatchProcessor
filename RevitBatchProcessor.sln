@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2020", "BatchR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2021", "BatchRvtAddin2021\BatchRvtAddin2021.csproj", "{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2022", "BatchRvtAddin2022\BatchRvtAddin2022.csproj", "{5529D2BF-74BD-47A8-A6DE-37006AC07C0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +93,10 @@ Global
 		{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}.Debug|x64.Build.0 = Debug|x64
 		{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}.Release|x64.ActiveCfg = Release|x64
 		{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}.Release|x64.Build.0 = Release|x64
+		{5529D2BF-74BD-47A8-A6DE-37006AC07C0C}.Debug|x64.ActiveCfg = Debug|x64
+		{5529D2BF-74BD-47A8-A6DE-37006AC07C0C}.Debug|x64.Build.0 = Debug|x64
+		{5529D2BF-74BD-47A8-A6DE-37006AC07C0C}.Release|x64.ActiveCfg = Release|x64
+		{5529D2BF-74BD-47A8-A6DE-37006AC07C0C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

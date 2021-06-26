@@ -430,7 +430,7 @@ namespace BatchRvtGUI
                     {
                         this.batchRvtProcess.Kill();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         // TODO: report failure to kill the process?
                     }
@@ -539,7 +539,7 @@ namespace BatchRvtGUI
             this.UIConfiguration.UpdateConfig();
 
             bool validated = ValidateConfig();
-            
+
             if (validated)
             {
                 bool isSaved = SaveSettings();
@@ -547,7 +547,7 @@ namespace BatchRvtGUI
                 // TODO: show error message if save failed!!
 
                 var settingsFilePath = BatchRvtSettings.GetDefaultSettingsFilePath();
-                
+
                 this.batchRvtProcess = BatchRvt.StartBatchRvt(settingsFilePath);
 
                 this.readBatchRvtOutput_Timer = new Timer() { Interval = READ_OUTPUT_INTERVAL_IN_MS };
@@ -1100,7 +1100,7 @@ namespace BatchRvtGUI
                 File.WriteAllText(scriptFilePath, scriptContents);
                 success = true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 success = false;
             }
@@ -1226,7 +1226,7 @@ namespace BatchRvtGUI
                                             TextFileUtil.WriteToTabDelimitedTxtFile(rows, revitFileListPath);
                                             isSaved = true;
                                         }
-                                        catch (Exception ex)
+                                        catch (Exception)
                                         {
                                             isSaved = false;
                                         }

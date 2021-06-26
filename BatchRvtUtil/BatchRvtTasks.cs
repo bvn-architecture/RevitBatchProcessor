@@ -172,7 +172,10 @@ namespace BatchRvtUtil
                     RevitVersion.SupportedRevitVersion.Revit2019 :
                     useRevitVersion == UseRevitVersion.Revit2020 ?
                     RevitVersion.SupportedRevitVersion.Revit2020 :
-                    RevitVersion.SupportedRevitVersion.Revit2021
+                    useRevitVersion == UseRevitVersion.Revit2021 ?
+                    RevitVersion.SupportedRevitVersion.Revit2021 :
+                    RevitVersion.SupportedRevitVersion.Revit2022
+
                 );
 
             var batchRvtSettings = BatchRvtSettings.Create(
@@ -304,7 +307,8 @@ namespace BatchRvtUtil
                 Revit2018 = 4,
                 Revit2019 = 5,
                 Revit2020 = 6,
-                Revit2021 = 7
+                Revit2021 = 7,
+                Revit2022 = 8
         }
     }
 }

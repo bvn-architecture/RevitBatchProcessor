@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2022", "BatchRvtAddin2022.csproj", "{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}.Debug|x64.ActiveCfg = Debug|x64
+		{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}.Debug|x64.Build.0 = Debug|x64
+		{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}.Release|x64.ActiveCfg = Release|x64
+		{1A6FE589-4B85-4094-AFB7-48E7637B6ED0}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {31EA89A2-405D-42E0-A167-C7732D13B3C1}
+	EndGlobalSection
+EndGlobal
