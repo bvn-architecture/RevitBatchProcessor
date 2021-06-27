@@ -30,6 +30,10 @@ echo.
 echo Removing BatchRvt addin for Revit 2021
 call RemoveAddin.bat 2021
 
+echo.
+echo Removing BatchRvt addin for Revit 2022
+call RemoveAddin.bat 2022
+
 echo Done.
 echo.
 
