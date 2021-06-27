@@ -113,7 +113,7 @@ Daniel Rumery [@DanRumery](https://github.com/DanRumery) (Original / Primary Aut
 - Vincent Cadoret [@vinnividivicci](https://github.com/vinnividivicci)
 - Ryan Schwartz [@RyanSchw](https://github.com/RyanSchw)
 - Dimitar Venkov [@dimven](https://github.com/dimven)
-- Nicklas �stergaard [@NicklasOestergaard](https://github.com/NicklasOestergaard) (Upgraded support for Revit 2022)
+- Nicklas Ostergaard [@NicklasOestergaard](https://github.com/NicklasOestergaard) (Upgraded support for Revit 2022)
 
 # Usage
 
