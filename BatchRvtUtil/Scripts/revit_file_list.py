@@ -89,10 +89,10 @@ class RevitCloudModelInfo:
         self.isValid = False
         parts = self.GetCloudModelDescriptorParts(cloudModelDescriptor)
         numberOfParts = len(parts)
-        if numberOfParts == 2 or numberOfParts == 3:
+        if numberOfParts > 1 :
             revitVersionPart = str.Empty
             otherParts = parts
-            if numberOfParts == 3:
+            if numberOfParts > 2 :
                 revitVersionPart = parts[0]
                 otherParts = parts[1:]
             self.projectGuid = self.SafeParseGuidText(otherParts[0])
