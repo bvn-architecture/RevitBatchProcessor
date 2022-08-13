@@ -340,7 +340,8 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
                 snapshotDataExportFolderPath = str.Empty
                 
                 if batchRvtConfig.EnableDataExport:
-                    snapshotDataExportFolderPath = snapshot_data_util.GetSnapshotFolderPath(
+                    try:
+                        snapshotDataExportFolderPath = snapshot_data_util.GetSnapshotFolderPath(
                             batchRvtConfig.DataExportFolderPath,
                             revitFilePath,
                             isCloudModel,
@@ -348,9 +349,11 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
                             cloudModelId,
                             batchRvtConfig.SessionStartTime
                         )
-                    path_util.CreateDirectory(snapshotDataExportFolderPath)
-                    snapshotDataExportFolderPaths.append(snapshotDataExportFolderPath)
-
+                        path_util.CreateDirectory(snapshotDataExportFolderPath)
+                        snapshotDataExportFolderPaths.append(snapshotDataExportFolderPath)
+                    except Exception as ex:
+                            Output("Failed to write session data: " + str(ex))
+                    
                 scriptData = ScriptDataUtil.ScriptData()
                 scriptData.SessionId.SetValue(batchRvtConfig.SessionId)
                 scriptData.TaskScriptFilePath.SetValue(batchRvtConfig.ScriptFilePath)
@@ -448,9 +451,10 @@ def RunBatchRevitTasks(batchRvtConfig):
         Output("Revit Files for processing (" + str(supportedCount) + "):")
         for supportedRevitFileInfo in supportedRevitFileList:
             batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo, Output)
-
-        if batchRvtConfig.EnableDataExport:
-            session_data_exporter.ExportSessionFilesData(
+       
+        try:
+            if batchRvtConfig.EnableDataExport:
+                session_data_exporter.ExportSessionFilesData(
                     batchRvtConfig.SessionDataFolderPath,
                     batchRvtConfig.SessionId,
                     [
@@ -458,6 +462,8 @@ def RunBatchRevitTasks(batchRvtConfig):
                         for supportedRevitFileInfo in supportedRevitFileList
                     ]
                 )
+        except Exception as ex:
+            Output("Failed to write session data: " + str(ex))
 
     if not aborted:
         Output()

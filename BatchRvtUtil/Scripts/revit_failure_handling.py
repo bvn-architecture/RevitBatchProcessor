@@ -112,6 +112,10 @@ def ProcessFailures(failuresAccessor, output, rollBackOnWarning=False):
                     elif failureDefinition.IsResolutionApplicable(FailureResolutionType.UnlockConstraints):
                         output()
                         output("\t" + "WARNING: UnlockConstraints is not a valid resolution for this failure despite the definition reporting that it is an applicable resolution!")
+                    elif failure.HasResolutionOfType(FailureResolutionType.DetachElements):
+                        failure.SetCurrentResolutionType(FailureResolutionType.DetachElements)
+                    elif failure.HasResolutionOfType(FailureResolutionType.SkipElements):
+                        failure.SetCurrentResolutionType(FailureResolutionType.SkipElements)
                     output()
                     output("\t" + "Attempting to resolve error using resolution: " + str(failure.GetCurrentResolutionType()))
                     failuresAccessor.ResolveFailure(failure)
