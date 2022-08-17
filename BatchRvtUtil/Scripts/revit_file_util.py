@@ -127,6 +127,15 @@ def ToCloudPath(cloudProjectId, cloudModelId):
     cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(cloudProjectGuid, cloudModelGuid)
     return cloudPath
 
+def ToCloudPath2021(cloudProjectId, cloudModelId):
+    cloudProjectGuid = ToGuid(cloudProjectId)
+    cloudModelGuid = ToGuid(cloudModelId)
+    try:
+        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(ModelPathUtils.CloudRegionUS, cloudProjectGuid, cloudModelGuid)
+    except:
+        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(ModelPathUtils.CloudRegionEMEA, cloudProjectGuid, cloudModelGuid)
+    return cloudPath
+
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
     modelPath = ToModelPath(modelPath)
     localModelPath = ToModelPath(localModelPath)
@@ -171,8 +180,17 @@ def OpenAndActivateDetachAndPreserveWorksets(uiApplication, modelPath, closeAllW
         openOptions.Audit = True
     return uiApplication.OpenAndActivateDocument(modelPath, openOptions, False)
 
+def IsRvt2021_OrNewer(application):
+    try:
+        return int(application.VersionNumber) > 2020
+    except:
+        return false
+
 def OpenCloudDocument(application, cloudProjectId, cloudModelId, closeAllWorksets=False, worksetConfig=None, audit=False):
-    cloudPath = ToCloudPath(cloudProjectId, cloudModelId)
+    if IsRvt2021_OrNewer(application):
+        cloudPath = ToCloudPath2021(cloudProjectId, cloudModelId)
+    else:
+        cloudPath = ToCloudPath(cloudProjectId, cloudModelId)
     openOptions = OpenOptions()
     worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
@@ -181,7 +199,10 @@ def OpenCloudDocument(application, cloudProjectId, cloudModelId, closeAllWorkset
     return application.OpenDocumentFile(cloudPath, openOptions)
 
 def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, closeAllWorksets=False, worksetConfig=None, audit=False):
-    cloudPath = ToCloudPath(cloudProjectId, cloudModelId)
+    if IsRvt2021_OrNewer(uiApplication.Application):
+        cloudPath = ToCloudPath2021(cloudProjectId, cloudModelId)
+    else:
+        cloudPath = ToCloudPath(cloudProjectId, cloudModelId)
     openOptions = OpenOptions()
     worksetConfig = ParseWorksetConfigurationOption(closeAllWorksets, worksetConfig)
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
