@@ -34,7 +34,8 @@ namespace BatchRvtUtil
                 Revit2019 = 4,
                 Revit2020 = 5,
                 Revit2021 = 6,
-                Revit2022 = 7
+                Revit2022 = 7,
+                Revit2023 = 8
         }
 
         private const string REVIT_EXECUTABLE_FILE_NAME = "Revit.exe";
@@ -49,7 +50,8 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2019, @".\Autodesk\Revit\Addins\2019" },
                 { SupportedRevitVersion.Revit2020, @".\Autodesk\Revit\Addins\2020" },
                 { SupportedRevitVersion.Revit2021, @".\Autodesk\Revit\Addins\2021" },
-                { SupportedRevitVersion.Revit2022, @".\Autodesk\Revit\Addins\2022" }
+                { SupportedRevitVersion.Revit2022, @".\Autodesk\Revit\Addins\2022" },
+                { SupportedRevitVersion.Revit2023, @".\Autodesk\Revit\Addins\2023" }
             };
 
         private static readonly Dictionary<SupportedRevitVersion, string> SUPPORTED_REVIT_VERSION_NUMBERS =
@@ -62,7 +64,8 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2019, "2019" },
                 { SupportedRevitVersion.Revit2020, "2020" },
                 { SupportedRevitVersion.Revit2021, "2021" },
-                { SupportedRevitVersion.Revit2022, "2022" }
+                { SupportedRevitVersion.Revit2022, "2022" },
+                { SupportedRevitVersion.Revit2023, "2023" }
             };
 
         private static readonly Dictionary<SupportedRevitVersion, IEnumerable<string>> REVIT_EXECUTABLE_FOLDER_PATHS =
@@ -127,6 +130,13 @@ namespace BatchRvtUtil
                         @"C:\Program Files\Autodesk\Revit 2022",
                         @"D:\Program Files\Autodesk\Revit 2022"
                     }
+                },
+                {
+                    SupportedRevitVersion.Revit2023,
+                    new [] {
+                        @"C:\Program Files\Autodesk\Revit 2023",
+                        @"D:\Program Files\Autodesk\Revit 2023"
+                    }
                 }
             };
 
@@ -140,7 +150,8 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2019, @"C:\REVIT_LOCAL2019" },
                 { SupportedRevitVersion.Revit2020, @"C:\REVIT_LOCAL2020" },
                 { SupportedRevitVersion.Revit2021, @"C:\REVIT_LOCAL2021" },
-                { SupportedRevitVersion.Revit2022, @"C:\REVIT_LOCAL2022" }
+                { SupportedRevitVersion.Revit2022, @"C:\REVIT_LOCAL2022" },
+                { SupportedRevitVersion.Revit2023, @"C:\REVIT_LOCAL2023" }
             };
 
         public static string GetRevitExecutableFolderPath(SupportedRevitVersion revitVersion)
