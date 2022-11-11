@@ -13,7 +13,7 @@ SetupLogging=True
 ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 DefaultGroupName=Revit Batch Processor
-OutputBaseFilename=RevitBatchProcessorSetup
+OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}
 
 [Files]
 Source: "..\BatchRvtGUI\bin\x64\Release\*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
