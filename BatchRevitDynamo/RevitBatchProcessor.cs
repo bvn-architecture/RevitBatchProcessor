@@ -210,7 +210,8 @@ namespace BatchRevitDynamo
                 Revit2019 = 5,
                 Revit2020 = 6,
                 Revit2021 = 7,
-                Revit2022 = 8
+                Revit2022 = 8,
+                Revit2023 = 9
         }
         public enum RevitSessionOption { UseSeparateSessionPerFile = 0, UseSameSessionForFilesOfSameVersion = 1 }
         public enum CentralFileOpenOption { Detach = 0, CreateNewLocal = 1 }
