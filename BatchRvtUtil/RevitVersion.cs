@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Microsoft.Win32;
 
 namespace BatchRvtUtil
 {
@@ -34,7 +35,8 @@ namespace BatchRvtUtil
                 Revit2019 = 4,
                 Revit2020 = 5,
                 Revit2021 = 6,
-                Revit2022 = 7
+                Revit2022 = 7,
+                Revit2023 = 8
         }
 
         private const string REVIT_EXECUTABLE_FILE_NAME = "Revit.exe";
@@ -49,7 +51,8 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2019, @".\Autodesk\Revit\Addins\2019" },
                 { SupportedRevitVersion.Revit2020, @".\Autodesk\Revit\Addins\2020" },
                 { SupportedRevitVersion.Revit2021, @".\Autodesk\Revit\Addins\2021" },
-                { SupportedRevitVersion.Revit2022, @".\Autodesk\Revit\Addins\2022" }
+                { SupportedRevitVersion.Revit2022, @".\Autodesk\Revit\Addins\2022" },
+                { SupportedRevitVersion.Revit2023, @".\Autodesk\Revit\Addins\2023" }
             };
 
         private static readonly Dictionary<SupportedRevitVersion, string> SUPPORTED_REVIT_VERSION_NUMBERS =
@@ -62,73 +65,87 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2019, "2019" },
                 { SupportedRevitVersion.Revit2020, "2020" },
                 { SupportedRevitVersion.Revit2021, "2021" },
-                { SupportedRevitVersion.Revit2022, "2022" }
+                { SupportedRevitVersion.Revit2022, "2022" },
+                { SupportedRevitVersion.Revit2023, "2023" }
             };
 
-        private static readonly Dictionary<SupportedRevitVersion, IEnumerable<string>> REVIT_EXECUTABLE_FOLDER_PATHS =
-            new Dictionary<SupportedRevitVersion, IEnumerable<string>>()
+        private static Dictionary<SupportedRevitVersion,string> REVIT_EXECUTABLE_FOLDER_PATHS()
+        {
+            var revitInstallPaths = new Dictionary<SupportedRevitVersion, string>();
+            foreach (var versionName in Enum.GetNames(typeof(SupportedRevitVersion)))
             {
+                SupportedRevitVersion enumOfVersion = (SupportedRevitVersion)Enum.Parse(typeof(SupportedRevitVersion), versionName);
+
+                var installLocation = GetRevitInstallPath(enumOfVersion); 
+                if (installLocation == null)
                 {
-                    SupportedRevitVersion.Revit2015,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2015",
-                        @"C:\Program Files\Autodesk\Revit Architecture 2015",
-                        @"D:\Program Files\Autodesk\Revit 2015",
-                        @"D:\Program Files\Autodesk\Revit Architecture 2015"
-                    }
-                },
-                {
-                    SupportedRevitVersion.Revit2016,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2016",
-                        @"C:\Program Files\Autodesk\Revit Architecture 2016",
-                        @"D:\Program Files\Autodesk\Revit 2016",
-                        @"D:\Program Files\Autodesk\Revit Architecture 2016",
-                    }
-                },
-                {
-                    SupportedRevitVersion.Revit2017,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2017",
-                        @"D:\Program Files\Autodesk\Revit 2017"
-                    }
-                },
-                {
-                    SupportedRevitVersion.Revit2018,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2018",
-                        @"D:\Program Files\Autodesk\Revit 2018"
-                    }
-                },
-                {
-                    SupportedRevitVersion.Revit2019,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2019",
-                        @"D:\Program Files\Autodesk\Revit 2019"
-                    }
-                },
-                {
-                    SupportedRevitVersion.Revit2020,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2020",
-                        @"D:\Program Files\Autodesk\Revit 2020"
-                    }
-                },
-                {
-                    SupportedRevitVersion.Revit2021,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2021",
-                        @"D:\Program Files\Autodesk\Revit 2021"
-                    }
-                },
-                {
-                    SupportedRevitVersion.Revit2022,
-                    new [] {
-                        @"C:\Program Files\Autodesk\Revit 2022",
-                        @"D:\Program Files\Autodesk\Revit 2022"
-                    }
+                    continue;
                 }
-            };
+                revitInstallPaths.Add(enumOfVersion, GetRevitInstallPath(enumOfVersion));
+            }
+
+            return revitInstallPaths;
+        }
+
+        private static string GetRevitInstallPath(SupportedRevitVersion revitVersion)
+        {
+            var versionName = Enum.GetName(typeof(SupportedRevitVersion), revitVersion); 
+            var version = versionName?.Remove(0, 5);
+            var appPath = $@"SOFTWARE\Autodesk\Revit\{version}";
+            if (appPath == null) throw new ArgumentNullException(nameof(appPath));
+            using (var sk = Registry.LocalMachine.OpenSubKey(appPath))
+            {
+                if (sk is null)
+                {
+                    return null;
+                }
+
+                string revitSubkey = null;
+                foreach (var revitKey in sk.GetSubKeyNames())
+                {
+                    if (!revitKey.Contains("REVIT-"))
+                    {
+                        continue;
+                    }
+
+                    revitSubkey = revitKey;
+
+                }
+                if (revitSubkey == null)
+                {
+                    return null;
+                }
+
+                using (var rk = sk.OpenSubKey(revitSubkey))
+                {
+                    if (rk is null)
+                    {
+                        return null;
+                    }
+                    var displayName = rk.GetValue("ProductName");
+                    var installLocation = rk.GetValue("InstallationLocation");
+                    return installLocation?.ToString();
+                }
+            }
+        }
+
+        public static string GetRevitExecutableFolderPath(SupportedRevitVersion revitVersion)
+        {
+
+            if (GetRevitInstallPath(revitVersion) == null)
+            {
+                return null;
+            }
+            return File.Exists((Path.Combine(GetRevitInstallPath(revitVersion) ?? string.Empty, REVIT_EXECUTABLE_FILE_NAME))) ? GetRevitInstallPath(revitVersion) : null;
+        }
+
+        public static List<SupportedRevitVersion> GetInstalledRevitVersions()
+        {
+            return REVIT_EXECUTABLE_FOLDER_PATHS().Keys
+                .Where(IsRevitVersionInstalled)
+                .Where(BatchRvt.IsBatchRvtAddinInstalled)
+                .ToList();
+        }
 
         private static readonly Dictionary<SupportedRevitVersion, string> REVIT_LOCAL_FOLDER_PATHS =
             new Dictionary<SupportedRevitVersion, string>()
@@ -140,22 +157,9 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2019, @"C:\REVIT_LOCAL2019" },
                 { SupportedRevitVersion.Revit2020, @"C:\REVIT_LOCAL2020" },
                 { SupportedRevitVersion.Revit2021, @"C:\REVIT_LOCAL2021" },
-                { SupportedRevitVersion.Revit2022, @"C:\REVIT_LOCAL2022" }
+                { SupportedRevitVersion.Revit2022, @"C:\REVIT_LOCAL2022" },
+                { SupportedRevitVersion.Revit2023, @"C:\REVIT_LOCAL2023" }
             };
-
-        public static string GetRevitExecutableFolderPath(SupportedRevitVersion revitVersion)
-        {
-            string revitExecutableFolderPath = null;
-
-            if (REVIT_EXECUTABLE_FOLDER_PATHS.ContainsKey(revitVersion))
-            {
-                revitExecutableFolderPath =
-                    REVIT_EXECUTABLE_FOLDER_PATHS[revitVersion]
-                    .FirstOrDefault(folderPath => File.Exists(Path.Combine(folderPath, REVIT_EXECUTABLE_FILE_NAME)));
-            }
-
-            return revitExecutableFolderPath;
-        }
 
         public static string GetRevitExecutableFilePath(SupportedRevitVersion revitVersion)
         {
@@ -196,13 +200,13 @@ namespace BatchRvtUtil
             return GetInstalledRevitVersions().OrderBy(supportedRevitVersion => supportedRevitVersion).FirstOrDefault();
         }
 
-        public static List<SupportedRevitVersion> GetInstalledRevitVersions()
-        {
-            return REVIT_EXECUTABLE_FOLDER_PATHS.Keys
-                .Where(IsRevitVersionInstalled)
-                .Where(BatchRvt.IsBatchRvtAddinInstalled)
-                .ToList();
-        }
+        //public static List<SupportedRevitVersion> GetInstalledRevitVersions()
+        //{
+        //    return REVIT_EXECUTABLE_FOLDER_PATHS.Keys
+        //        .Where(IsRevitVersionInstalled)
+        //        .Where(BatchRvt.IsBatchRvtAddinInstalled)
+        //        .ToList();
+        //}
 
         public static string GetRevitVersionText(SupportedRevitVersion revitVersion)
         {
