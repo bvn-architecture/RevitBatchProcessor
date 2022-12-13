@@ -19,30 +19,32 @@
 #
 
 import clr
-import System
 
 clr.AddReference("Newtonsoft.Json")
 
-import Newtonsoft.Json as JSON
 from Newtonsoft.Json import JsonConvert, Formatting
-from Newtonsoft.Json.Linq import JObject, JArray, JValue
+from Newtonsoft.Json.Linq import JObject, JValue
+
 
 def GetValueFromJValue(jvalue):
     return JValue.Value.GetValue(jvalue)
 
+
 def ToJObject(pythonObject):
     return JObject.FromObject(pythonObject)
+
 
 def DeserializeToJObject(text):
     return JsonConvert.DeserializeObject(text)
 
+
 def ToString(jobject, prettyPrint=False):
     return (
-            JObject.ToString(jobject)
-            if prettyPrint else
-            JObject.ToString(jobject, Formatting.None)
-        )
+        JObject.ToString(jobject)
+        if prettyPrint else
+        JObject.ToString(jobject, Formatting.None)
+    )
+
 
 def SerializeObject(pythonObject, prettyPrint=False):
     return ToString(ToJObject(pythonObject), prettyPrint)
-

@@ -18,13 +18,10 @@
 #
 #
 
-import clr
-import System
-
-import win32_user32
-import ui_automation_util
-import script_host_error
 import global_test_mode
+import script_host_error
+import ui_automation_util
+import win32_user32
 
 REVIT_DIALOG_MESSAGE_HANDLER_PREFIX = "[ REVIT DIALOG BOX HANDLER ]"
 
@@ -44,9 +41,9 @@ CHANGES_TITLE = "Local Changes Not Synchronized with Central"
 NWC_TITLE = "Navisworks NWC Exporter"
 REVIT_TITLE = "Revit"
 OPENING_WORKSETS_TITLES = [
-        "Worksets",
-        "Opening Worksets"
-    ]
+    "Worksets",
+    "Opening Worksets"
+]
 
 DIRECTUI_CLASS_NAME = "DirectUIHWND"
 CTRLNOTIFYSINK_CLASS_NAME = "CtrlNotifySink"
@@ -72,7 +69,6 @@ CLOSE_LOCAL_FILE_BUTTON_TEXT = "Close the local file"
 RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish all elements and worksets"
 RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish elements and worksets"
 
-
 HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION = [False]
 
 
@@ -90,6 +86,7 @@ class RevitDialogInfo:
                     buttonInfo = ui_automation_util.WindowInfo(button)
                     self.Buttons.append(buttonInfo)
         return
+
 
 def SendButtonClick(buttons, output):
     okButtons = ui_automation_util.FilterControlsByText(buttons, OK_BUTTON_TEXT)
@@ -132,14 +129,17 @@ def SendButtonClick(buttons, output):
         output("WARNING: Could not find suitable button to click.")
         targetButton = None
 
-    if targetButton is not None:
-        targetButtonText = ui_automation_util.GetButtonText(targetButton)
-        output()
-        output("Sending button click to '" + targetButtonText + "' button...")
-        win32_user32.SendButtonClickMessage(targetButton.Hwnd)
-        output()
-        output("...sent.")
+    if targetButton is None:
+        return
+
+    targetButtonText = ui_automation_util.GetButtonText(targetButton)
+    output()
+    output("Sending button click to '" + targetButtonText + "' button...")
+    win32_user32.SendButtonClickMessage(targetButton.Hwnd)
+    output()
+    output("...sent.")
     return
+
 
 def DismissRevitDialogBox(title, buttons, targetButtonText, output):
     targetButtons = ui_automation_util.FilterControlsByText(buttons, targetButtonText)
@@ -152,16 +152,19 @@ def DismissRevitDialogBox(title, buttons, targetButtonText, output):
         for button in buttons:
             buttonText = ui_automation_util.GetButtonText(button)
             output()
-            output("\tButton: '" + buttonText +"'")
+            output("\tButton: '" + buttonText + "'")
 
-    if targetButton is not None:
-        targetButtonText = ui_automation_util.GetButtonText(targetButton)
-        output()
-        output("Sending button click to '" + targetButtonText + "' button...")
-        win32_user32.SendButtonClickMessage(targetButton.Hwnd)
-        output()
-        output("...sent.")
+    if targetButton is None:
+        return
+
+    targetButtonText = ui_automation_util.GetButtonText(targetButton)
+    output()
+    output("Sending button click to '" + targetButtonText + "' button...")
+    win32_user32.SendButtonClickMessage(targetButton.Hwnd)
+    output()
+    output("...sent.")
     return
+
 
 def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
     output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, REVIT_DIALOG_MESSAGE_HANDLER_PREFIX)
@@ -172,22 +175,23 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
             buttons = revitDialog.Buttons
             win32Buttons = revitDialog.Win32Buttons
             if enabledDialog.WindowText == MODEL_UPGRADE_WINDOW_TITLE and len(buttons) == 0:
-                pass # Do nothing for model upgrade dialog box. It has no buttons and will go away on its own.
+                pass  # Do nothing for model upgrade dialog box. It has no buttons and will go away on its own.
             elif (
                     enabledDialog.WindowText == LOAD_LINK_WINDOW_TITLE
                     and
                     len(win32Buttons) == 1
                     and
                     ui_automation_util.GetButtonText(win32Buttons[0]) == CANCEL_LINK_BUTTON_TEXT
-                ):
-                pass # Do nothing for this dialog box. It will go away on its own.
+            ):
+                pass  # Do nothing for this dialog box. It will go away on its own.
             elif enabledDialog.WindowText == script_host_error.BATCH_RVT_ERROR_WINDOW_TITLE:
                 # Report dialog detection but do nothing for BatchRvt error message windows.
                 if not HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION[0]:
                     output()
                     output("WARNING: Revit Batch Processor error window detected! Processing has halted!")
                     HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION[0] = True
-                    staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
+                    staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in
+                                          win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
                     if len(staticControls) > 0:
                         output()
                         output("Dialog has the following static control text:")
@@ -203,7 +207,8 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
             elif enabledDialog.WindowText == CLOSE_PROJECT_WITHOUT_SAVING_TITLE and len(buttons) == 3:
                 output()
                 output("'" + enabledDialog.WindowText + "' dialog box detected.")
-                DismissRevitDialogBox(enabledDialog.WindowText, buttons, RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT, output)
+                DismissRevitDialogBox(enabledDialog.WindowText, buttons, RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT,
+                                      output)
             elif enabledDialog.WindowText == SAVE_FILE_WINDOW_TITLE and len(buttons) == 3:
                 output()
                 output("'" + enabledDialog.WindowText + "' dialog box detected.")
@@ -248,7 +253,8 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
             elif enabledDialog.WindowText in ["Revit", str.Empty] and len(buttons) == 0 and len(win32Buttons) > 0:
                 output()
                 output("'" + enabledDialog.WindowText + "' dialog box detected.")
-                staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
+                staticControls = list(ui_automation_util.WindowInfo(hwnd) for hwnd in
+                                      win32_user32.FindWindows(enabledDialog.Hwnd, STATIC_CONTROL_CLASS_NAME, None))
                 if len(staticControls) > 0:
                     output()
                     output("Dialog has the following static control text:")
@@ -258,7 +264,8 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
                             output()
                             output(staticControlText)
                 SendButtonClick(win32Buttons, output)
-            elif enabledDialog.WindowText == AUTODESK_CUSTOMER_INVOLVEMENT_PROGRAM_TITLE and len(buttons) == 0 and len(win32Buttons) > 0:
+            elif enabledDialog.WindowText == AUTODESK_CUSTOMER_INVOLVEMENT_PROGRAM_TITLE and len(buttons) == 0 and len(
+                    win32Buttons) > 0:
                 output()
                 output("'" + enabledDialog.WindowText + "' dialog box detected.")
                 output()
@@ -281,6 +288,6 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
                 for button in buttons:
                     buttonText = ui_automation_util.GetButtonText(button)
                     output()
-                    output("\tButton: '" + buttonText +"'")
+                    output("\tButton: '" + buttonText + "'")
                 SendButtonClick(buttons, output)
     return

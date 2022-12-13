@@ -17,89 +17,82 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-
+using BatchRvt.ScriptHost.Util;
+using IronPython.Modules;
 using MSScripting = Microsoft.Scripting;
 using ScriptingHosting = Microsoft.Scripting.Hosting;
 using IronPythonHosting = IronPython.Hosting;
 
-namespace BatchRvt.ScriptHost
+namespace BatchRvt.ScriptHost;
+
+public static class ScriptUtil
 {
-    public static class ScriptUtil
+    private const string PYTHON_LIB_ZIP_NAME = "python_27_lib.zip";
+
+    public static void AddPythonStandardLibrary(ScriptingHosting.ScriptScope scope)
     {
-        private const string PYTHON_LIB_ZIP_NAME = "python_27_lib.zip";
+        var thisAssembly = typeof(ScriptUtil).Assembly;
+        var pythonLibResourceName = thisAssembly.GetManifestResourceNames()
+            .Single(name => name.ToLowerInvariant().EndsWith(PYTHON_LIB_ZIP_NAME.ToLowerInvariant()));
+        var importer = new ResourceMetaPathImporter(thisAssembly, pythonLibResourceName);
+        dynamic sysModule = IronPythonHosting.Python.GetSysModule(scope.Engine);
+        sysModule.meta_path.append(importer);
+    }
 
-        public static void AddPythonStandardLibrary(ScriptingHosting.ScriptScope scope)
+    private static void AddVariables(ScriptingHosting.ScriptScope scope,
+        IEnumerable<KeyValuePair<string, object>> variables)
+    {
+        foreach (var kv in variables) scope.SetVariable(kv.Key, kv.Value);
+    }
+
+    public static void AddBuiltinVariables(ScriptingHosting.ScriptEngine engine,
+        IEnumerable<KeyValuePair<string, object>> variables)
+    {
+        AddVariables(IronPythonHosting.Python.GetBuiltinModule(engine), variables);
+    }
+
+    public static void AddSearchPaths(ScriptingHosting.ScriptEngine engine,
+        IEnumerable<string> additionalSearchPaths)
+    {
+        var searchPaths = engine.GetSearchPaths();
+
+        foreach (var path in additionalSearchPaths) searchPaths.Add(path);
+
+        engine.SetSearchPaths(searchPaths);
+    }
+
+    public static ScriptingHosting.ScriptEngine CreatePythonEngine()
+    {
+        var engineOptions = new Dictionary<string, object>
         {
-            var thisAssembly = typeof(ScriptUtil).Assembly;
-            var pythonLibResourceName = thisAssembly.GetManifestResourceNames()
-                    .Single(name => name.ToLowerInvariant().EndsWith(PYTHON_LIB_ZIP_NAME.ToLowerInvariant()));
-            var importer = new IronPython.Modules.ResourceMetaPathImporter(thisAssembly, pythonLibResourceName);
-            dynamic sysModule = IronPython.Hosting.Python.GetSysModule(scope.Engine);
-            sysModule.meta_path.append(importer);
+            { "FullFrames", true }
+            /*{ "Debug", true },*/
+        };
 
-            return;
-        }
+        var engine = IronPythonHosting.Python.CreateEngine(engineOptions);
 
-        public static void AddVariables(ScriptingHosting.ScriptScope scope, IEnumerable<KeyValuePair<string, object>> variables)
-        {
-            foreach (var kv in variables)
-            {
-                scope.SetVariable(kv.Key, kv.Value);
-            }
+        return engine;
+    }
 
-            return;
-        }
+    public static ScriptingHosting.ScriptScope CreateMainModule(ScriptingHosting.ScriptEngine engine)
+    {
+        var mainModuleScope = IronPythonHosting.Python.CreateModule(engine, "__main__");
 
-        public static void AddBuiltinVariables(ScriptingHosting.ScriptEngine engine, IEnumerable<KeyValuePair<string, object>> variables)
-        {
-            AddVariables(IronPythonHosting.Python.GetBuiltinModule(engine), variables);
+        return mainModuleScope;
+    }
 
-            return;
-        }
+    public static ScriptingHosting.ScriptSource CreateScriptSourceFromFile(
+        ScriptingHosting.ScriptEngine engine, string sourceFilePath
+    )
+    {
+        var sourceText = TextFileUtil.ReadAllText(sourceFilePath);
 
-        public static void AddSearchPaths(ScriptingHosting.ScriptEngine engine, IEnumerable<string> additionalSearchPaths)
-        {
-            var searchPaths = engine.GetSearchPaths();
+        var scriptSource =
+            engine.CreateScriptSourceFromString(sourceText, sourceFilePath, MSScripting.SourceCodeKind.Statements);
 
-            foreach (var path in additionalSearchPaths)
-            {
-                searchPaths.Add(path);
-            }
-
-            engine.SetSearchPaths(searchPaths);
-        }
-
-        public static ScriptingHosting.ScriptEngine CreatePythonEngine()
-        {
-            var engineOptions = new Dictionary<string, object> {
-                        { "FullFrames", true },
-                        /*{ "Debug", true },*/
-                    };
-
-            var engine = IronPythonHosting.Python.CreateEngine(engineOptions);
-
-            return engine;
-        }
-
-        public static ScriptingHosting.ScriptScope CreateMainModule(ScriptingHosting.ScriptEngine engine)
-        {
-            var mainModuleScope = IronPythonHosting.Python.CreateModule(engine, "__main__");
-
-            return mainModuleScope;
-        }
-
-        public static ScriptingHosting.ScriptSource CreateScriptSourceFromFile(
-                ScriptingHosting.ScriptEngine engine, string sourceFilePath
-            )
-        {
-            var sourceText = TextFileUtil.ReadAllText(sourceFilePath);
-
-            var scriptSource = engine.CreateScriptSourceFromString(sourceText, sourceFilePath, MSScripting.SourceCodeKind.Statements);
-
-            return scriptSource;
-        }
+        return scriptSource;
     }
 }

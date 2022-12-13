@@ -1,6 +1,6 @@
-
-import clr
 import System
+import clr
+
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
@@ -19,4 +19,3 @@ dataExportFolderPath = script_util.GetExportFolderPath()
 # TODO: some real work!
 Output()
 Output("This post-processing script is running!")
-

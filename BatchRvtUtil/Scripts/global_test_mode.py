@@ -18,18 +18,18 @@
 #
 #
 
-import clr
-import System
-
 import test_mode_util
 
 GLOBAL_TEST_MODE = [None]
 
+
 def GetGlobalTestMode():
     return GLOBAL_TEST_MODE[0]
 
+
 def IsGlobalTestMode():
     return GetGlobalTestMode() is not None
+
 
 def InitializeGlobalTestMode(testModeFolderPath):
     if IsGlobalTestMode():
@@ -40,17 +40,20 @@ def InitializeGlobalTestMode(testModeFolderPath):
         GLOBAL_TEST_MODE[0] = globalTestMode
     return
 
+
 def ExportSessionId(sessionId):
     if IsGlobalTestMode():
         globalTestMode = GetGlobalTestMode()
         globalTestMode.ExportSessionId(sessionId)
     return
 
+
 def ExportRevitProcessId(revitProcessId):
     if IsGlobalTestMode():
         globalTestMode = GetGlobalTestMode()
         globalTestMode.ExportRevitProcessId(revitProcessId)
     return
+
 
 def PrefixedOutputForGlobalTestMode(output_, prefixForTestMode):
     if IsGlobalTestMode():

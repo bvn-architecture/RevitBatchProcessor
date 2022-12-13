@@ -18,12 +18,14 @@
 #
 #
 
-import clr
 import System
+import clr
+
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
 from System.Diagnostics import Process
+
 clr.AddReference("System.Windows.Forms")
 from System.Windows.Forms import Application
 from System.IO import File
@@ -32,7 +34,6 @@ import global_test_mode
 import thread_util
 import script_environment
 import client_util
-import stream_io_util
 import script_host_error
 import path_util
 import time_util
@@ -50,12 +51,13 @@ import revit_process_host
 from batch_rvt_util import BatchRvt, RevitVersion
 from revit_script_util import ScriptDataUtil
 
-
 END_SESSION_DELAY_IN_SECONDS = 5
 CLOSE_MAIN_WINDOW_ATTEMPTS = 10
 
+
 def GetCurrentProcess():
     return Process.GetCurrentProcess()
+
 
 def RunSingleTaskScript(scriptFilePath):
     aborted = False
@@ -71,12 +73,13 @@ def RunSingleTaskScript(scriptFilePath):
             output()
             output("Task script operation completed.")
             return
+
         result = script_host_error.WithErrorHandling(
-                executeTaskScript,
-                "ERROR: An error occurred while executing the task script! Operation aborted.",
-                output,
-                showMessageBoxOnTaskError
-            )
+            executeTaskScript,
+            "ERROR: An error occurred while executing the task script! Operation aborted.",
+            output,
+            showMessageBoxOnTaskError
+        )
     except Exception, e:
         aborted = True
         raise
@@ -94,6 +97,7 @@ def RunSingleTaskScript(scriptFilePath):
         output("Operation completed.")
 
     return aborted
+
 
 def RunBatchTaskScript(scriptFilePath):
     aborted = False
@@ -143,20 +147,20 @@ def RunBatchTaskScript(scriptFilePath):
             snapshotEndTime = None
             revitJournalFilePath = uiapp.Application.RecordingJournalFilename
             snapshotData = snapshot_data_exporter.ExportTemporarySnapshotData(
-                    sessionId,
-                    centralFilePath,
-                    isCloudModel,
-                    cloudProjectId,
-                    cloudModelId,
-                    snapshotStartTime,
-                    snapshotEndTime,
-                    dataExportFolderPath,
-                    revitJournalFilePath,
-                    snapshotError
-                )
+                sessionId,
+                centralFilePath,
+                isCloudModel,
+                cloudProjectId,
+                cloudModelId,
+                snapshotStartTime,
+                snapshotEndTime,
+                dataExportFolderPath,
+                revitJournalFilePath,
+                snapshotError
+            )
 
         localFilePath = None
-        openCreateNewLocal = False # default is False because the file may not be a workshared Central file.
+        openCreateNewLocal = False  # default is False because the file may not be a workshared Central file.
         isCentralModel = False
         isLocalModel = False
         try:
@@ -197,7 +201,7 @@ def RunBatchTaskScript(scriptFilePath):
 
             def processDocument(doc):
                 revit_script_util.SetScriptDocument(doc)
-                
+
                 def executeTaskScript():
                     success = False
                     output()
@@ -222,29 +226,29 @@ def RunBatchTaskScript(scriptFilePath):
                     return
 
                 result = script_host_error.WithErrorHandling(
-                        executeTaskScript,
-                        "ERROR: An error occurred while executing the task script! Operation aborted.",
-                        output,
-                        showMessageBoxOnTaskError
-                    )
+                    executeTaskScript,
+                    "ERROR: An error occurred while executing the task script! Operation aborted.",
+                    output,
+                    showMessageBoxOnTaskError
+                )
                 return result
 
             result = None
-            activeDoc = None #revit_script_util.GetActiveDocument(uiapp)
+            activeDoc = None  # revit_script_util.GetActiveDocument(uiapp)
             if activeDoc is not None:
                 result = processDocument(activeDoc)
             else:
                 if isCloudModel:
                     result = revit_script_util.RunCloudDocumentAction(
-                            uiapp,
-                            openInUI,
-                            cloudProjectId,
-                            cloudModelId,
-                            worksetConfigurationOption,
-                            auditOnOpening,
-                            processDocument,
-                            output
-                        )
+                        uiapp,
+                        openInUI,
+                        cloudProjectId,
+                        cloudModelId,
+                        worksetConfigurationOption,
+                        auditOnOpening,
+                        processDocument,
+                        output
+                    )
                 elif openCreateNewLocal:
                     revitVersion = RevitVersion.GetSupportedRevitVersion(revit_session.GetSessionRevitVersionNumber())
                     localFilePath = RevitVersion.GetRevitLocalFilePath(revitVersion, centralFilePath)
@@ -260,35 +264,36 @@ def RunBatchTaskScript(scriptFilePath):
                         output("WARNING: failed to delete the local file!")
                     path_util.CreateDirectoryForFilePath(localFilePath)
                     result = revit_script_util.RunNewLocalDocumentAction(
-                            uiapp,
-                            openInUI,
-                            centralFilePath,
-                            localFilePath,
-                            worksetConfigurationOption,
-                            auditOnOpening,
-                            processDocument,
-                            output
-                        )
+                        uiapp,
+                        openInUI,
+                        centralFilePath,
+                        localFilePath,
+                        worksetConfigurationOption,
+                        auditOnOpening,
+                        processDocument,
+                        output
+                    )
                 elif isCentralModel or isLocalModel:
                     result = revit_script_util.RunDetachedDocumentAction(
-                            uiapp,
-                            openInUI,
-                            centralFilePath,
-                            discardWorksetsOnDetach,
-                            worksetConfigurationOption,
-                            auditOnOpening,
-                            processDocument,
-                            output
-                        )
+                        uiapp,
+                        openInUI,
+                        centralFilePath,
+                        discardWorksetsOnDetach,
+                        worksetConfigurationOption,
+                        auditOnOpening,
+                        processDocument,
+                        output
+                    )
                 else:
-                    result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, auditOnOpening, processDocument, output)
+                    result = revit_script_util.RunDocumentAction(uiapp, openInUI, centralFilePath, auditOnOpening,
+                                                                 processDocument, output)
         except Exception, e:
             aborted = True
             snapshotError = exception_util.GetExceptionDetails(e)
             raise
         finally:
             if isCloudModel:
-                pass # explicitly do nothing for cloud-based models
+                pass  # explicitly do nothing for cloud-based models
             elif openCreateNewLocal and deleteLocalAfter:
                 try:
                     if File.Exists(localFilePath):
@@ -304,17 +309,17 @@ def RunBatchTaskScript(scriptFilePath):
             if enableDataExport:
                 snapshotEndTime = time_util.GetDateTimeNow()
                 snapshotData = snapshot_data_exporter.ExportSnapshotData(
-                        sessionId,
-                        centralFilePath,
-                        isCloudModel,
-                        cloudProjectId,
-                        cloudModelId,
-                        snapshotStartTime,
-                        snapshotEndTime,
-                        dataExportFolderPath,
-                        revitJournalFilePath,
-                        snapshotError
-                    )
+                    sessionId,
+                    centralFilePath,
+                    isCloudModel,
+                    cloudProjectId,
+                    cloudModelId,
+                    snapshotStartTime,
+                    snapshotEndTime,
+                    dataExportFolderPath,
+                    revitJournalFilePath,
+                    snapshotError
+                )
                 snapshot_data_util.ConsolidateSnapshotData(dataExportFolderPath, output)
 
             # Ensure aborted message is shown in the event of an exception.
@@ -331,6 +336,7 @@ def RunBatchTaskScript(scriptFilePath):
 
     return aborted
 
+
 def ShutdownSession(process):
     for i in xrange(CLOSE_MAIN_WINDOW_ATTEMPTS):
         process.Refresh()
@@ -338,11 +344,13 @@ def ShutdownSession(process):
         Application.DoEvents()
     return
 
+
 def DoEvents(seconds):
     for i in xrange(seconds):
         Application.DoEvents()
         thread_util.SleepForSeconds(1)
     return
+
 
 def GetRevitProcessingOptionForSession(scriptDatas):
     oldScriptData = revit_script_util.GetCurrentScriptData()
@@ -351,41 +359,44 @@ def GetRevitProcessingOptionForSession(scriptDatas):
     revit_script_util.SetCurrentScriptData(oldScriptData)
     return revitProcessingOption
 
+
 def DoRevitSessionProcessing(
         scriptFilePath,
         scriptDataFilePath,
         progressNumber,
         batchRvtProcessUniqueId,
         output
-    ):
+):
     results = []
     revit_script_util.SetUIApplication(revit_session.GetSessionUIApplication())
     revit_script_util.SetScriptDataFilePath(scriptDataFilePath)
     scriptDatas = (
-            revit_script_util.LoadScriptDatas()
-            .Where(lambda scriptData: scriptData.ProgressNumber.GetValue() >= progressNumber)
-            .OrderBy(lambda scriptData: scriptData.ProgressNumber.GetValue())
-            .ToList()
-        )
+        revit_script_util.LoadScriptDatas()
+        .Where(lambda scriptData: scriptData.ProgressNumber.GetValue() >= progressNumber)
+        .OrderBy(lambda scriptData: scriptData.ProgressNumber.GetValue())
+        .ToList()
+    )
     if len(scriptDatas) > 0:
         revitProcessingOption = GetRevitProcessingOptionForSession(scriptDatas)
         if revitProcessingOption == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing:
             for scriptData in scriptDatas:
                 revit_script_util.SetCurrentScriptData(scriptData)
                 if not revit_process_host.IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
-                    script_host_error.ShowScriptErrorMessageBox("ERROR: The BatchRvt process appears to have terminated! Operation aborted.")
+                    script_host_error.ShowScriptErrorMessageBox(
+                        "ERROR: The BatchRvt process appears to have terminated! Operation aborted.")
                     break
                 progressRecordFilePath = ScriptDataUtil.GetProgressRecordFilePath(scriptDataFilePath)
-                progressRecorded = ScriptDataUtil.SetProgressNumber(progressRecordFilePath, scriptData.ProgressNumber.GetValue())
+                progressRecorded = ScriptDataUtil.SetProgressNumber(progressRecordFilePath,
+                                                                    scriptData.ProgressNumber.GetValue())
                 if not progressRecorded:
                     output()
                     output("WARNING: Failed to update the session progress record file!")
                 result = script_host_error.WithErrorHandling(
-                        lambda: RunBatchTaskScript(scriptFilePath),
-                        "ERROR: An error occurred while processing the file!",
-                        output,
-                        False
-                    )
+                    lambda: RunBatchTaskScript(scriptFilePath),
+                    "ERROR: An error occurred while processing the file!",
+                    output,
+                    False
+                )
                 results.append(result)
         else:
             scriptData = scriptDatas[0]
@@ -395,6 +406,7 @@ def DoRevitSessionProcessing(
     else:
         raise Exception("ERROR: received no script data!")
     return results
+
 
 def Main():
     environmentVariables = script_environment.GetEnvironmentVariables()
@@ -407,7 +419,6 @@ def Main():
     global_test_mode.InitializeGlobalTestMode(testModeFolderPath)
 
     if outputPipeHandleString is not None and scriptFilePath is not None:
-
         outputStream = client_util.CreateAnonymousPipeClient(client_util.OUT, outputPipeHandleString)
 
         def outputStreamAction():
@@ -416,17 +427,17 @@ def Main():
             def outputStreamWriterAction():
                 revit_script_util.SetOutputFunction(stream_io_util.GetSafeWriteLine(outputStreamWriter))
                 result = script_host_error.WithErrorHandling(
-                        lambda: DoRevitSessionProcessing(
-                                scriptFilePath,
-                                scriptDataFilePath,
-                                progressNumber,
-                                batchRvtProcessUniqueId,
-                                revit_script_util.Output
-                            ),
-                        "ERROR: An error occurred while executing the script host! Operation aborted.",
-                        output=revit_script_util.Output,
-                        showErrorMessageBox=False
-                    )
+                    lambda: DoRevitSessionProcessing(
+                        scriptFilePath,
+                        scriptDataFilePath,
+                        progressNumber,
+                        batchRvtProcessUniqueId,
+                        revit_script_util.Output
+                    ),
+                    "ERROR: An error occurred while executing the script host! Operation aborted.",
+                    output=revit_script_util.Output,
+                    showErrorMessageBox=False
+                )
                 return result
 
             stream_io_util.UsingStream(outputStreamWriter, outputStreamWriterAction)
@@ -436,6 +447,7 @@ def Main():
 
     return
 
+
 def TerminateSession():
     currentProcess = GetCurrentProcess()
     DoEvents(END_SESSION_DELAY_IN_SECONDS)
@@ -444,10 +456,11 @@ def TerminateSession():
     currentProcess.Kill()
     return
 
+
 script_host_error.WithErrorHandling(
-        Main,
-        "ERROR: An error occurred while executing the script host! Operation aborted.",
-        showErrorMessageBox=False
-    )
+    Main,
+    "ERROR: An error occurred while executing the script host! Operation aborted.",
+    showErrorMessageBox=False
+)
 
 TerminateSession()

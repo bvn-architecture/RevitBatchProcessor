@@ -17,64 +17,49 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using System.Windows.Forms;
 using BatchRvtUtil;
 
-namespace BatchRvtGUI
+namespace BatchRvtGUI;
+
+public partial class RevitFileScanningOptionsUI : Form
 {
-    public partial class RevitFileScanningOptionsUI : Form
+    public RevitFileScanningOptionsUI()
     {
-        public RevitFileScanningOptionsUI()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        public RevitFileScanning.RevitFileType GetSelectedRevitFileType()
-        {
-            var revitFileType = RevitFileScanning.RevitFileType.Project;
+    public RevitFileScanning.RevitFileType GetSelectedRevitFileType()
+    {
+        var revitFileType = RevitFileScanning.RevitFileType.Project;
 
-            if (this.projectFilesRadioButton.Checked)
-            {
-                revitFileType = RevitFileScanning.RevitFileType.Project;
-            }
-            else if (this.familyFilesRadioButton.Checked)
-            {
-                revitFileType = RevitFileScanning.RevitFileType.Family;
-            }
-            else if (this.revitFilesRadioButton.Checked)
-            {
-                revitFileType = RevitFileScanning.RevitFileType.ProjectAndFamily;
-            }
+        if (projectFilesRadioButton.Checked)
+            revitFileType = RevitFileScanning.RevitFileType.Project;
+        else if (familyFilesRadioButton.Checked)
+            revitFileType = RevitFileScanning.RevitFileType.Family;
+        else if (revitFilesRadioButton.Checked) revitFileType = RevitFileScanning.RevitFileType.ProjectAndFamily;
 
-            return revitFileType;
-        }
+        return revitFileType;
+    }
 
-        public bool IncludeSubfolders()
-        {
-            return this.includeSubfoldersCheckBox.Checked;
-        }
+    public bool IncludeSubfolders()
+    {
+        return includeSubfoldersCheckBox.Checked;
+    }
 
-        public bool ExpandNetworkPaths()
-        {
-            return this.expandNetworkPathsCheckBox.Checked;
-        }
+    public bool ExpandNetworkPaths()
+    {
+        return expandNetworkPathsCheckBox.Checked;
+    }
 
-        public bool ExtractRevitVersionInfo()
-        {
-            return this.detectRevitFileVersionCheckBox.Checked;
-        }
+    public bool ExtractRevitVersionInfo()
+    {
+        return detectRevitFileVersionCheckBox.Checked;
+    }
 
-        public bool IgnoreRevitBackupFiles()
-        {
-            return this.ignoreBackupFilesCheckBox.Checked;
-        }
+    public bool IgnoreRevitBackupFiles()
+    {
+        return ignoreBackupFilesCheckBox.Checked;
     }
 }

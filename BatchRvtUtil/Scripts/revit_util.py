@@ -19,14 +19,15 @@
 #
 
 import clr
-import System
 
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 
+
 def PurgeReleasedAPIObjects(app):
     app.PurgeReleasedAPIObjects()
     return
+
 
 def InTransaction(transaction, action):
     result = None

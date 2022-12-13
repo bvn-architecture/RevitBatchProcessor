@@ -18,14 +18,16 @@
 #
 #
 
-import clr
+import exceptions
+
 import System
+import clr
 from System.Text import StringBuilder
 
 import global_test_mode
-import exceptions
 
 EXCEPTION_MESSAGE_HANDLER_PREFIX = "[ EXCEPTION MESSAGE ]"
+
 
 def GetInterpretedFrameInfo(clsExceptionData):
     interpretedFrameInfo = None
@@ -40,49 +42,56 @@ def GetInterpretedFrameInfo(clsExceptionData):
             break
     return interpretedFrameInfo
 
+
 def GetClrException(exception):
     return (
-            exception.clsException if isinstance(exception, exceptions.Exception)
-            else
-            exception if isinstance(exception, System.Exception)
-            else
-            None
-        )
+        exception.clsException if isinstance(exception, exceptions.Exception)
+        else
+        exception if isinstance(exception, System.Exception)
+        else
+        None
+    )
+
 
 def LogOutputErrorDetails(exception, output_, verbose=True):
     output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, EXCEPTION_MESSAGE_HANDLER_PREFIX)
     exceptionMessage = (
-            str(exception.message) if isinstance(exception, exceptions.Exception)
-            else
-            str(exception.Message) if isinstance(exception, System.Exception)
-            else
-            str.Empty
-        )
+        str(exception.message) if isinstance(exception, exceptions.Exception)
+        else
+        str(exception.Message) if isinstance(exception, System.Exception)
+        else
+        str.Empty
+    )
     output()
     output("Exception: [" + type(exception).__name__ + "] " + exceptionMessage)
     try:
         clsException = GetClrException(exception)
-        if clsException is not None:
-            clsExceptionType = clr.GetClrType(type(clsException))
-            output(".NET exception: [" + str(clsExceptionType.Name) + "] " + str(clsException.Message))
-            if verbose:
-                interpretedFrameInfo = GetInterpretedFrameInfo(clsException.Data)
-                if interpretedFrameInfo is not None:
-                    output()
-                    output("Further exception information:")
-                    output()
-                    for i in interpretedFrameInfo:
-                        if str(i) != "CallSite.Target":
-                            output("\t" + str(i))
+        if clsException is None:
+            return
+        clsExceptionType = clr.GetClrType(type(clsException))
+        output(".NET exception: [" + str(clsExceptionType.Name) + "] " + str(clsException.Message))
+        if not verbose:
+            return
+        interpretedFrameInfo = GetInterpretedFrameInfo(clsException.Data)
+        if interpretedFrameInfo is None:
+            return
+        output()
+        output("Further exception information:")
+        output()
+        for i in interpretedFrameInfo:
+            if str(i) != "CallSite.Target":
+                output("\t" + str(i))
     except:
         output("Could not obtain further exception information.")
     return
 
+
 def GetExceptionDetails(exception):
     exceptionDetails = StringBuilder()
+
     def output(message=""):
         exceptionDetails.AppendLine(message)
         return
+
     LogOutputErrorDetails(exception, output)
     return exceptionDetails.ToString()
-

@@ -19,7 +19,6 @@
 #
 
 import clr
-import System
 
 clr.AddReference("System.Core")
 from System.IO import HandleInheritability
@@ -33,6 +32,7 @@ PIPE_IO_BUFFER_SIZE = 8192
 IN = Pipes.PipeDirection.In
 OUT = Pipes.PipeDirection.Out
 
+
 def CreateNamedPipeServer(pipeName):
     worldsid = Principal.SecurityIdentifier(Principal.WellKnownSidType.WorldSid, None)
     localsid = Principal.SecurityIdentifier(Principal.WellKnownSidType.LocalSid, None)
@@ -44,22 +44,22 @@ def CreateNamedPipeServer(pipeName):
     ps.AddAccessRule(localpr)
 
     return Pipes.NamedPipeServerStream(
-            pipeName,
-            Pipes.PipeDirection.InOut,
-            MAX_NUMBER_OF_INSTANCES,
-            Pipes.PipeTransmissionMode.Byte,
-            Pipes.PipeOptions.Asynchronous,
-            PIPE_IO_BUFFER_SIZE,
-            PIPE_IO_BUFFER_SIZE,
-            ps
-        )
+        pipeName,
+        Pipes.PipeDirection.InOut,
+        MAX_NUMBER_OF_INSTANCES,
+        Pipes.PipeTransmissionMode.Byte,
+        Pipes.PipeOptions.Asynchronous,
+        PIPE_IO_BUFFER_SIZE,
+        PIPE_IO_BUFFER_SIZE,
+        ps
+    )
+
 
 def CreateAnonymousPipeServer(pipeDirection, handleInheritability=None):
     handleInheritability = handleInheritability if handleInheritability is not None else HandleInheritability.None
     outputPipeServer = Pipes.AnonymousPipeServerStream(
-            pipeDirection,
-            handleInheritability,
-            PIPE_IO_BUFFER_SIZE
-        )
+        pipeDirection,
+        handleInheritability,
+        PIPE_IO_BUFFER_SIZE
+    )
     return outputPipeServer
-

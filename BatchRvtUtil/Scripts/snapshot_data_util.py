@@ -18,16 +18,13 @@
 #
 #
 
-import clr
-import System
-from System import Guid
-from System.IO import Path, DirectoryInfo, File
+from System.IO import Path, File
 
+import exception_util
+import json_util
 import path_util
 import revit_file_list
 import text_file_util
-import json_util
-import exception_util
 
 SNAPSHOT_FOLDER_NAME_FORMAT = "yyyyMMdd_HHmmss_fff"
 PROJECT_BIM_FOLDER_NAME = "BIM"
@@ -37,20 +34,25 @@ SNAPSHOT_DATA_FILENAME = "snapshot.json"
 TEMP_SNAPSHOT_DATA_FILENAME = "temp_snapshot.json"
 SNAPSHOT_DATA__REVIT_JOURNAL_FILE = "revitJournalFile"
 
+
 def GetUnknownProjectUniqueFolderName():
     return Path.GetRandomFileName().Replace(".", str.Empty).ToUpper()
+
 
 def GetSnapshotFolderName(timestamp):
     folderName = timestamp.ToString(SNAPSHOT_FOLDER_NAME_FORMAT)
     return folderName
 
+
 def GetRevitModelName(revitFilePath):
     return Path.GetFileNameWithoutExtension(revitFilePath)
+
 
 def GetRevitFileVersionDetails(revitFilePath):
     revitFileInfo = revit_file_list.RevitFileInfo(revitFilePath)
     revitFileVersionDetails = revitFileInfo.TryGetRevitVersionText()
     return revitFileVersionDetails
+
 
 def GetSnapshotFolderPath(
         dataExportFolderPath,
@@ -59,7 +61,7 @@ def GetSnapshotFolderPath(
         cloudProjectId,
         cloudModelId,
         timestamp
-    ):
+):
     snapshotFolderName = GetSnapshotFolderName(timestamp.ToLocalTime())
     if isCloudModel:
         snapshotFolderPath = Path.Combine(dataExportFolderPath, cloudProjectId, cloudModelId, snapshotFolderName)
@@ -71,16 +73,20 @@ def GetSnapshotFolderPath(
         snapshotFolderPath = Path.Combine(dataExportFolderPath, projectFolderName, modelName, snapshotFolderName)
     return snapshotFolderPath
 
+
 def GetSnapshotDataFilePath(snapshotDataFolderPath):
     return Path.Combine(snapshotDataFolderPath, SNAPSHOT_DATA_FILENAME)
 
+
 def GetTemporarySnapshotDataFilePath(snapshotDataFolderPath):
     return Path.Combine(snapshotDataFolderPath, TEMP_SNAPSHOT_DATA_FILENAME)
+
 
 def ReadSnapshotDataRevitJournalFilePath(snapshotDataFilePath):
     text = text_file_util.ReadFromTextFile(snapshotDataFilePath)
     jobjectSnapshotData = json_util.DeserializeToJObject(text)
     return jobjectSnapshotData[SNAPSHOT_DATA__REVIT_JOURNAL_FILE].ToObject[str]()
+
 
 def CopySnapshotRevitJournalFile(snapshotDataFolderPath, output):
     revitJournalFilePath = None
@@ -100,13 +106,15 @@ def CopySnapshotRevitJournalFile(snapshotDataFolderPath, output):
     File.Copy(revitJournalFilePath, snapshotRevitJournalFilePath)
     return
 
+
 def ConsolidateSnapshotData(dataExportFolderPath, output):
     try:
         snapshotDataFilePath = GetSnapshotDataFilePath(dataExportFolderPath)
         temporarySnapshotDataFilePath = GetTemporarySnapshotDataFilePath(dataExportFolderPath)
         if File.Exists(snapshotDataFilePath):
-            if File.Exists(temporarySnapshotDataFilePath):
-                File.Delete(temporarySnapshotDataFilePath)
+            if not File.Exists(temporarySnapshotDataFilePath):
+                return
+            File.Delete(temporarySnapshotDataFilePath)
         elif File.Exists(temporarySnapshotDataFilePath):
             File.Move(temporarySnapshotDataFilePath, snapshotDataFilePath)
         else:
@@ -121,4 +129,3 @@ def ConsolidateSnapshotData(dataExportFolderPath, output):
         output("\t" + dataExportFolderPath)
         exception_util.LogOutputErrorDetails(e, output)
     return
-

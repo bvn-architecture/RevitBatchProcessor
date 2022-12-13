@@ -18,14 +18,9 @@
 #
 #
 
-import clr
-import System
 from System.IO import Path
 
-import std_io_util
-from std_io_util import Output
 import path_util
-from path_util import GetProjectFolderNameFromRevitProjectFilePath # Might come in handy for pre/post-processing scripts.
 
 PYTHON_SCRIPT_FILE_EXTENSION = ".py"
 DYNAMO_SCRIPT_FILE_EXTENSION = ".dyn"
@@ -36,45 +31,56 @@ EXPORT_FOLDER_PATH_CONTAINER = [None]
 SESSION_DATA_FOLDER_PATH_CONTAINER = [None]
 REVIT_FILE_LIST_FILE_PATH_CONTAINER = [None]
 
+
 def SetSessionId(batchRvtConfig):
     SESSION_ID_CONTAINER[0] = batchRvtConfig.SessionId
     return
+
 
 def SetTaskData(batchRvtConfig):
     TASK_DATA_CONTAINER[0] = batchRvtConfig.TaskData
     return
 
+
 def SetExportFolderPath(batchRvtConfig):
     EXPORT_FOLDER_PATH_CONTAINER[0] = batchRvtConfig.DataExportFolderPath
     return
+
 
 def SetSessionDataFolderPath(batchRvtConfig):
     SESSION_DATA_FOLDER_PATH_CONTAINER[0] = batchRvtConfig.SessionDataFolderPath
     return
 
+
 def SetRevitFileListFilePath(batchRvtConfig):
     REVIT_FILE_LIST_FILE_PATH_CONTAINER[0] = batchRvtConfig.RevitFileListFilePath
     return
+
 
 def GetSessionId():
     sessionId = SESSION_ID_CONTAINER[0]
     return sessionId
 
+
 def GetTaskData():
     taskData = TASK_DATA_CONTAINER[0]
     return taskData
+
 
 def GetExportFolderPath():
     exportFolderPath = EXPORT_FOLDER_PATH_CONTAINER[0]
     return exportFolderPath
 
+
 def GetSessionDataFolderPath():
     sessionDataFolderPath = SESSION_DATA_FOLDER_PATH_CONTAINER[0]
     return sessionDataFolderPath
 
+
 def GetRevitFileListFilePath():
     revitFileListFilePath = REVIT_FILE_LIST_FILE_PATH_CONTAINER[0]
     return revitFileListFilePath
+
 
 def ExecuteScript(scriptFilePath):
     path_util.AddSearchPath(Path.GetDirectoryName(scriptFilePath))

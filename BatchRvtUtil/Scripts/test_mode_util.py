@@ -18,14 +18,13 @@
 #
 #
 
-import clr
-import System
 from System.IO import Directory, Path, File
 
 import json_util
 
 TEST_MODE_DATA__SESSION_ID = "sessionId"
 TEST_MODE_DATA__REVIT_PROCESS_IDS = "revitProcessIds"
+
 
 class TestMode:
     def __init__(self, testModeFolderPath):
@@ -38,7 +37,7 @@ class TestMode:
         if not Directory.Exists(self.TestModeFolderPath):
             raise Exception("ERROR: failed to create the test mode folder!")
         return
-    
+
     def GetTestModeDataFilePath(self):
         return Path.Combine(self.TestModeFolderPath, "test_mode_data.json")
 
@@ -70,6 +69,7 @@ class TestMode:
             revitProcessIds = testModeData[TEST_MODE_DATA__REVIT_PROCESS_IDS]
             revitProcessIds.Add(revitProcessId)
             return
+
         self.WithTestModeData(action)
         return
 
@@ -77,14 +77,17 @@ class TestMode:
         def action(testModeData):
             testModeData[TEST_MODE_DATA__SESSION_ID] = sessionId
             return
+
         self.WithTestModeData(action)
         return
+
 
 def GetSessionId(testModeData):
     return json_util.GetValueFromJValue(testModeData[TEST_MODE_DATA__SESSION_ID])
 
+
 def GetRevitProcessIds(testModeData):
     return [
-            json_util.GetValueFromJValue(revitProcessId)
-            for revitProcessId in testModeData[TEST_MODE_DATA__REVIT_PROCESS_IDS]
-        ]
+        json_util.GetValueFromJValue(revitProcessId)
+        for revitProcessId in testModeData[TEST_MODE_DATA__REVIT_PROCESS_IDS]
+    ]

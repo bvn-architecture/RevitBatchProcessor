@@ -19,17 +19,17 @@
 #
 
 import clr
-import System
+
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import ModelPathUtils, WorksetConfiguration, WorksetConfigurationOption
-from Autodesk.Revit.Exceptions import OperationCanceledException, CorruptModelException, InvalidOperationException, ArgumentException
+from Autodesk.Revit.Exceptions import OperationCanceledException, CorruptModelException, InvalidOperationException, \
+    ArgumentException
 
 import exception_util
 import path_util
 import revit_file_util
 import revit_dialog_util
 import revit_failure_handling
-import batch_rvt_util
 from batch_rvt_util import ScriptDataUtil, BatchRvt
 
 OUTPUT_FUNCTION_CONTAINER = [None]
@@ -40,30 +40,37 @@ SCRIPT_DATA_CONTAINER = [None]
 SCRIPT_DOCUMENT_CONTAINER = [None]
 SCRIPT_UIAPPLICATION_CONTAINER = [None]
 
+
 def SetOutputFunction(output):
     OUTPUT_FUNCTION_CONTAINER[0] = output
     return
+
 
 def SetScriptDataFilePath(scriptDataFilePath):
     SCRIPT_DATA_FILE_PATH_CONTAINER[0] = scriptDataFilePath
     return
 
+
 def SetScriptDocument(doc):
     SCRIPT_DOCUMENT_CONTAINER[0] = doc
     return
+
 
 def SetUIApplication(uiapp):
     SCRIPT_UIAPPLICATION_CONTAINER[0] = uiapp
     return
 
+
 def Output(m="", msgId=""):
-    message = (("[" + str(msgId) + "]"+ " ") if msgId != "" else "") + m
+    message = (("[" + str(msgId) + "]" + " ") if msgId != "" else "") + m
     OUTPUT_FUNCTION_CONTAINER[0](message)
     return
+
 
 def GetScriptDataFilePath():
     scriptDataFilePath = SCRIPT_DATA_FILE_PATH_CONTAINER[0]
     return scriptDataFilePath
+
 
 def LoadScriptDatas():
     scriptDataFilePath = GetScriptDataFilePath()
@@ -74,27 +81,35 @@ def LoadScriptDatas():
         raise Exception("ERROR: could not load script data file.")
     return scriptDatas
 
+
 def GetCurrentScriptData():
     return SCRIPT_DATA_CONTAINER[0]
+
 
 def SetCurrentScriptData(scriptData):
     SCRIPT_DATA_CONTAINER[0] = scriptData
     return
 
+
 def IsCloudModel():
     return SCRIPT_DATA_CONTAINER[0].IsCloudModel.GetValue()
+
 
 def GetCloudProjectId():
     return SCRIPT_DATA_CONTAINER[0].CloudProjectId.GetValue()
 
+
 def GetCloudModelId():
     return SCRIPT_DATA_CONTAINER[0].CloudModelId.GetValue()
+
 
 def GetRevitFilePath():
     return SCRIPT_DATA_CONTAINER[0].RevitFilePath.GetValue()
 
+
 def GetOpenInUI():
     return SCRIPT_DATA_CONTAINER[0].OpenInUI.GetValue()
+
 
 def GetProjectFolderName():
     projectFolderName = None
@@ -103,61 +118,80 @@ def GetProjectFolderName():
         projectFolderName = path_util.GetProjectFolderNameFromRevitProjectFilePath(revitFilePath)
     return projectFolderName
 
+
 def GetDataExportFolderPath():
     return SCRIPT_DATA_CONTAINER[0].DataExportFolderPath.GetValue()
+
 
 def GetSessionId():
     return SCRIPT_DATA_CONTAINER[0].SessionId.GetValue()
 
+
 def GetTaskScriptFilePath():
     return SCRIPT_DATA_CONTAINER[0].TaskScriptFilePath.GetValue()
+
 
 def GetTaskData():
     return SCRIPT_DATA_CONTAINER[0].TaskData.GetValue()
 
+
 def GetSessionDataFolderPath():
     return SCRIPT_DATA_CONTAINER[0].SessionDataFolderPath.GetValue()
+
 
 def GetShowMessageBoxOnTaskError():
     return SCRIPT_DATA_CONTAINER[0].ShowMessageBoxOnTaskScriptError.GetValue()
 
+
 def GetEnableDataExport():
     return SCRIPT_DATA_CONTAINER[0].EnableDataExport.GetValue()
+
 
 def GetRevitProcessingOption():
     return SCRIPT_DATA_CONTAINER[0].RevitProcessingOption.GetValue()
 
+
 def GetCentralFileOpenOption():
     return SCRIPT_DATA_CONTAINER[0].CentralFileOpenOption.GetValue()
+
 
 def GetDeleteLocalAfter():
     return SCRIPT_DATA_CONTAINER[0].DeleteLocalAfter.GetValue()
 
+
 def GetDiscardWorksetsOnDetach():
     return SCRIPT_DATA_CONTAINER[0].DiscardWorksetsOnDetach.GetValue()
+
 
 def GetWorksetConfigurationOption():
     return SCRIPT_DATA_CONTAINER[0].WorksetConfigurationOption.GetValue()
 
+
 def GetAuditOnOpening():
     return SCRIPT_DATA_CONTAINER[0].AuditOnOpening.GetValue()
+
 
 def GetProgressNumber():
     return SCRIPT_DATA_CONTAINER[0].ProgressNumber.GetValue()
 
+
 def GetProgressMax():
     return SCRIPT_DATA_CONTAINER[0].ProgressMax.GetValue()
 
+
 def GetAssociatedData():
     return SCRIPT_DATA_CONTAINER[0].AssociatedData.GetValue()
+
 
 def GetScriptDocument():
     doc = SCRIPT_DOCUMENT_CONTAINER[0]
     return doc
 
+
 def GetUIApplication():
     uiapp = SCRIPT_UIAPPLICATION_CONTAINER[0]
     return uiapp
+
 
 def WithExceptionLogging(action, output):
     result = None
@@ -168,13 +202,15 @@ def WithExceptionLogging(action, output):
         raise
     return result
 
+
 def CreateWorksetConfiguration(batchRvtWorksetConfigurationOption):
     worksetConfigurationOption = (
-            WorksetConfigurationOption.CloseAllWorksets if batchRvtWorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.CloseAllWorksets else
-            WorksetConfigurationOption.OpenAllWorksets if batchRvtWorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.OpenAllWorksets else
-            WorksetConfigurationOption.OpenLastViewed
-        )
+        WorksetConfigurationOption.CloseAllWorksets if batchRvtWorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.CloseAllWorksets else
+        WorksetConfigurationOption.OpenAllWorksets if batchRvtWorksetConfigurationOption == BatchRvt.WorksetConfigurationOption.OpenAllWorksets else
+        WorksetConfigurationOption.OpenLastViewed
+    )
     return WorksetConfiguration(worksetConfigurationOption)
+
 
 def GetWorksharingCentralModelPath(doc):
     centralModelPath = None
@@ -184,19 +220,22 @@ def GetWorksharingCentralModelPath(doc):
         centralModelPath = None
     return centralModelPath
 
+
 def GetCentralModelFilePath(doc):
     modelPath = GetWorksharingCentralModelPath(doc)
     filePath = (
-            ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
-            if modelPath is not None else
-            str.Empty
-        )
+        ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+        if modelPath is not None else
+        str.Empty
+    )
     return filePath
+
 
 def GetActiveDocument(uiapp):
     uidoc = uiapp.ActiveUIDocument
     doc = uidoc.Document if uidoc is not None else None
     return doc
+
 
 def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
     app = doc.Application
@@ -217,7 +256,9 @@ def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
     app.PurgeReleasedAPIObjects()
     return
 
-def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, worksetConfig, audit, documentAction, output):
+
+def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets, worksetConfig, audit, documentAction,
+                               output):
     app = uiapp.Application
     result = None
     output()
@@ -227,20 +268,24 @@ def WithOpenedDetachedDocument(uiapp, openInUI, centralFilePath, discardWorksets
         if discardWorksets:
             uidoc = revit_file_util.OpenAndActivateDetachAndDiscardWorksets(uiapp, centralFilePath, audit)
         else:
-            uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, closeAllWorksets, worksetConfig, audit)
+            uidoc = revit_file_util.OpenAndActivateDetachAndPreserveWorksets(uiapp, centralFilePath, closeAllWorksets,
+                                                                             worksetConfig, audit)
         doc = uidoc.Document
     else:
         if discardWorksets:
             doc = revit_file_util.OpenDetachAndDiscardWorksets(app, centralFilePath, audit)
         else:
-            doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, closeAllWorksets, worksetConfig, audit)
+            doc = revit_file_util.OpenDetachAndPreserveWorksets(app, centralFilePath, closeAllWorksets, worksetConfig,
+                                                                audit)
     try:
         result = documentAction(doc)
     finally:
         SafeCloseWithoutSave(doc, openInUI, "Closed detached instance of central file: " + centralFilePath, output)
     return result
 
-def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, audit, documentAction, output):
+
+def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, worksetConfig, audit, documentAction,
+                               output):
     try:
         app = uiapp.Application
         result = None
@@ -250,10 +295,12 @@ def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, 
         output("New local file: " + localFilePath)
         closeAllWorksets = worksetConfig is None
         if openInUI:
-            uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, closeAllWorksets, worksetConfig, audit)
+            uidoc = revit_file_util.OpenAndActivateNewLocal(uiapp, centralFilePath, localFilePath, closeAllWorksets,
+                                                            worksetConfig, audit)
             doc = uidoc.Document
         else:
-            doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, closeAllWorksets, worksetConfig, audit)
+            doc = revit_file_util.OpenNewLocal(app, centralFilePath, localFilePath, closeAllWorksets, worksetConfig,
+                                               audit)
         try:
             result = documentAction(doc)
         finally:
@@ -266,17 +313,21 @@ def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, 
             raise
     return result
 
-def WithOpenedCloudDocument(uiapp, openInUI, cloudProjectId, cloudModelId, worksetConfig, audit, documentAction, output):
+
+def WithOpenedCloudDocument(uiapp, openInUI, cloudProjectId, cloudModelId, worksetConfig, audit, documentAction,
+                            output):
     app = uiapp.Application
     result = None
     output()
     output("Opening cloud model.")
     closeAllWorksets = worksetConfig is None
     if openInUI:
-        uidoc = revit_file_util.OpenAndActivateCloudDocument(uiapp, cloudProjectId, cloudModelId, closeAllWorksets, worksetConfig, audit)
+        uidoc = revit_file_util.OpenAndActivateCloudDocument(uiapp, cloudProjectId, cloudModelId, closeAllWorksets,
+                                                             worksetConfig, audit)
         doc = uidoc.Document
     else:
-        doc = revit_file_util.OpenCloudDocument(app, cloudProjectId, cloudModelId, closeAllWorksets, worksetConfig, audit)
+        doc = revit_file_util.OpenCloudDocument(app, cloudProjectId, cloudModelId, closeAllWorksets, worksetConfig,
+                                                audit)
     try:
         cloudModelPathText = ModelPathUtils.ConvertModelPathToUserVisiblePath(doc.GetCloudModelPath())
         output()
@@ -285,6 +336,7 @@ def WithOpenedCloudDocument(uiapp, openInUI, cloudProjectId, cloudModelId, works
     finally:
         SafeCloseWithoutSave(doc, openInUI, "Closed cloud model.", output)
     return result
+
 
 def WithOpenedDocument(uiapp, openInUI, revitFilePath, audit, documentAction, output):
     app = uiapp.Application
@@ -303,67 +355,81 @@ def WithOpenedDocument(uiapp, openInUI, revitFilePath, audit, documentAction, ou
         SafeCloseWithoutSave(doc, openInUI, "Closed file: " + revitFilePath, output)
     return result
 
-def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, batchRvtWorksetConfigurationOption, auditOnOpening, documentAction, output):
+
+def RunDetachedDocumentAction(uiapp, openInUI, centralFilePath, discardWorksets, batchRvtWorksetConfigurationOption,
+                              auditOnOpening, documentAction, output):
     def revitAction():
         result = WithOpenedDetachedDocument(
-                uiapp,
-                openInUI,
-                centralFilePath,
-                discardWorksets,
-                CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
-                auditOnOpening,
-                documentAction,
-                output
-            )
+            uiapp,
+            openInUI,
+            centralFilePath,
+            discardWorksets,
+            CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
+            auditOnOpening,
+            documentAction,
+            output
+        )
         return result
+
     result = WithErrorReportingAndHandling(uiapp, revitAction, output)
     return result
 
-def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, batchRvtWorksetConfigurationOption, auditOnOpening, documentAction, output):
+
+def RunNewLocalDocumentAction(uiapp, openInUI, centralFilePath, localFilePath, batchRvtWorksetConfigurationOption,
+                              auditOnOpening, documentAction, output):
     def revitAction():
         result = WithOpenedNewLocalDocument(
-                uiapp,
-                openInUI,
-                centralFilePath,
-                localFilePath,
-                CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
-                auditOnOpening,
-                documentAction,
-                output
-            )
+            uiapp,
+            openInUI,
+            centralFilePath,
+            localFilePath,
+            CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
+            auditOnOpening,
+            documentAction,
+            output
+        )
         return result
+
     result = WithErrorReportingAndHandling(uiapp, revitAction, output)
     return result
 
-def RunCloudDocumentAction(uiapp, openInUI, cloudProjectId, cloudModelId, batchRvtWorksetConfigurationOption, auditOnOpening, documentAction, output):
+
+def RunCloudDocumentAction(uiapp, openInUI, cloudProjectId, cloudModelId, batchRvtWorksetConfigurationOption,
+                           auditOnOpening, documentAction, output):
     def revitAction():
         result = WithOpenedCloudDocument(
-                uiapp,
-                openInUI,
-                cloudProjectId,
-                cloudModelId,
-                CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
-                auditOnOpening,
-                documentAction,
-                output
-            )
+            uiapp,
+            openInUI,
+            cloudProjectId,
+            cloudModelId,
+            CreateWorksetConfiguration(batchRvtWorksetConfigurationOption),
+            auditOnOpening,
+            documentAction,
+            output
+        )
         return result
+
     result = WithErrorReportingAndHandling(uiapp, revitAction, output)
     return result
+
 
 def RunDocumentAction(uiapp, openInUI, revitFilePath, auditOnOpening, documentAction, output):
     def revitAction():
         result = WithOpenedDocument(uiapp, openInUI, revitFilePath, auditOnOpening, documentAction, output)
         return result
+
     result = WithErrorReportingAndHandling(uiapp, revitAction, output)
     return result
+
 
 def WithErrorReportingAndHandling(uiapp, revitAction, output):
     def action():
         result = WithDocumentOpeningErrorReporting(revitAction, output)
         return result
+
     result = WithAutomatedErrorHandling(uiapp, action, output)
     return result
+
 
 def WithDocumentOpeningErrorReporting(documentOpeningAction, output):
     try:
@@ -378,13 +444,15 @@ def WithDocumentOpeningErrorReporting(documentOpeningAction, output):
         raise
     return result
 
+
 def WithAutomatedErrorHandling(uiapp, revitAction, output):
     def action():
         def action():
             result = revit_dialog_util.WithDialogBoxShowingHandler(uiapp, revitAction, output)
             return result
+
         result = revit_failure_handling.WithFailuresProcessingHandler(uiapp.Application, action, output)
         return result
+
     result = WithExceptionLogging(action, output)
     return result
-

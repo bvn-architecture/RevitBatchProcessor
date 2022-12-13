@@ -18,8 +18,8 @@
 #
 #
 
-import clr
 import System
+import clr
 
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
@@ -35,21 +35,23 @@ import exception_util
 
 REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX = "[ REVIT WARNINGS HANDLER ]"
 
+
 def ElementIdsToSemicolonDelimitedText(elementIds):
     return str.Join("; ", [str(elementId.IntegerValue) for elementId in elementIds])
+
 
 def ReportFailureWarning(failure, failureDefinition, output):
     failureSeverity = failure.GetSeverity()
     # TODO: more thorough reporting?
     output()
     output(
-            "\t" +
-            str(failureSeverity) +
-            " - " +
-            str(failure.GetDescriptionText()) +
-            " - " +
-            "(" + "GUID: " + str(failure.GetFailureDefinitionId().Guid) + ")"
-        )
+        "\t" +
+        str(failureSeverity) +
+        " - " +
+        str(failure.GetDescriptionText()) +
+        " - " +
+        "(" + "GUID: " + str(failure.GetFailureDefinitionId().Guid) + ")"
+    )
 
     if failureSeverity == FailureSeverity.Error or failureSeverity == FailureSeverity.Warning:
         failingElementIds = failure.GetFailingElementIds()
@@ -69,17 +71,18 @@ def ReportFailureWarning(failure, failureDefinition, output):
             defaultResolutionType = failureDefinition.GetDefaultResolutionType()
             for resolutionType in failureDefinition.GetApplicableResolutionTypes():
                 output(
-                        "\t\t" +
-                        str(resolutionType) +
-                        (" (Default)" if (resolutionType == defaultResolutionType) else str.Empty) +
-                        " - " +
-                        "'" + failureDefinition.GetResolutionCaption(resolutionType) + "'"
-                    )
+                    "\t\t" +
+                    str(resolutionType) +
+                    (" (Default)" if (resolutionType == defaultResolutionType) else str.Empty) +
+                    " - " +
+                    "'" + failureDefinition.GetResolutionCaption(resolutionType) + "'"
+                )
         else:
             output()
             output("\t" + "WARNING: no resolutions available")
 
     return
+
 
 def ProcessFailures(failuresAccessor, output, rollBackOnWarning=False):
     try:
@@ -105,19 +108,21 @@ def ProcessFailures(failuresAccessor, output, rollBackOnWarning=False):
                         result != FailureProcessingResult.ProceedWithRollBack
                         and
                         not rollBackOnWarning
-                    ):
+                ):
                     # If Unlock Constraints is a valid resolution type for the current failure, use it.
                     if failure.HasResolutionOfType(FailureResolutionType.UnlockConstraints):
                         failure.SetCurrentResolutionType(FailureResolutionType.UnlockConstraints)
                     elif failureDefinition.IsResolutionApplicable(FailureResolutionType.UnlockConstraints):
                         output()
-                        output("\t" + "WARNING: UnlockConstraints is not a valid resolution for this failure despite the definition reporting that it is an applicable resolution!")
+                        output(
+                            "\t" + "WARNING: UnlockConstraints is not a valid resolution for this failure despite the definition reporting that it is an applicable resolution!")
                     elif failure.HasResolutionOfType(FailureResolutionType.DetachElements):
                         failure.SetCurrentResolutionType(FailureResolutionType.DetachElements)
                     elif failure.HasResolutionOfType(FailureResolutionType.SkipElements):
                         failure.SetCurrentResolutionType(FailureResolutionType.SkipElements)
                     output()
-                    output("\t" + "Attempting to resolve error using resolution: " + str(failure.GetCurrentResolutionType()))
+                    output("\t" + "Attempting to resolve error using resolution: " + str(
+                        failure.GetCurrentResolutionType()))
                     failuresAccessor.ResolveFailure(failure)
                     result = FailureProcessingResult.ProceedWithCommit
                 else:
@@ -131,6 +136,7 @@ def ProcessFailures(failuresAccessor, output, rollBackOnWarning=False):
         result = FailureProcessingResult.Continue
     return result
 
+
 class FailuresPreprocessor(IFailuresPreprocessor):
     def __init__(self, output):
         self.output = output
@@ -140,6 +146,7 @@ class FailuresPreprocessor(IFailuresPreprocessor):
         result = ProcessFailures(failuresAccessor, self.output)
         return result
 
+
 def SetTransactionFailureOptions(transaction, output):
     failureOptions = transaction.GetFailureHandlingOptions()
     failureOptions.SetForcedModalHandling(True)
@@ -148,12 +155,14 @@ def SetTransactionFailureOptions(transaction, output):
     transaction.SetFailureHandlingOptions(failureOptions)
     return
 
+
 def SetFailuresAccessorFailureOptions(failuresAccessor):
     failureOptions = failuresAccessor.GetFailureHandlingOptions()
     failureOptions.SetForcedModalHandling(True)
     failureOptions.SetClearAfterRollback(True)
     failuresAccessor.SetFailureHandlingOptions(failureOptions)
     return
+
 
 def FailuresProcessingEventHandler(sender, args, output):
     app = sender
@@ -163,18 +172,18 @@ def FailuresProcessingEventHandler(sender, args, output):
     args.SetProcessingResult(result)
     return
 
+
 def WithFailuresProcessingHandler(app, action, output_):
     output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX)
     result = None
     failuresProcessingEventHandler = (
-            EventHandler[FailuresProcessingEventArgs](
-                    lambda sender, args: FailuresProcessingEventHandler(sender, args, output)
-                )
+        EventHandler[FailuresProcessingEventArgs](
+            lambda sender, args: FailuresProcessingEventHandler(sender, args, output)
         )
+    )
     app.FailuresProcessing += failuresProcessingEventHandler
     try:
         result = action()
     finally:
         app.FailuresProcessing -= failuresProcessingEventHandler
     return result
-

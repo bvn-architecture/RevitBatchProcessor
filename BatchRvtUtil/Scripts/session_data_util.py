@@ -18,15 +18,13 @@
 #
 #
 
-import clr
-import System
 from System.IO import Path
 
 import snapshot_data_util
 
+
 def GetSessionFolderPath(dataExportFolderPath, sessionStartTime):
     return Path.Combine(
-            dataExportFolderPath,
-            snapshot_data_util.GetSnapshotFolderName(sessionStartTime.ToLocalTime())
-        )
-
+        dataExportFolderPath,
+        snapshot_data_util.GetSnapshotFolderName(sessionStartTime.ToLocalTime())
+    )

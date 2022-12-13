@@ -17,314 +17,305 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+public interface IPersistent
 {
-    public interface IPersistent
+    void Load(JObject jobject);
+    void Store(JObject jobject);
+}
+
+public interface ISetting<T> : IPersistent
+{
+    string GetName();
+    T GetValue();
+    void SetValue(T value);
+}
+
+public class Setting<T> : ISetting<T>
+{
+    private readonly Func<JObject, string, T> _deserialize;
+    private readonly string _name;
+    private readonly Action<JObject, string, T> _serialize;
+    private T _value;
+
+    protected Setting(string name, Action<JObject, string, T> serialize, Func<JObject, string, T> deserialize,
+        T defaultValue)
     {
-        void Load(JObject jobject);
-        void Store(JObject jobject);
+        this._name = name;
+        this._serialize = serialize;
+        this._deserialize = deserialize;
+        _value = defaultValue;
     }
 
-    public interface ISetting<T> : IPersistent
+    public string GetName()
     {
-        string GetName();
-        T GetValue();
-        void SetValue(T value);
+        return _name;
     }
 
-    public class Setting<T> : ISetting<T>
+    public void Load(JObject jobject)
     {
-        private readonly string name;
-        private readonly Action<JObject, string, T> serialize;
-        private readonly Func<JObject, string, T> deserialize;
-        private readonly T defaultValue;
-        private T value;
-
-        public Setting(string name, Action<JObject, string, T> serialize, Func<JObject, string, T> deserialize, T defaultValue)
-        {
-            this.name = name;
-            this.serialize = serialize;
-            this.deserialize = deserialize;
-            this.defaultValue = defaultValue;
-            this.value = defaultValue;
-        }
-
-        public string GetName()
-        {
-            return this.name;
-        }
-
-        public void Load(JObject jobject)
-        {
-            this.value = this.deserialize(jobject, this.name);
-        }
-
-        public void Store(JObject jobject)
-        {
-            this.serialize(jobject, this.name, this.value);
-        }
-
-        public virtual T GetValue()
-        {
-            return this.value;
-        }
-
-        public virtual void SetValue(T value)
-        {
-            this.value = value;
-        }
+        _value = _deserialize(jobject, _name);
     }
 
-    public class OptionalSetting<T> : Setting<T>
+    public void Store(JObject jobject)
     {
-        public OptionalSetting(string name, Action<JObject, string, T> serialize, Func<JObject, string, T> deserialize, T defaultValue)
-            : base(
-                name,
-                serialize,
-                (jobject, propertyName) => TryDeserialize(deserialize, jobject, propertyName, defaultValue),
-                defaultValue
-            )
-        {
-        }
-
-        private static T TryDeserialize(Func<JObject, string, T> deserialize, JObject jobject, string propertyName, T defaultValue)
-        {
-            T value = defaultValue;
-
-            try
-            {
-                value = deserialize(jobject, propertyName);
-            }
-            catch (Exception e)
-            {
-            }
-
-            return value;
-        }
+        _serialize(jobject, _name, _value);
     }
 
-    public class BooleanSetting : OptionalSetting<bool>
+    public virtual T GetValue()
     {
-        public BooleanSetting(string name)
-            : base(name, SetBooleanPropertyValue, GetBooleanPropertyValue, false)
-        {
-        }
-
-        private static bool GetBooleanPropertyValue(JObject jobject, string propertyName)
-        {
-            return (jobject[propertyName] as JValue).ToObject<bool>();
-        }
-
-        private static void SetBooleanPropertyValue(JObject jobject, string propertyName, bool value)
-        {
-            jobject[propertyName] = value;
-        }
+        return _value;
     }
 
-    public class IntegerSetting : OptionalSetting<int>
+    public virtual void SetValue(T value)
     {
-        public IntegerSetting(string name)
-            : base(name, SetIntegerPropertyValue, GetIntegerPropertyValue, 0)
-        {
-        }
+        this._value = value;
+    }
+}
 
-        private static int GetIntegerPropertyValue(JObject jobject, string propertyName)
-        {
-            return (jobject[propertyName] as JValue).ToObject<int>();
-        }
-
-        private static void SetIntegerPropertyValue(JObject jobject, string propertyName, int value)
-        {
-            jobject[propertyName] = value;
-        }
+public class OptionalSetting<T> : Setting<T>
+{
+    protected OptionalSetting(string name, Action<JObject, string, T> serialize, Func<JObject, string, T> deserialize,
+        T defaultValue)
+        : base(
+            name,
+            serialize,
+            (jobject, propertyName) => TryDeserialize(deserialize, jobject, propertyName, defaultValue),
+            defaultValue
+        )
+    {
     }
 
-    public class StringSetting : OptionalSetting<string>
+    private static T TryDeserialize(Func<JObject, string, T> deserialize, JObject jobject, string propertyName,
+        T defaultValue)
     {
-        public StringSetting(string name)
-            : base(name, SetStringPropertyValue, GetStringPropertyValue, string.Empty)
+        var value = defaultValue;
+
+        try
         {
+            value = deserialize(jobject, propertyName);
+        }
+        catch (Exception e)
+        {
+            // ignored
         }
 
-        public override void SetValue(string value)
-        {
-            base.SetValue(InitializeFromString((value)));
-        }
+        return value;
+    }
+}
 
-        public override string GetValue()
-        {
-            return InitializeFromString(base.GetValue());
-        }
-
-        private static string GetStringPropertyValue(JObject jobject, string propertyName)
-        {
-            return InitializeFromString((jobject[propertyName] as JValue).Value as string);
-        }
-
-        private static void SetStringPropertyValue(JObject jobject, string propertyName, string value)
-        {
-            jobject[propertyName] = InitializeFromString(value);
-        }
-
-        private static string InitializeFromString(string value)
-        {
-            return !string.IsNullOrWhiteSpace(value) ? value : string.Empty;
-        }
+public class BooleanSetting : OptionalSetting<bool>
+{
+    public BooleanSetting(string name)
+        : base(name, SetBooleanPropertyValue, GetBooleanPropertyValue, false)
+    {
     }
 
-    public class EnumSetting<T> : OptionalSetting<T>
-        where T : struct, IConvertible
+    private static bool GetBooleanPropertyValue(JObject jobject, string propertyName)
     {
-        public EnumSetting(string name)
-            : base(name, SetEnumPropertyValue, GetEnumPropertyValue, default(T))
-        {
-        }
-
-        private static T GetEnumPropertyValue(JObject jobject, string propertyName)
-        {
-            return StringToEnum((jobject[propertyName] as JValue).Value as string);
-        }
-
-        private static void SetEnumPropertyValue(JObject jobject, string propertyName, T value)
-        {
-            jobject[propertyName] = EnumToString(value);
-        }
-
-        private static T StringToEnum(string value)
-        {
-            var enumValue = default(T);
-
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                bool isParsed = Enum.TryParse<T>(value, true, out enumValue);
-            }
-
-            return enumValue;
-        }
-
-        private static string EnumToString(T value)
-        {
-            return Enum.GetName(typeof(T), value);
-        }
+        return ((JValue)jobject[propertyName]).ToObject<bool>();
     }
 
-    public class ListSetting<T> : OptionalSetting<List<T>>
+    private static void SetBooleanPropertyValue(JObject jobject, string propertyName, bool value)
     {
-        public ListSetting(string name)
-            : base(name, SetListPropertyValue, GetListPropertyValue, Enumerable.Empty<T>().ToList())
-        {
-        }
+        jobject[propertyName] = value;
+    }
+}
 
-        public override void SetValue(List<T> value)
-        {
-            base.SetValue(InitializeFromList((value)));
-        }
-
-        public override List<T> GetValue()
-        {
-            return InitializeFromList(base.GetValue());
-        }
-
-        private static List<T> GetListPropertyValue(JObject jobject, string propertyName)
-        {
-            var jarray = (jobject[propertyName] as JArray);
-
-            return InitializeFromList(jarray.Select(jvalue => jvalue.ToObject<T>()).ToList());
-        }
-
-        private static void SetListPropertyValue(JObject jobject, string propertyName, List<T> value)
-        {
-            jobject[propertyName] = new JArray(InitializeFromList(value));
-        }
-
-        private static List<T> InitializeFromList(IEnumerable<T> value)
-        {
-            return (value ?? Enumerable.Empty<T>()).ToList();
-        }
+public class IntegerSetting : OptionalSetting<int>
+{
+    public IntegerSetting(string name)
+        : base(name, SetIntegerPropertyValue, GetIntegerPropertyValue, 0)
+    {
     }
 
-    public class PersistentSettings : IPersistent
+    private static int GetIntegerPropertyValue(JObject jobject, string propertyName)
     {
-        private readonly IEnumerable<IPersistent> persistentSettings;
-
-        public PersistentSettings(IEnumerable<IPersistent> persistentSettings)
-        {
-            this.persistentSettings = persistentSettings.ToList();
-        }
-
-        public void Load(JObject jobject)
-        {
-            foreach (var persistent in this.persistentSettings)
-            {
-                persistent.Load(jobject);
-            }
-        }
-
-        public void Store(JObject jobject)
-        {
-            foreach (var persistent in this.persistentSettings)
-            {
-                persistent.Store(jobject);
-            }
-        }
+        return ((JValue)jobject[propertyName]).ToObject<int>();
     }
 
-    public interface IUIConfigItem
+    private static void SetIntegerPropertyValue(JObject jobject, string propertyName, int value)
     {
-        void UpdateUI();
-        void UpdateConfig();
+        jobject[propertyName] = value;
+    }
+}
+
+public class StringSetting : OptionalSetting<string>
+{
+    public StringSetting(string name)
+        : base(name, SetStringPropertyValue, GetStringPropertyValue, string.Empty)
+    {
     }
 
-    public class UIConfigItem : IUIConfigItem
+    public override void SetValue(string value)
     {
-        public UIConfigItem(Action updateUI, Action updateConfig)
-        {
-            updateUI_ = updateUI;
-            updateConfig_ = updateConfig;
-        }
-
-        public void UpdateUI()
-        {
-            updateUI_();
-        }
-
-        public void UpdateConfig()
-        {
-            updateConfig_();
-        }
-
-        private Action updateUI_;
-        private Action updateConfig_;
+        base.SetValue(InitializeFromString(value));
     }
 
-    public class UIConfig : IUIConfigItem
+    public override string GetValue()
     {
-        private readonly IEnumerable<IUIConfigItem> uiConfigItems;
+        return InitializeFromString(base.GetValue());
+    }
 
-        public UIConfig(IEnumerable<IUIConfigItem> uiConfigItems)
+    private static string GetStringPropertyValue(JObject jobject, string propertyName)
+    {
+        return InitializeFromString((jobject[propertyName] as JValue)?.Value as string);
+    }
+
+    private static void SetStringPropertyValue(JObject jobject, string propertyName, string value)
+    {
+        jobject[propertyName] = InitializeFromString(value);
+    }
+
+    private static string InitializeFromString(string value)
+    {
+        return !string.IsNullOrWhiteSpace(value) ? value : string.Empty;
+    }
+}
+
+public class EnumSetting<T> : OptionalSetting<T>
+    where T : struct, IConvertible
+{
+    public EnumSetting(string name)
+        : base(name, SetEnumPropertyValue, GetEnumPropertyValue, default)
+    {
+    }
+
+    private static T GetEnumPropertyValue(JObject jobject, string propertyName)
+    {
+        return StringToEnum((jobject[propertyName] as JValue)?.Value as string);
+    }
+
+    private static void SetEnumPropertyValue(JObject jobject, string propertyName, T value)
+    {
+        jobject[propertyName] = EnumToString(value);
+    }
+
+    private static T StringToEnum(string value)
+    {
+        var enumValue = default(T);
+
+        if (!string.IsNullOrWhiteSpace(value))
         {
-            this.uiConfigItems = uiConfigItems.ToList();
+            var isParsed = Enum.TryParse(value, true, out enumValue);
         }
 
-        public void UpdateUI()
-        {
-            foreach (var uiConfigItem in this.uiConfigItems)
-            {
-                uiConfigItem.UpdateUI();
-            }
-        }
+        return enumValue;
+    }
 
-        public void UpdateConfig()
-        {
-            foreach (var uiConfigItem in this.uiConfigItems)
-            {
-                uiConfigItem.UpdateConfig();
-            }
-        }
+    private static string EnumToString(T value)
+    {
+        return Enum.GetName(typeof(T), value);
+    }
+}
+
+public class ListSetting<T> : OptionalSetting<List<T>>
+{
+    public ListSetting(string name)
+        : base(name, SetListPropertyValue, GetListPropertyValue, Enumerable.Empty<T>().ToList())
+    {
+    }
+
+    public override void SetValue(List<T> value)
+    {
+        base.SetValue(InitializeFromList(value));
+    }
+
+    public override List<T> GetValue()
+    {
+        return InitializeFromList(base.GetValue());
+    }
+
+    private static List<T> GetListPropertyValue(JObject jobject, string propertyName)
+    {
+        var jarray = jobject[propertyName] as JArray;
+
+        return InitializeFromList(jarray.Select(jvalue => jvalue.ToObject<T>()).ToList());
+    }
+
+    private static void SetListPropertyValue(JObject jobject, string propertyName, List<T> value)
+    {
+        jobject[propertyName] = new JArray(InitializeFromList(value));
+    }
+
+    private static List<T> InitializeFromList(IEnumerable<T> value)
+    {
+        return (value ?? Enumerable.Empty<T>()).ToList();
+    }
+}
+
+public class PersistentSettings : IPersistent
+{
+    private readonly IEnumerable<IPersistent> persistentSettings;
+
+    public PersistentSettings(IEnumerable<IPersistent> persistentSettings)
+    {
+        this.persistentSettings = persistentSettings.ToList();
+    }
+
+    public void Load(JObject jobject)
+    {
+        foreach (var persistent in persistentSettings) persistent.Load(jobject);
+    }
+
+    public void Store(JObject jobject)
+    {
+        foreach (var persistent in persistentSettings) persistent.Store(jobject);
+    }
+}
+
+public interface IUIConfigItem
+{
+    void UpdateUI();
+    void UpdateConfig();
+}
+
+public class UIConfigItem : IUIConfigItem
+{
+    private readonly Action _updateConfig;
+
+    private readonly Action _updateUi;
+
+    public UIConfigItem(Action updateUI, Action updateConfig)
+    {
+        _updateUi = updateUI;
+        _updateConfig = updateConfig;
+    }
+
+    public void UpdateUI()
+    {
+        _updateUi();
+    }
+
+    public void UpdateConfig()
+    {
+        _updateConfig();
+    }
+}
+
+public class UIConfig : IUIConfigItem
+{
+    private readonly IEnumerable<IUIConfigItem> _uiConfigItems;
+
+    public UIConfig(IEnumerable<IUIConfigItem> uiConfigItems)
+    {
+        this._uiConfigItems = uiConfigItems.ToList();
+    }
+
+    public void UpdateUI()
+    {
+        foreach (var uiConfigItem in _uiConfigItems) uiConfigItem.UpdateUI();
+    }
+
+    public void UpdateConfig()
+    {
+        foreach (var uiConfigItem in _uiConfigItems) uiConfigItem.UpdateConfig();
     }
 }

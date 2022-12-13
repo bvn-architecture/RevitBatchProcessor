@@ -18,43 +18,45 @@
 #
 #
 
-import clr
 import System
+import clr
+
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
 from System.Net import IPAddress
 
-import batch_rvt_util
 from batch_rvt_util import Network
+
 
 def IsSpecialAddress(address):
     return (
-        address.Equals(IPAddress.Any) or
-        address.Equals(IPAddress.Broadcast) or
-        address.Equals(IPAddress.IPv6Any) or
-        address.Equals(IPAddress.IPv6Loopback) or
-        address.Equals(IPAddress.IPv6None) or
-        address.Equals(IPAddress.Loopback)
+            address.Equals(IPAddress.Any) or
+            address.Equals(IPAddress.Broadcast) or
+            address.Equals(IPAddress.IPv6Any) or
+            address.Equals(IPAddress.IPv6Loopback) or
+            address.Equals(IPAddress.IPv6None) or
+            address.Equals(IPAddress.Loopback)
     )
+
 
 def GetGatewayAddresses():
     return list(
-            address for address in
-            Network.GetGatewayAddresses()
-            .Where(lambda a: not IsSpecialAddress(a))
-            .Select(lambda a: a.ToString())
-            .Distinct()
-            .OrderBy(lambda a: a)
-        )
+        address for address in
+        Network.GetGatewayAddresses()
+        .Where(lambda a: not IsSpecialAddress(a))
+        .Select(lambda a: a.ToString())
+        .Distinct()
+        .OrderBy(lambda a: a)
+    )
+
 
 def GetIPAddresses():
     return list(
-            address for address in
-            Network.GetIPAddresses()
-            .Where(lambda a: not IsSpecialAddress(a))
-            .Select(lambda a: a.ToString())
-            .Distinct()
-            .OrderBy(lambda a: a)
-        )
-
+        address for address in
+        Network.GetIPAddresses()
+        .Where(lambda a: not IsSpecialAddress(a))
+        .Select(lambda a: a.ToString())
+        .Distinct()
+        .OrderBy(lambda a: a)
+    )

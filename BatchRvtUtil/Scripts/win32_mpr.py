@@ -18,11 +18,10 @@
 #
 #
 
-import clr
 import System
+import System.Runtime.InteropServices as Interop
 
 import win32_pinvoke
-import System.Runtime.InteropServices as Interop
 
 MPR_MODULE_NAME = "mpr.dll"
 
@@ -33,13 +32,14 @@ REMOTE_NAME_MAX_LENGTH = 1024
 NO_ERROR = 0
 
 WNetGetConnectionWinApiFunc = win32_pinvoke.GetWinApiFunctionUnicode(
-        WNETGETCONNECTION_FUNCTION_NAME,
-        MPR_MODULE_NAME,
-        System.Int32, # Return value
-        System.String, # [in] lpLocalName
-        System.Text.StringBuilder, # [out] lpRemoteName
-        System.IntPtr # [in, out] lpnLength
-    )
+    WNETGETCONNECTION_FUNCTION_NAME,
+    MPR_MODULE_NAME,
+    System.Int32,  # Return value
+    System.String,  # [in] lpLocalName
+    System.Text.StringBuilder,  # [out] lpRemoteName
+    System.IntPtr  # [in, out] lpnLength
+)
+
 
 def WNetGetConnection(localName):
     remoteName = None
@@ -53,4 +53,3 @@ def WNetGetConnection(localName):
     if result == NO_ERROR:
         remoteName = remoteNameBuffer.ToString()
     return remoteName
-

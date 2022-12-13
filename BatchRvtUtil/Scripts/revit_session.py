@@ -18,14 +18,12 @@
 #
 #
 
-import clr
-import System
-
 # NOTE: must not add any references to Revit API modules here because this module
 # is allowed to run outside of a Revit application.
 
 def GetRevitVersionNumber(uiapp):
     return uiapp.Application.VersionNumber
+
 
 def GetSessionUIApplication():
     uiapp = None
@@ -34,6 +32,7 @@ def GetSessionUIApplication():
     except NameError, e:
         pass
     return uiapp
+
 
 def GetSessionRevitVersionNumber():
     uiapp = GetSessionUIApplication()
