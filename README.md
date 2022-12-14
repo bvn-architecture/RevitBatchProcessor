@@ -1,5 +1,5 @@
 
-<span style="color:green; font-size:16px"> This fork builds on the great work of Dan Rummery and all original project contribuors.
+<span style="color:green; font-size:16px"> This fork builds on the great work of Dan Rummery and all original project contributors.
 I've created it to implement unit testing, refactor the project to make it a bit cleaner and improve performance.
 </span>
 
