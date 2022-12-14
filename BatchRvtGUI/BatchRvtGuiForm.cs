@@ -33,7 +33,7 @@ namespace BatchRvtGUI;
 
 public partial class BatchRvtGuiForm : Form
 {
-    public const string WINDOW_TITLE = "Revit Batch Processor";
+    private const string WINDOW_TITLE = "Revit Batch Processor";
 
     private const string NEW_TASK_SCRIPT_FILENAME = "new_task_script.py";
     private const string NEW_PREPROCESSING_SCRIPT_FILENAME = "new_pre_processing_script.py";
@@ -62,7 +62,7 @@ public partial class BatchRvtGuiForm : Form
     private const int RUNNING_MINIMUM_WIDTH = INITIAL_WIDTH;
 
     private const int ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE = 275;
-    private const int READ_OUTPUT_INTERVAL_IN_MS = 250;
+    private const int READ_OUTPUT_INTERVAL_IN_MS = 10;
 
     private readonly Size RUNNING_INITIAL_SIZE = new(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
     private readonly Size RUNNING_MAXIMUM_SIZE = new(0, 0); // no maximum size
@@ -407,14 +407,14 @@ public partial class BatchRvtGuiForm : Form
 
     private void VerifyExcelInstallation(string filePath)
     {
-        if (!string.IsNullOrWhiteSpace(filePath))
-            if (ExcelUtil.HasExcelExtension(filePath) && !ExcelUtil.IsExcelInstalled())
-                MessageBox.Show(
-                    "WARNING: An Excel installation was not detected! Support for Excel files requires an Excel installation.",
-                    Text,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
+        if (string.IsNullOrWhiteSpace(filePath)) return;
+        if (ExcelUtil.HasExcelExtension(filePath) && !ExcelUtil.IsExcelInstalled())
+            MessageBox.Show(
+                "WARNING: An Excel installation was not detected! Support for Excel files requires an Excel installation.",
+                Text,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
+            );
     }
 
     private bool SaveSettings(string filePath = null)
@@ -428,60 +428,67 @@ public partial class BatchRvtGuiForm : Form
 
     private void BatchRvtGuiForm_FormClosing(object sender, FormClosingEventArgs e)
     {
-        if (isBatchRvtRunning)
+        if (!isBatchRvtRunning)
         {
-            var message = new StringBuilder();
-
-            message.AppendLine("Do you want to terminate the currently running task?");
-
-            var dialogResult = MessageBox.Show(
-                message.ToString(),
-                Text,
-                MessageBoxButtons.YesNoCancel,
-                MessageBoxIcon.Asterisk,
-                MessageBoxDefaultButton.Button3
-            );
-
-            if (dialogResult == DialogResult.Cancel)
-                e.Cancel = true;
-            else if (dialogResult == DialogResult.Yes)
-                try
-                {
-                    batchRvtProcess.Kill();
-                }
-                catch (Exception)
-                {
-                    // TODO: report failure to kill the process?
-                }
+            return;
         }
 
-        if (!e.Cancel)
+        var message = new StringBuilder();
+
+        message.AppendLine("Do you want to terminate the currently running task?");
+
+        var dialogResult = MessageBox.Show(
+            message.ToString(),
+            Text,
+            MessageBoxButtons.YesNoCancel,
+            MessageBoxIcon.Asterisk,
+            MessageBoxDefaultButton.Button3
+        );
+
+        if (dialogResult == DialogResult.Cancel)
+            e.Cancel = true;
+        else if (dialogResult == DialogResult.Yes)
+            try
+            {
+                batchRvtProcess.Kill();
+            }
+            catch (Exception)
+            {
+                // TODO: report failure to kill the process?
+            }
+        
+
+        if (e.Cancel)
         {
-            var message = new StringBuilder();
-
-            message.AppendLine("Do you want to save the current settings as default?");
-
-            var dialogResult = MessageBox.Show(
-                message.ToString(),
-                Text,
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button1
-            );
-
-            if (dialogResult == DialogResult.Yes)
-            {
-                var isSaved = SaveSettings();
-
-                // TODO: show error message if save failed!!
-            }
-
-            if (readBatchRvtOutput_Timer != null)
-            {
-                readBatchRvtOutput_Timer.Stop();
-                readBatchRvtOutput_Timer.Dispose();
-            }
+            return;
         }
+        
+           
+
+        message.AppendLine("Do you want to save the current settings as default?");
+
+        var dialogResult2 = MessageBox.Show(
+            message.ToString(),
+            Text,
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question,
+            MessageBoxDefaultButton.Button1
+        );
+
+        if (dialogResult2 == DialogResult.Yes)
+        {
+            var isSaved = SaveSettings();
+
+            // TODO: show error message if save failed!!
+        }
+
+        if (readBatchRvtOutput_Timer == null)
+        {
+            return;
+        }
+        readBatchRvtOutput_Timer.Stop();
+        readBatchRvtOutput_Timer.Dispose();
+
     }
 
     private void alwaysOnTopCheckbox_CheckedChanged(object sender, EventArgs e)
@@ -601,13 +608,9 @@ public partial class BatchRvtGuiForm : Form
         pendingErrorReadLineTask = linesAndPendingTask.Item2;
         lines = linesAndPendingTask.Item1;
 
-        foreach (var line in lines)
+        foreach (var line in lines.Where(line => !line.StartsWith("log4cplus:")).Where(line => Settings.ShowRevitProcessErrorMessages.GetValue()))
         {
-            if (line.StartsWith("log4cplus:")) // ignore pesky log4cplus messages (an Autodesk thing?)
-                continue;
-
-            if (Settings.ShowRevitProcessErrorMessages.GetValue())
-                batchRvtOutputTextBox.AppendText("[ REVIT ERROR MESSAGE ] : " + line + Environment.NewLine);
+            batchRvtOutputTextBox.AppendText("[ REVIT ERROR MESSAGE ] : " + line + Environment.NewLine);
         }
 
         if (!isBatchRvtRunning) return;
@@ -621,7 +624,7 @@ public partial class BatchRvtGuiForm : Form
     {
         BrowseForExistingScriptFile(
             "Select Task script",
-            scriptFilePath => { UpdateTaskScript(scriptFilePath); },
+            UpdateTaskScript,
             ScriptType.Any,
             PathUtil.GetExistingFileDirectoryPath(taskScriptTextBox.Text)
         );

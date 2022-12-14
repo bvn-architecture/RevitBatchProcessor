@@ -1,6 +1,6 @@
-import System
-import clr
 
+import clr
+import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
@@ -30,3 +30,4 @@ dataExportFolderPath = revit_script_util.GetDataExportFolderPath()
 # TODO: some real work!
 Output()
 Output("This task script is running!")
+

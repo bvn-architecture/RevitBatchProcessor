@@ -18,14 +18,16 @@
 #
 #
 
-import global_test_mode
+import clr
+import System
+
 import monitor_process
+import global_test_mode
 
 MONITOR_INTERVAL_IN_SECONDS = 0.25
 UNRESPONSIVE_THRESHHOLD_IN_SECONDS = 10
 
 REVIT_BUSY_HANDLER_PREFIX = "[ REVIT BUSY MONITOR ]"
-
 
 def OnBeginUnresponsive(output):
     output()
@@ -33,17 +35,15 @@ def OnBeginUnresponsive(output):
     output()
     return
 
-
 def OnEndUnresponsive(unresponsiveTimeInSeconds, output):
     output()
     output(
-        "Revit process appeared busy or unresponsive for about " +
-        unresponsiveTimeInSeconds.ToString() +
-        " seconds."
-    )
+            "Revit process appeared busy or unresponsive for about " +
+            unresponsiveTimeInSeconds.ToString() +
+            " seconds."
+        )
     output()
     return
-
 
 def MonitorHostRevitProcess(hostRevitProcess, monitoringAction, output):
     output()
@@ -53,17 +53,18 @@ def MonitorHostRevitProcess(hostRevitProcess, monitoringAction, output):
     busyOutput = global_test_mode.PrefixedOutputForGlobalTestMode(output, REVIT_BUSY_HANDLER_PREFIX)
 
     monitor_process.MonitorProcess(
-        hostRevitProcess,
-        monitoringAction,
-        MONITOR_INTERVAL_IN_SECONDS,
-        UNRESPONSIVE_THRESHHOLD_IN_SECONDS,
-        lambda: OnBeginUnresponsive(busyOutput),
-        lambda unresponsiveTimeInSeconds: OnEndUnresponsive(unresponsiveTimeInSeconds, busyOutput)
-    )
-
+            hostRevitProcess,
+            monitoringAction,
+            MONITOR_INTERVAL_IN_SECONDS,
+            UNRESPONSIVE_THRESHHOLD_IN_SECONDS,
+            lambda: OnBeginUnresponsive(busyOutput),
+            lambda unresponsiveTimeInSeconds: OnEndUnresponsive(unresponsiveTimeInSeconds, busyOutput)
+        )
+    
     output()
     output("Revit process (PID: " + str(hostRevitProcess.Id) + ") has exited!")
 
     # TODO: do something with last pending read line task if it exists?
 
     return
+

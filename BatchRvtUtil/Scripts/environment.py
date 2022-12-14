@@ -18,12 +18,13 @@
 #
 #
 
+import clr
+import System
 from System import Environment
-
 
 def GetMachineName():
     return Environment.MachineName
 
-
 def GetUserName():
     return Environment.UserName
+

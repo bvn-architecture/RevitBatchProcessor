@@ -19,13 +19,13 @@
 #
 
 import clr
+import System
 
 clr.AddReference("System.Core")
 import System.IO.Pipes as Pipes
 
 IN = Pipes.PipeDirection.In
 OUT = Pipes.PipeDirection.Out
-
 
 def CreateNamedPipeClient(node, pipeName):
     return Pipes.NamedPipeClientStream(
@@ -35,7 +35,7 @@ def CreateNamedPipeClient(node, pipeName):
         Pipes.PipeOptions.Asynchronous
     )
 
-
 def CreateAnonymousPipeClient(pipeDirection, pipeHandleString):
     pipeClient = Pipes.AnonymousPipeClientStream(pipeDirection, pipeHandleString)
     return pipeClient
+

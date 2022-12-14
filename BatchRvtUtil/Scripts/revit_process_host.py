@@ -18,9 +18,8 @@
 #
 #
 
-import System
 import clr
-
+import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 from System.Diagnostics import Process
@@ -29,16 +28,16 @@ import revit_process
 import script_environment
 import time_util
 
+
 PROCESS_UNIQUE_ID_DELIMITER = "|"
 
 
 def GetUniqueIdForProcess(process):
     return str.Join(
-        PROCESS_UNIQUE_ID_DELIMITER,
-        process.Id.ToString(),
-        time_util.GetISO8601FormattedUtcDate(process.StartTime)
-    )
-
+            PROCESS_UNIQUE_ID_DELIMITER,
+            process.Id.ToString(),
+            time_util.GetISO8601FormattedUtcDate(process.StartTime)
+        )
 
 def IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
     def IsBatchRvtProcess(process):
@@ -48,10 +47,8 @@ def IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
         except Exception, e:
             isTargetProcess = False
         return isTargetProcess
-
     batchRvtProcess = Process.GetProcesses().FirstOrDefault(IsBatchRvtProcess)
     return (batchRvtProcess is not None)
-
 
 def StartHostRevitProcess(
         revitVersion,
@@ -61,20 +58,19 @@ def StartHostRevitProcess(
         progressNumber,
         scriptOutputPipeHandleString,
         testModeFolderPath
-):
+    ):
     batchRvtProcessUniqueId = GetUniqueIdForProcess(Process.GetCurrentProcess())
-
     def initEnvironmentVariables(environmentVariables):
         script_environment.InitEnvironmentVariables(
-            environmentVariables,
-            batchRvtScriptsFolderPath,
-            scriptFilePath,
-            scriptDataFilePath,
-            progressNumber,
-            scriptOutputPipeHandleString,
-            batchRvtProcessUniqueId,
-            testModeFolderPath
-        )
+                environmentVariables,
+                batchRvtScriptsFolderPath,
+                scriptFilePath,
+                scriptDataFilePath,
+                progressNumber,
+                scriptOutputPipeHandleString,
+                batchRvtProcessUniqueId,
+                testModeFolderPath
+            )
         return
-
     return revit_process.StartRevitProcess(revitVersion, initEnvironmentVariables)
+

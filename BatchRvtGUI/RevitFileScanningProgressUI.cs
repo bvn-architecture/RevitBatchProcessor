@@ -115,14 +115,12 @@ public partial class RevitFileScanningProgressUI : Form
 
     private void RevitFileScanningProgressUI_FormClosing(object sender, FormClosingEventArgs e)
     {
-        if (e.CloseReason == CloseReason.UserClosing)
-            if (!scanningCompleted_ && !scanningCancelled_)
-            {
-                // NOTE: this scenario occurs when the user closes the progress window using Alt+F4.
-                CancelWithConfirmationPrompt();
+        if (e.CloseReason != CloseReason.UserClosing) return;
+        if (scanningCompleted_ || scanningCancelled_) return;
+        // NOTE: this scenario occurs when the user closes the progress window using Alt+F4.
+        CancelWithConfirmationPrompt();
 
-                if (!scanningCancelled_) e.Cancel = true;
-            }
+        if (!scanningCancelled_) e.Cancel = true;
 
         //if (!e.Cancel) progressUpdateTimer_.Stop();
     }

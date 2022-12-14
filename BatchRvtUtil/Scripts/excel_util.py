@@ -18,9 +18,11 @@
 #
 #
 
-import System
 import clr
-from System.Runtime.InteropServices import Marshal
+import System
+
+from System.Reflection import Missing
+from System.Runtime.InteropServices import COMException, Marshal
 
 clr.AddReference("Microsoft.Office.Interop.Excel")
 import Microsoft.Office.Interop.Excel as Excel
@@ -33,21 +35,20 @@ xlNoChange = 1
 
 def FindFirstValue(range, searchOrder, searchDirection):
     afterCell = range.Cells[
-        range.Rows.Count if (searchDirection == Excel.XlSearchDirection.xlNext) else 1,
-        range.Columns.Count if (searchDirection == Excel.XlSearchDirection.xlNext) else 1
-    ]
+            range.Rows.Count if (searchDirection == Excel.XlSearchDirection.xlNext) else 1,
+            range.Columns.Count if (searchDirection == Excel.XlSearchDirection.xlNext) else 1
+        ]
     return range.Find(
-        "*",
-        afterCell,
-        Excel.XlFindLookIn.xlValues,
-        MissingValue,
-        searchOrder,
-        searchDirection,
-        MissingValue,
-        MissingValue,
-        MissingValue
-    )
-
+            "*",
+            afterCell,
+            Excel.XlFindLookIn.xlValues,
+            MissingValue,
+            searchOrder,
+            searchDirection,
+            MissingValue,
+            MissingValue,
+            MissingValue
+        )
 
 # Returns the row number of the first non-blank row in the range.
 # If all rows are blank, returns 0.
@@ -55,13 +56,11 @@ def GetFirstUsedRowNumber(range):
     firstUsedCell = FindFirstValue(range, Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext)
     return firstUsedCell.Row if (firstUsedCell is not None) else 0
 
-
 # Returns the column number of the first non-blank column in the range.
 # If all columns are blank, returns 0.
 def GetFirstUsedColumnNumber(range):
     firstUsedCell = FindFirstValue(range, Excel.XlSearchOrder.xlByColumns, Excel.XlSearchDirection.xlNext)
     return firstUsedCell.Column if (firstUsedCell is not None) else 0
-
 
 # Returns the row number of the last non-blank row in the range.
 # If all rows are blank, returns 0.
@@ -69,19 +68,17 @@ def GetLastUsedRowNumber(range):
     lastUsedCell = FindFirstValue(range, Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious)
     return lastUsedCell.Row if (lastUsedCell is not None) else 0
 
-
 # Returns the column number of the last non-blank column in the range.
 # If all columns are blank, returns 0.
 def GetLastUsedColumnNumber(range):
     lastUsedCell = FindFirstValue(range, Excel.XlSearchOrder.xlByColumns, Excel.XlSearchDirection.xlPrevious)
     return lastUsedCell.Column if (lastUsedCell is not None) else 0
 
-
 def WriteRowsToWorksheet(worksheet, rows):
     for rowIndex, row in enumerate(rows):
         excelRows = worksheet.Rows
         excelRow = excelRows[rowIndex + 1]
-        excelRow.NumberFormat = "@"  # Set type to 'Text'
+        excelRow.NumberFormat = "@" # Set type to 'Text'
         for cellIndex, cellValue in enumerate(row):
             cells = excelRow.Cells
             cell = cells[cellIndex + 1]
@@ -91,7 +88,6 @@ def WriteRowsToWorksheet(worksheet, rows):
         Marshal.FinalReleaseComObject(excelRow)
         Marshal.FinalReleaseComObject(excelRows)
     return
-
 
 def ReadRowsFromWorksheet(worksheet):
     usedRange = worksheet.UsedRange
@@ -103,21 +99,18 @@ def ReadRowsFromWorksheet(worksheet):
         rows.append(row)
     return rows
 
-
 def GetNumberOfRowsAndColumns(worksheet):
     usedRange = worksheet.UsedRange
     return (
-        usedRange.Row + usedRange.Rows.Count - 1,
-        usedRange.Column + usedRange.Columns.Count - 1
-    )
-
+            usedRange.Row + usedRange.Rows.Count - 1,
+            usedRange.Column + usedRange.Columns.Count - 1
+        )
 
 def GetWorksheetRange(worksheet, firstRowNumber, firstColumnNumber, lastRowNumber, lastColumnNumber):
     return worksheet.Range[
-        worksheet.Cells[firstRowNumber, firstColumnNumber],
-        worksheet.Cells[lastRowNumber, lastColumnNumber]
-    ]
-
+            worksheet.Cells[firstRowNumber, firstColumnNumber],
+            worksheet.Cells[lastRowNumber, lastColumnNumber]
+        ]
 
 def ReadRowsText(range):
     rows = []
@@ -128,7 +121,6 @@ def ReadRowsText(range):
         rows.Add(row)
     return rows
 
-
 def ReadRowsTextFromWorksheet(worksheet):
     rows = []
     usedRange = worksheet.UsedRange
@@ -138,14 +130,13 @@ def ReadRowsTextFromWorksheet(worksheet):
         rows = ReadRowsText(GetWorksheetRange(worksheet, 1, 1, lastUsedRowNumber, lastUsedColumnNumber))
     return rows
 
-
 def WithExcelApp(excelAppAction):
     result = None
     app = Excel.ApplicationClass()
-    app.Visible = False  # Set this to False so Excel isn't visible to the user.
+    app.Visible = False # Set this to False so Excel isn't visible to the user.
     app.DisplayAlerts = False
     app.ScreenUpdating = False
-    app.AskToUpdateLinks = False  # Suppress prompt to update data links.
+    app.AskToUpdateLinks = False # Suppress prompt to update data links.
     try:
         result = excelAppAction(app)
     finally:
@@ -155,10 +146,8 @@ def WithExcelApp(excelAppAction):
         Marshal.FinalReleaseComObject(app)
     return result
 
-
 def WithExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
     result = None
-
     def excelAppAction(app):
         result = None
         workbooks = None
@@ -174,14 +163,11 @@ def WithExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
             if workbooks is not None:
                 Marshal.FinalReleaseComObject(workbooks)
         return result
-
     result = WithExcelApp(excelAppAction)
     return result
 
-
 def WithNewExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
     result = None
-
     def excelAppAction(app):
         result = None
         workbooks = None
@@ -199,10 +185,8 @@ def WithNewExcelWorkbook(excelFilePath, workbookAction, saveChanges=False):
             if workbooks is not None:
                 Marshal.FinalReleaseComObject(workbooks)
         return result
-
     result = WithExcelApp(excelAppAction)
     return result
-
 
 def ReadRowsTextFromWorkbook(excelFilePath, worksheetName=None):
     def excelWorkbookAction(workbook):
@@ -212,10 +196,8 @@ def ReadRowsTextFromWorkbook(excelFilePath, worksheetName=None):
         Marshal.FinalReleaseComObject(worksheet)
         Marshal.FinalReleaseComObject(worksheets)
         return rows
-
     rows = WithExcelWorkbook(excelFilePath, excelWorkbookAction)
     return rows
-
 
 def WriteRowsTextToWorkbook(excelFilePath, rows, worksheetName=None):
     def excelWorkbookAction(workbook):
@@ -225,10 +207,8 @@ def WriteRowsTextToWorkbook(excelFilePath, rows, worksheetName=None):
         Marshal.FinalReleaseComObject(worksheet)
         Marshal.FinalReleaseComObject(worksheets)
         return
-
     WithExcelWorkbook(excelFilePath, excelWorkbookAction, saveChanges=True)
     return
-
 
 def WriteRowsTextToNewWorkbook(excelFilePath, rows, worksheetName=None):
     def excelWorkbookAction(workbook):
@@ -241,6 +221,5 @@ def WriteRowsTextToNewWorkbook(excelFilePath, rows, worksheetName=None):
         Marshal.FinalReleaseComObject(worksheet)
         Marshal.FinalReleaseComObject(worksheets)
         return
-
     WithNewExcelWorkbook(excelFilePath, excelWorkbookAction, saveChanges=True)
     return

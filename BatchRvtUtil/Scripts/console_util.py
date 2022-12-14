@@ -18,8 +18,9 @@
 #
 #
 
+import clr
+import System
 from System import Console, ConsoleKey
-
 
 def WaitForSpaceBarKeyPress():
     while True:
@@ -28,14 +29,11 @@ def WaitForSpaceBarKeyPress():
             break
     return
 
-
 def IsInputRedirected():
     return Console.IsInputRedirected
 
-
 def ReadLine():
     return Console.ReadLine()
-
 
 def ReadLines():
     lines = []
@@ -44,3 +42,4 @@ def ReadLines():
         lines.append(line)
         line = Console.ReadLine()
     return lines
+

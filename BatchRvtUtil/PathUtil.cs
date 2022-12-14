@@ -60,16 +60,12 @@ public static class PathUtil
 
     public static string GetExistingFileDirectoryPath(string existingFilePath)
     {
-        string initialDirectory = null;
-
-        if (File.Exists(existingFilePath)) initialDirectory = Path.GetDirectoryName(existingFilePath);
-
-        return initialDirectory;
+        return File.Exists(existingFilePath) ? Path.GetDirectoryName(existingFilePath) : null;
     }
 
     public static bool HasExtension(string filePath, string extension)
     {
-        return Path.GetExtension(filePath).ToLower() == extension.ToLower();
+        return string.Equals(Path.GetExtension(filePath), extension, StringComparison.CurrentCultureIgnoreCase);
     }
 
     private static T IgnoringPathExceptions<T>(Func<T> func)
@@ -100,8 +96,7 @@ public static class PathUtil
     {
         // NOTE: DirectoryInfo can throw path-related exceptions, hence the use of IgnoringPathExceptions here.
         return IgnoringPathExceptions(
-            () => { return SafeEnumerateFiles(new DirectoryInfo(root), pattern, searchOption); }
-        ) ?? Enumerable.Empty<string>();
+            () => SafeEnumerateFiles(new DirectoryInfo(root), pattern, searchOption)) ?? Enumerable.Empty<string>();
     }
 
     // See https://stackoverflow.com/questions/13130052/directoryinfo-enumeratefiles-causes-unauthorizedaccessexception-and-other

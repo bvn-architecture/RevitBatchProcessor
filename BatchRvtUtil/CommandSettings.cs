@@ -31,18 +31,18 @@ public static class CommandSettings
     public const string SESSION_ID_OPTION = "session_id";
     public const string TASK_DATA_OPTION = "task_data";
     public const string TEST_MODE_FOLDER_PATH_OPTION = "test_mode_folder_path";
-    private const string REVIT_FILE_LIST_OPTION = "file_list";
-    private const string REVIT_VERSION_OPTION = "revit_version";
-    private const string TASK_SCRIPT_FILE_PATH_OPTION = "task_script";
-    private const string DETACH_OPTION = "detach";
-    private const string CREATE_NEW_LOCAL_OPTION = "create_new_local";
-    private const string WORKSETS_OPTION = "worksets";
-    private const string CLOSE_ALL_WORKSETS_OPTION_VALUE = "close_all";
-    private const string OPEN_ALL_WORKSETS_OPTION_VALUE = "open_all";
-    private const string OPEN_LAST_VIEWED_WORKSETS_OPTION_VALUE = "last_viewed";
-    private const string AUDIT_ON_OPENING_OPTION = "audit";
-    private const string PER_FILE_PROCESSING_TIMEOUT_OPTION = "per_file_timeout";
-    private const string HELP_OPTION = "help";
+    public const string REVIT_FILE_LIST_OPTION = "file_list";
+    public const string REVIT_VERSION_OPTION = "revit_version";
+    public const string TASK_SCRIPT_FILE_PATH_OPTION = "task_script";
+    public const string DETACH_OPTION = "detach";
+    public const string CREATE_NEW_LOCAL_OPTION = "create_new_local";
+    public const string WORKSETS_OPTION = "worksets";
+    public const string CLOSE_ALL_WORKSETS_OPTION_VALUE = "close_all";
+    public const string OPEN_ALL_WORKSETS_OPTION_VALUE = "open_all";
+    public const string OPEN_LAST_VIEWED_WORKSETS_OPTION_VALUE = "last_viewed";
+    public const string AUDIT_ON_OPENING_OPTION = "audit";
+    public const string PER_FILE_PROCESSING_TIMEOUT_OPTION = "per_file_timeout";
+    public const string HELP_OPTION = "help";
 
     private static readonly string[] ALL_VALID_OPTONS =
     {
@@ -81,7 +81,7 @@ public static class CommandSettings
             { HELP_OPTION, null }
         };
 
-    private static string ParseTextOptionValue(string textOptionValue)
+    public static string ParseTextOptionValue(string textOptionValue)
     {
         string parsedValue = null;
 
@@ -90,14 +90,14 @@ public static class CommandSettings
         return parsedValue;
     }
 
-    private static int? ParsePositiveIntegerOptionValue(string integerOptionValue)
+    public static int? ParsePositiveIntegerOptionValue(string integerOptionValue)
     {
         var parsed = int.TryParse(integerOptionValue, out var parsedValue);
 
         return parsed && parsedValue > 0 ? parsedValue : null;
     }
 
-    private static string ParseExistingFilePathOptionValue(string filePathOptionValue)
+    public static string ParseExistingFilePathOptionValue(string filePathOptionValue)
     {
         string parsedValue = null;
 
@@ -109,7 +109,7 @@ public static class CommandSettings
         return parsedValue;
     }
 
-    private static string ParseExistingFolderPathOptionValue(string folderPathOptionValue)
+    public static string ParseExistingFolderPathOptionValue(string folderPathOptionValue)
     {
         string parsedValue = null;
 

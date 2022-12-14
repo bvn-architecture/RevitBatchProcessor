@@ -18,6 +18,9 @@
 #
 #
 
+import clr
+import System
+
 import sys
 
 import logging_util
@@ -28,14 +31,12 @@ SHOW_OUTPUT = True
 ORIGINAL_STDOUT = sys.stdout
 ORIGINAL_STDERR = sys.stderr
 
-
 def RedirectScriptOutput(output):
     sys.stdout.flush()
     sys.stderr.flush()
     sys.stdout = output
     sys.stderr = output
     return
-
 
 def RestoreScriptOutput():
     sys.stderr.flush()
@@ -44,12 +45,15 @@ def RestoreScriptOutput():
     sys.stdout = ORIGINAL_STDERR
     return
 
-
 def Output(m="", msgId=""):
     timestamp = time_util.GetDateTimeNow().ToString("HH:mm:ss")
-    message = timestamp + " : " + (("[" + str(msgId) + "]" + " ") if msgId != "" else "") + m + "\n"
+    message = ""
+    for line in m.split("\n"):
+        message += timestamp + " : " + (("[" + str(msgId) + "]" + " ") if msgId != "" else "") + line + "\n"
     if SHOW_OUTPUT:
         ORIGINAL_STDOUT.write(message)
     if logging_util.LOG_FILE[0] is not None:
-        logging_util.LOG_FILE[0].WriteMessage({"msgId": msgId, "message": m})
+        logging_util.LOG_FILE[0].WriteMessage({ "msgId" : msgId, "message" : m })
     return
+
+

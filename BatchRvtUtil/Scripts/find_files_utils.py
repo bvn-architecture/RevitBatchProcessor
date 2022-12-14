@@ -18,34 +18,34 @@
 #
 #
 
+import clr
+import System
+
 from System.Diagnostics import Process, ProcessStartInfo
 from System.Text import Encoding
 
 DIR_COMMAND_DIRECTORIES = "dir /ad /b /on"
 DIR_COMMAND_FILES = "dir /a-d /b /on"
 
-
 # NOTE: the pushd/popd commands are needed in order for dir command to respect relative base folder paths
 #       when invoked from this script. Otherwise it always uses the current directory, for whatever reason.
 #       note that setting the ProcessStartInfo.WorkingDirectory property doesn't alleviate this problem!
 def GetDirFoldersCommand(baseFolderPath, folderPattern, includeSubfolders):
     return (
-            'pushd "' + baseFolderPath + '" && ' +  # '&&' is used so that the command fails if the folder doesn't exist.
+            'pushd "' + baseFolderPath + '" && ' + # '&&' is used so that the command fails if the folder doesn't exist.
             DIR_COMMAND_DIRECTORIES + (' /s' if includeSubfolders else '') + ' "' + folderPattern + '" & ' +
             'popd'
-    )
-
+        )
 
 # NOTE: the pushd/popd commands are needed in order for dir command to respect relative base folder paths
 #       when invoked from this script. Otherwise it always uses the current directory, for whatever reason.
 #       note that setting the ProcessStartInfo.WorkingDirectory property doesn't alleviate this problem!
 def GetDirFilesCommand(baseFolderPath, filePattern, includeSubfolders):
     return (
-            'pushd "' + baseFolderPath + '" && ' +  # '&&' is used so that the command fails if the folder doesn't exist.
+            'pushd "' + baseFolderPath + '" && ' + # '&&' is used so that the command fails if the folder doesn't exist.
             DIR_COMMAND_FILES + (' /s' if includeSubfolders else '') + ' "' + filePattern + '" & ' +
             'popd'
-    )
-
+        )
 
 def StartCmdProcess(commandLine):
     # NOTE: do not call Process.WaitForExit() until redirected streams have been entirely read from / closed.
@@ -58,12 +58,11 @@ def StartCmdProcess(commandLine):
     psi.UseShellExecute = False
     psi.CreateNoWindow = True
     psi.RedirectStandardInput = False
-    psi.RedirectStandardError = False  # See notes above if enabling this alongside redirect output stream.
+    psi.RedirectStandardError = False # See notes above if enabling this alongside redirect output stream.
     psi.RedirectStandardOutput = True
     psi.StandardOutputEncoding = Encoding.Unicode
     p = Process.Start(psi)
     return p
-
 
 def ReadProcessOutputLines(process):
     output = process.StandardOutput
@@ -73,12 +72,10 @@ def ReadProcessOutputLines(process):
         line = output.ReadLine()
     return
 
-
 def FindFiles(baseFolderPath, filePattern, includeSubfolders=False):
     cmd = GetDirFilesCommand(baseFolderPath, filePattern, includeSubfolders)
     p = StartCmdProcess(cmd)
     return ReadProcessOutputLines(p)
-
 
 def FindFolders(baseFolderPath, folderPattern, includeSubfolders=False):
     cmd = GetDirFoldersCommand(baseFolderPath, folderPattern, includeSubfolders)

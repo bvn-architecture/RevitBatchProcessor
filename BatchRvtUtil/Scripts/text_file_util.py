@@ -18,27 +18,25 @@
 #
 #
 
+import clr
+import System
+
 from System.IO import File, StringReader
 from System.Text import Encoding
-
 import path_util
 import stream_io_util
 
 TXT_FILE_EXTENSION = ".txt"
 
-
 def ReadAllLines(filePath):
     lines = File.ReadAllLines(filePath)
-    if len(lines) > 0:  # Workaround for a potential lack of detection of Unicode txt files.
-        if not lines[0].Contains("\x00"):
-            return
-        lines = File.ReadAllLines(filePath, Encoding.Unicode)
+    if len(lines) > 0: # Workaround for a potential lack of detection of Unicode txt files.
+        if lines[0].Contains("\x00"):
+            lines = File.ReadAllLines(filePath, Encoding.Unicode)
     return lines
-
 
 def HasTextFileExtension(filePath):
     return path_util.HasFileExtension(filePath, TXT_FILE_EXTENSION)
-
 
 def GetLinesFromText(text):
     reader = StringReader(text)
@@ -52,66 +50,60 @@ def GetLinesFromText(text):
         reader.Dispose()
     return lines
 
-
 def GetRowsFromLines(lines):
     return list(line.Split("\t") for line in lines)
-
 
 def GetRowsFromText(text):
     lines = GetLinesFromText(text)
     return GetRowsFromLines(lines)
 
-
 def GetRowsFromTextFile(filePath):
     lines = ReadAllLines(filePath)
     return GetRowsFromLines(lines)
 
-
 def WriteToTextFile(textFilePath, text):
     path_util.CreateDirectoryForFilePath(textFilePath)
-
+    
     fileStream = stream_io_util.CreateFile(textFilePath, True)
-
+    
     def fileStreamAction():
         textWriter = stream_io_util.GetStreamWriter(fileStream)
-
+        
         def textWriterAction():
             textWriter.Write(text)
             return
-
+        
         stream_io_util.UsingStream(textWriter, textWriterAction)
         return
 
     stream_io_util.UsingStream(fileStream, fileStreamAction)
     return
 
-
 def WriteLinesToTextFile(textFilePath, lines):
     path_util.CreateDirectoryForFilePath(textFilePath)
-
+    
     fileStream = stream_io_util.CreateFile(textFilePath, True)
-
+    
     def fileStreamAction():
         textWriter = stream_io_util.GetStreamWriter(fileStream)
-
+        
         def textWriterAction():
             for line in lines:
                 textWriter.WriteLine(line)
             return
-
+        
         stream_io_util.UsingStream(textWriter, textWriterAction)
         return
 
     stream_io_util.UsingStream(fileStream, fileStreamAction)
     return
 
-
 def ReadFromTextFile(textFilePath):
     fileStream = stream_io_util.OpenFile(textFilePath, True)
-
+    
     def fileStreamAction():
         textReader = stream_io_util.GetStreamReader(fileStream)
-
+        
         def textReaderAction():
             text = textReader.ReadToEnd()
             return text
@@ -121,3 +113,4 @@ def ReadFromTextFile(textFilePath):
 
     text = stream_io_util.UsingStream(fileStream, fileStreamAction)
     return text
+

@@ -43,23 +43,23 @@ public static class RevitVersion
 
     private const string REVIT_EXECUTABLE_FILE_NAME = "Revit.exe";
 
-    private static string GetVersionNumber(SupportedRevitVersion supportedRevitVersion)
+    public static string GetVersionNumber(SupportedRevitVersion supportedRevitVersion)
     {
         var versionName = Enum.GetName(typeof(SupportedRevitVersion), supportedRevitVersion);
         return versionName?.Remove(0, 5);
     }
 
-    private static string GetAddinPath(SupportedRevitVersion supportedRevitVersion)
+    public static string GetAddinPath(SupportedRevitVersion supportedRevitVersion)
     {
         return $".\\Autodesk\\Revit\\Addins\\{GetVersionNumber(supportedRevitVersion)}";
     }
 
-    internal static string GetAddinName(SupportedRevitVersion supportedRevitVersion)
+    public static string GetAddinName(SupportedRevitVersion supportedRevitVersion)
     {
         return $"BatchRvtAddin{GetVersionNumber(supportedRevitVersion)}.addin";
     }
 
-    private static Dictionary<SupportedRevitVersion, string> REVIT_EXECUTABLE_FOLDER_PATHS()
+    public static Dictionary<SupportedRevitVersion, string> REVIT_EXECUTABLE_FOLDER_PATHS()
     {
         return (from versionName in Enum.GetNames(typeof(SupportedRevitVersion))
             select (SupportedRevitVersion)Enum.Parse(typeof(SupportedRevitVersion), versionName)
@@ -69,7 +69,7 @@ public static class RevitVersion
             select enumOfVersion).ToDictionary(enumOfVersion => enumOfVersion, GetRevitInstallPath);
     }
 
-    private static string GetRevitInstallPath(SupportedRevitVersion supportedRevitVersion)
+    public static string GetRevitInstallPath(SupportedRevitVersion supportedRevitVersion)
     {
         var appPath = $@"SOFTWARE\Autodesk\Revit\{GetVersionNumber(supportedRevitVersion)}";
         if (appPath == null) throw new ArgumentNullException(nameof(appPath));
@@ -91,7 +91,7 @@ public static class RevitVersion
         return installLocation?.ToString();
     }
 
-    private static string GetRevitExecutableFolderPath(SupportedRevitVersion revitVersion)
+    public static string GetRevitExecutableFolderPath(SupportedRevitVersion revitVersion)
     {
         if (GetRevitInstallPath(revitVersion) == null) return null;
         return File.Exists(Path.Combine(GetRevitInstallPath(revitVersion) ?? string.Empty,
@@ -108,14 +108,14 @@ public static class RevitVersion
             .ToList();
     }
 
-    private static string GetRevitExecutableFilePath(SupportedRevitVersion revitVersion)
+    public static string GetRevitExecutableFilePath(SupportedRevitVersion revitVersion)
     {
         var folderPath = GetRevitExecutableFolderPath(revitVersion);
 
         return folderPath != null ? Path.Combine(folderPath, REVIT_EXECUTABLE_FILE_NAME) : null;
     }
 
-    private static bool IsRevitVersionInstalled(SupportedRevitVersion revitVersion)
+    public static bool IsRevitVersionInstalled(SupportedRevitVersion revitVersion)
     {
         return File.Exists(GetRevitExecutableFilePath(revitVersion));
     }

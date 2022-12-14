@@ -259,15 +259,16 @@ public static class BatchRvtTasks
 
         var batchRvtSettings = commandSettingsData.Settings;
 
-        if (batchRvtSettings != null)
-            if (batchRvtSettings.RevitProcessingOption.GetValue() ==
-                BatchRvt.RevitProcessingOption.BatchRevitFileProcessing)
-                if (
-                    string.IsNullOrWhiteSpace(batchRvtSettings.RevitFileListFilePath.GetValue())
-                    &&
-                    commandSettingsData.RevitFileList == null
-                )
-                    throw new ArgumentNullException(@"No Revit file list was specified for Batch processing mode.");
+        if (batchRvtSettings != null && batchRvtSettings.RevitProcessingOption.GetValue() ==
+                                     BatchRvt.RevitProcessingOption.BatchRevitFileProcessing
+                                     &&
+                                     string.IsNullOrWhiteSpace(batchRvtSettings.RevitFileListFilePath.GetValue())
+                                     &&
+                                     commandSettingsData.RevitFileList == null)
+        {
+            throw new ArgumentNullException(@"No Revit file list was specified for Batch processing mode.");
+        }
+            
 
         commandSettingsData.GeneratedLogFilePath = null;
 

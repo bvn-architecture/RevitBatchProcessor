@@ -76,11 +76,8 @@ public static class RevitFileScanning
 
             var expandedRevitFilePaths = new List<string>();
 
-            foreach (var indexedExpandedRevitFilePath in indexedExpandedRevitFilePaths)
+            foreach (var (index, expandedRevitFilePath) in indexedExpandedRevitFilePaths)
             {
-                var index = indexedExpandedRevitFilePath.Item1;
-                var expandedRevitFilePath = indexedExpandedRevitFilePath.Item2;
-
                 progressReporter(expandingNetworkPathsMessagePrefix + " (" + (index + 1) + " of " +
                                  numberOfRevitFilePaths + ") ...");
 
@@ -102,11 +99,8 @@ public static class RevitFileScanning
 
         var allRevitVersionTexts = new List<string[]>();
 
-        foreach (var indexedRevitVersionText in indexedRevitVersionTexts)
+        foreach (var (index, revitVersionTexts) in indexedRevitVersionTexts)
         {
-            var index = indexedRevitVersionText.Item1;
-            var revitVersionTexts = indexedRevitVersionText.Item2;
-
             progressReporter(extractingNetworkPathsMessagePrefix + " (" + (index + 1) + " of " +
                              numberOfRevitFilePaths + ") ...");
 

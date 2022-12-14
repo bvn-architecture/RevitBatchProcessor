@@ -80,6 +80,10 @@ public static class BatchRvt
 
     public static bool IsBatchRvtLine(string line)
     {
+        if (line is null)
+        {
+            throw new ArgumentException("Argument can't be null");
+        }
         var parts = line.Split();
 
         var success =
@@ -98,20 +102,7 @@ public static class BatchRvt
     {
         var baseDirectory = GetBatchRvtFolderPath();
 
-        var batchRvtOptions = new Dictionary<string, string>
-        {
-            { CommandSettings.SETTINGS_FILE_PATH_OPTION, settingsFilePath }
-        };
-
-        if (!string.IsNullOrWhiteSpace(logFolderPath))
-            batchRvtOptions[CommandSettings.LOG_FOLDER_PATH_OPTION] = logFolderPath;
-
-        if (!string.IsNullOrWhiteSpace(sessionId)) batchRvtOptions[CommandSettings.SESSION_ID_OPTION] = sessionId;
-
-        if (!string.IsNullOrWhiteSpace(taskData)) batchRvtOptions[CommandSettings.TASK_DATA_OPTION] = taskData;
-
-        if (!string.IsNullOrWhiteSpace(testModeFolderPath))
-            batchRvtOptions[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION] = testModeFolderPath;
+        var batchRvtOptions = SetBatchRvtOptions(settingsFilePath, logFolderPath, sessionId, taskData, testModeFolderPath);
 
         var psi = new ProcessStartInfo(Path.Combine(baseDirectory, "BatchRvt.exe"))
         {
@@ -128,6 +119,26 @@ public static class BatchRvt
         var batchRvtProcess = Process.Start(psi);
 
         return batchRvtProcess;
+    }
+
+    private static Dictionary<string, string> SetBatchRvtOptions(string settingsFilePath, string logFolderPath, string sessionId,
+        string taskData, string testModeFolderPath)
+    {
+        var batchRvtOptions = new Dictionary<string, string>
+        {
+            { CommandSettings.SETTINGS_FILE_PATH_OPTION, settingsFilePath }
+        };
+
+        if (!string.IsNullOrWhiteSpace(logFolderPath))
+            batchRvtOptions[CommandSettings.LOG_FOLDER_PATH_OPTION] = logFolderPath;
+
+        if (!string.IsNullOrWhiteSpace(sessionId)) batchRvtOptions[CommandSettings.SESSION_ID_OPTION] = sessionId;
+
+        if (!string.IsNullOrWhiteSpace(taskData)) batchRvtOptions[CommandSettings.TASK_DATA_OPTION] = taskData;
+
+        if (!string.IsNullOrWhiteSpace(testModeFolderPath))
+            batchRvtOptions[CommandSettings.TEST_MODE_FOLDER_PATH_OPTION] = testModeFolderPath;
+        return batchRvtOptions;
     }
 
     public static void ExecuteMonitorScript(

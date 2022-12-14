@@ -26,11 +26,11 @@ namespace BatchRvtUtil;
 
 public static class CommandLineUtil
 {
-    private const string OptionSwitchPrefix = "--";
+    private const string OPTION_SWITCH_PREFIX = "--";
 
     private static int FindArgOptionSwitch(string[] args, string optionSwitch)
     {
-        return Array.FindIndex(args, 1, arg => arg.ToLower() == OptionSwitchPrefix + optionSwitch.ToLower());
+        return Array.FindIndex(args, 1, arg => arg.ToLower() == OPTION_SWITCH_PREFIX + optionSwitch.ToLower());
     }
 
     private static string GetArgOptionValue(string[] args, string optionSwitch)
@@ -41,7 +41,7 @@ public static class CommandLineUtil
         if (optionSwitchIndex + 1 >= args.Length) return null;
         var optionValue = args[optionSwitchIndex + 1];
 
-        if (optionValue is { } && optionValue.StartsWith(OptionSwitchPrefix)) optionValue = null;
+        if (optionValue is { } && optionValue.StartsWith(OPTION_SWITCH_PREFIX)) optionValue = null;
 
         return optionValue;
     }
@@ -76,10 +76,10 @@ public static class CommandLineUtil
 
         var args = Environment.GetCommandLineArgs();
 
-        if (args.Length > 1) allOptionSwitches = args.Where(arg => arg.StartsWith(OptionSwitchPrefix));
+        if (args.Length > 1) allOptionSwitches = args.Where(arg => arg.StartsWith(OPTION_SWITCH_PREFIX));
 
         return allOptionSwitches
-            .Select(optionSwitch => optionSwitch.Substring(OptionSwitchPrefix.Length).ToLower()).ToList();
+            .Select(optionSwitch => optionSwitch.Substring(OPTION_SWITCH_PREFIX.Length).ToLower()).ToList();
     }
 
     public static bool HasCommandLineOption(string optionSwitch, bool expectOptionValue = true)

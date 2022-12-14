@@ -18,10 +18,12 @@
 #
 #
 
+import clr
+import System
 from System.Diagnostics import Process, ProcessStartInfo
 
+import batch_rvt_util
 from batch_rvt_util import RevitVersion
-
 
 def StartRevitProcess(revitVersion, initEnvironmentVariables):
     revitExecutableFilePath = RevitVersion.GetRevitExecutableFilePath(revitVersion)
@@ -33,3 +35,4 @@ def StartRevitProcess(revitVersion, initEnvironmentVariables):
     initEnvironmentVariables(psi.EnvironmentVariables)
     revitProcess = Process.Start(psi)
     return revitProcess
+

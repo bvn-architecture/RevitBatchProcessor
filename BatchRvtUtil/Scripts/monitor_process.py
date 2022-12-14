@@ -19,6 +19,7 @@
 #
 
 import clr
+import System
 
 clr.AddReference("System.Windows.Forms")
 import System.Windows.Forms as WinForms
@@ -35,7 +36,6 @@ def IsProcessResponding(process):
         pass
     return isResponding
 
-
 def MonitorProcess(
         process,
         monitoringAction,
@@ -43,7 +43,8 @@ def MonitorProcess(
         unresponsiveThreshholdInSeconds,
         onBeginUnresponsive,
         onEndUnresponsive
-):
+    ):
+
     wasResponding = True
     isResponding = True
     unresponsiveStartTime = None
@@ -56,25 +57,25 @@ def MonitorProcess(
         wasResponding = isResponding
         isResponding = IsProcessResponding(process)
 
-        if wasResponding and not isResponding:  # responsive -> unresponsive
+        if wasResponding and not isResponding: # responsive -> unresponsive
             unresponsiveStartTime = time_util.GetDateTimeNow()
             haveNotifiedBeginUnresponsive = False
 
-        elif isResponding and not wasResponding:  # unresponsive -> responsive
-            if haveNotifiedBeginUnresponsive:  # notify end of unresponsiveness
+        elif isResponding and not wasResponding: # unresponsive -> responsive
+            if haveNotifiedBeginUnresponsive: # notify end of unresponsiveness
                 onEndUnresponsive(time_util.GetSecondsElapsedSince(unresponsiveStartTime))
                 haveNotifiedBeginUnresponsive = False
 
-        elif not isResponding and not wasResponding:  # continuing unresponsiveness
-            if not haveNotifiedBeginUnresponsive:  # notify unresponsiveness beyond threshold
+        elif not isResponding and not wasResponding: # continuing unresponsiveness
+            if not haveNotifiedBeginUnresponsive: # notify unresponsiveness beyond threshold
                 if time_util.GetSecondsElapsedSince(unresponsiveStartTime) >= unresponsiveThreshholdInSeconds:
                     onBeginUnresponsive()
                     haveNotifiedBeginUnresponsive = True
 
         thread_util.SleepForSeconds(monitorIntervalInSeconds)
-
+        
         WinForms.Application.DoEvents()
-
+        
         monitoringAction()
 
         process.Refresh()
@@ -85,3 +86,4 @@ def MonitorProcess(
         haveNotifiedBeginUnresponsive = False
 
     return
+

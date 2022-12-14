@@ -19,26 +19,23 @@
 #
 
 import clr
+import System
 from System.Diagnostics import Process
 
 clr.AddReference("System.Windows.Forms")
-from System.Windows.Forms import IWin32Window, Cursor
+from System.Windows.Forms import MessageBox, IWin32Window, Cursor
 
 clr.AddReference("System.Drawing")
 from System.Drawing import Point
 
-
 class WindowHandleWrapper(IWin32Window):
     def __init__(self, hwnd):
         self.hwnd = hwnd
-
     def get_Handle(self):
         return self.hwnd
-
     @staticmethod
     def GetMainWindowHandle():
         return WindowHandleWrapper(Process.GetCurrentProcess().MainWindowHandle)
-
 
 def SetMousePosition(x, y):
     Cursor.Position = Point(x, y)

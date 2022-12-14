@@ -18,8 +18,9 @@
 #
 #
 
+import clr
+import System
 from System.IO import StringReader
-
 
 def Try(f):
     result = None
@@ -29,16 +30,14 @@ def Try(f):
         result = None
     return result
 
-
 def FindAllIndicesOf(text, value):
     indices = []
     currentIndex = 0
     index = text.IndexOf(value)
     while index != -1:
         indices.append(index)
-        index = text.IndexOf(value, index + 1)
+        index = text.IndexOf(value, index+1)
     return indices
-
 
 def ReadLinesFromText(text):
     lines = []

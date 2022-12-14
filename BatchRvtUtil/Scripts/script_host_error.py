@@ -19,9 +19,9 @@
 #
 
 import clr
+import System
 from System import AppDomain
 from System.Text import StringBuilder
-
 clr.AddReference("System.Windows.Forms")
 from System.Windows.Forms import MessageBox
 
@@ -33,17 +33,14 @@ BATCH_RVT_ERROR_WINDOW_TITLE = "BatchRvt Script Error"
 
 SCRIPT_HOST_ERROR_DATA_VARIABLE = "revit_script_host"
 
-
 def SetDataInCurrentDomain(name, data):
     AppDomain.CurrentDomain.SetData(name, data)
     return
-
 
 def ShowScriptErrorMessageBox(errorMessage):
     mainWindowHandle = winforms_util.WindowHandleWrapper.GetMainWindowHandle()
     MessageBox.Show(mainWindowHandle, errorMessage, BATCH_RVT_ERROR_WINDOW_TITLE)
     return
-
 
 def WithErrorHandling(action, errorMessage, output=None, showErrorMessageBox=False):
     result = None
@@ -68,3 +65,4 @@ def WithErrorHandling(action, errorMessage, output=None, showErrorMessageBox=Fal
         SetDataInCurrentDomain(SCRIPT_HOST_ERROR_DATA_VARIABLE, e)
 
     return result
+

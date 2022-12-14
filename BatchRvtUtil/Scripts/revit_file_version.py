@@ -22,7 +22,6 @@ import clr
 
 clr.AddReference("System.Core")
 import System.Linq
-
 clr.ImportExtensions(System.Linq)
 from System.Linq import Enumerable
 
@@ -45,53 +44,45 @@ STORAGE_ROOT_TYPE_NAME = "System.IO.Packaging.StorageRoot"
 STORAGE_ROOT_OPEN_METHOD_NAME = "Open"
 BASIC_FILE_INFO_STREAM_NAME = "BasicFileInfo"
 
-
 def GetWindowsBaseAssembly():
     return clr.GetClrType(Packaging.StorageInfo).Assembly
-
 
 def GetStorageRootType():
     return GetWindowsBaseAssembly().GetType(STORAGE_ROOT_TYPE_NAME, True, False)
 
-
 def InvokeStorageRootMember(storageRoot, methodName, *methodArgs):
     return GetStorageRootType().InvokeMember(
-        methodName,
-        Refl.BindingFlags.Static | Refl.BindingFlags.Instance |
-        Refl.BindingFlags.Public | Refl.BindingFlags.NonPublic |
-        Refl.BindingFlags.InvokeMethod,
-        None,
-        storageRoot,
-        methodArgs.ToArray[object](),
-    )
-
+            methodName,
+            Refl.BindingFlags.Static | Refl.BindingFlags.Instance |
+            Refl.BindingFlags.Public | Refl.BindingFlags.NonPublic |
+            Refl.BindingFlags.InvokeMethod,
+            None,
+            storageRoot,
+            methodArgs.ToArray[object](),
+        )
 
 def GetStorageRoot(filePath):
     storageRoot = InvokeStorageRootMember(
-        None,
-        STORAGE_ROOT_OPEN_METHOD_NAME,
-        filePath,
-        System.IO.FileMode.Open,
-        System.IO.FileAccess.Read,
-        System.IO.FileShare.Read
-    ) if not str.IsNullOrWhiteSpace(filePath) else None
+                None,
+                STORAGE_ROOT_OPEN_METHOD_NAME,
+                filePath,
+                System.IO.FileMode.Open,
+                System.IO.FileAccess.Read,
+                System.IO.FileShare.Read
+            ) if not str.IsNullOrWhiteSpace(filePath) else None
     return storageRoot
-
 
 def GetBasicFileInfoStream(storageRoot):
     return storageRoot.GetStreamInfo(BASIC_FILE_INFO_STREAM_NAME).GetStream()
 
-
 def CreateByteBuffer(length):
     return Enumerable.Repeat[System.Byte](0, length).ToArray()
-
 
 def ReadAllBytes(stream):
     length = int(stream.Length)
     buffer = CreateByteBuffer(length)
     readCount = stream.Read(buffer, 0, length)
     return buffer.Take(readCount).ToArray()
-
 
 def GetRevitVersionText_OldMethod(revitFilePath):
     storageRoot = GetStorageRoot(revitFilePath)
@@ -103,20 +94,18 @@ def GetRevitVersionText_OldMethod(revitFilePath):
     versionText = unicodeString.Substring(start, end - start)
     return versionText.Substring(0, versionText.LastIndexOf(")") + 1)
 
-
 def GetBasicFileInfoBytes(revitFilePath):
     storageRoot = GetStorageRoot(revitFilePath)
     stream = GetBasicFileInfoStream(storageRoot)
     bytes = ReadAllBytes(stream)
     return bytes
 
-
 def GetRevitFileVersionInfoText(revitFilePath):
     revitVersionInfoText = str.Empty
     bytes = GetBasicFileInfoBytes(revitFilePath)
     asciiString = Encoding.ASCII.GetString(bytes)
-    TEXT_MARKER = '\r\n'  # Most common delimiter around the text section.
-    TEXT_MARKER_ALT = '\x04\r\x00\n\x00'  # Alternative delimiter (occasionally encountered... not sure why though).
+    TEXT_MARKER = '\r\n' # Most common delimiter around the text section.
+    TEXT_MARKER_ALT = '\x04\r\x00\n\x00' # Alternative delimiter (occasionally encountered... not sure why though).
     textMarker = TEXT_MARKER
     textMarkerIndices = util.FindAllIndicesOf(asciiString, textMarker)
     numberOfTextMarkerIndices = len(textMarkerIndices)
@@ -131,7 +120,6 @@ def GetRevitFileVersionInfoText(revitFilePath):
         revitVersionInfoText = Encoding.Unicode.GetString(bytes[startTextIndex:endTextIndex])
     return revitVersionInfoText
 
-
 def TryGetRevitFileVersionInfoText(revitFilePath):
     revitVersionInfoText = str.Empty
     try:
@@ -141,7 +129,6 @@ def TryGetRevitFileVersionInfoText(revitFilePath):
     except IOException, e:
         revitVersionInfoText = str.Empty
     return revitVersionInfoText
-
 
 def ExtractRevitVersionInfoFromText(revitVersionInfoText):
     REVIT_BUILD_PROPERTY = "Revit Build:"
@@ -170,44 +157,40 @@ def ExtractRevitVersionInfoFromText(revitVersionInfoText):
             revitBuildLine = indexedLines.SingleOrDefault(lambda l: l[1].Contains(REVIT_BUILD_PROPERTY))
             if revitBuildLine is not None:
                 lineNumber = revitBuildLine[0]
-                revitBuildLine = indexedLines[lineNumber + 1]
+                revitBuildLine = indexedLines[lineNumber+1]
                 revitBuildLineText = revitBuildLine[1]
                 indexOfLastSavePath = revitBuildLineText.IndexOf("Last Save Path:")
-                revitBuildLineText = revitBuildLineText[
-                                     :indexOfLastSavePath] if indexOfLastSavePath != -1 else revitBuildLineText
+                revitBuildLineText = revitBuildLineText[:indexOfLastSavePath] if indexOfLastSavePath != -1 else revitBuildLineText
         else:
             revitBuildLineText = revitBuildLine[1]
             revitBuildLineText = revitBuildLineText[len(REVIT_BUILD_PROPERTY):]
         revitVersionDescription = revitBuildLineText.Trim()
     return revitVersionDescription
 
-
 def GetRevitVersionText(revitFilePath):
     revitVersionInfoText = TryGetRevitFileVersionInfoText(revitFilePath)
     revitVersionText = ExtractRevitVersionInfoFromText(revitVersionInfoText)
     return revitVersionText
 
-
 def GenerateRevitVersionTextPrefixes(revitVersionNumberText, includeDisciplineVersions=False):
     REVIT_VERSION_TEXT_PREFIXES = [
-        "Autodesk Revit",
-        "Autodesk Revit LT",
-        # Very old versions (e.g. 2010) may have the following prefixes.
-        "Revit",
-        "Revit LT"
-    ]
+            "Autodesk Revit",
+            "Autodesk Revit LT",
+            # Very old versions (e.g. 2010) may have the following prefixes.
+            "Revit",
+            "Revit LT"
+        ]
     if includeDisciplineVersions:
         REVIT_VERSION_TEXT_PREFIXES.extend([
-            "Autodesk Revit Architecture",
-            "Autodesk Revit MEP",
-            "Autodesk Revit Structure",
-            # Very old versions (e.g. 2010) may have the following prefixes.
-            "Revit Architecture",
-            "Revit MEP",
-            "Revit Structure"
-        ])
+                "Autodesk Revit Architecture",
+                "Autodesk Revit MEP",
+                "Autodesk Revit Structure",
+                # Very old versions (e.g. 2010) may have the following prefixes.
+                "Revit Architecture",
+                "Revit MEP",
+                "Revit Structure"
+            ])
     return [str.Join(" ", prefix, revitVersionNumberText) for prefix in REVIT_VERSION_TEXT_PREFIXES]
-
 
 REVIT_VERSION_TEXT_PREFIXES_2010 = GenerateRevitVersionTextPrefixes("2010", includeDisciplineVersions=True)
 REVIT_VERSION_TEXT_PREFIXES_2011 = GenerateRevitVersionTextPrefixes("2011", includeDisciplineVersions=True)
@@ -224,13 +207,11 @@ REVIT_VERSION_TEXT_PREFIXES_2021 = GenerateRevitVersionTextPrefixes("2021")
 REVIT_VERSION_TEXT_PREFIXES_2022 = GenerateRevitVersionTextPrefixes("2022")
 REVIT_VERSION_TEXT_PREFIXES_2023 = GenerateRevitVersionTextPrefixes("2023")
 
-
 def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
     revitVersionNumberText = None
     if not str.IsNullOrWhiteSpace(revitVersionText):
         def StartsWithOneOfPrefixes(text, prefixes):
             return any(text.StartsWith(prefix) for prefix in prefixes)
-
         if StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2010):
             revitVersionNumberText = "2010"
         elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2011):
@@ -260,3 +241,4 @@ def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
         elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2023):
             revitVersionNumberText = "2023"
     return revitVersionNumberText
+

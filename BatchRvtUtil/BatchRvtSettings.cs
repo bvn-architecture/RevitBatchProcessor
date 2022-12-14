@@ -54,9 +54,9 @@ public class BatchRvtSettings : IPersistent
     public readonly BooleanSetting IfNotAvailableUseMinimumAvailableRevitVersion =
         new("ifNotAvailableUseMinimumAvailableRevitVersion");
 
-    private readonly BooleanSetting OpenInUI = new("openInUI");
+    public readonly BooleanSetting OpenInUI = new("openInUI");
 
-    private readonly PersistentSettings persistentSettings;
+    public readonly PersistentSettings persistentSettings;
     public readonly StringSetting PostProcessingScriptFilePath = new("PostProcessingScriptFilePath");
     public readonly StringSetting PreProcessingScriptFilePath = new("preProcessingScriptFilePath");
     public readonly IntegerSetting ProcessingTimeOutInMinutes = new("processingTimeOutInMinutes");

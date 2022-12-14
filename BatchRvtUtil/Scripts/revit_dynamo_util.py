@@ -19,6 +19,7 @@
 #
 
 import clr
+import System
 
 clr.AddReference("System.Xml")
 from System.Xml import XmlDocument, XmlException
@@ -46,7 +47,6 @@ DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE = "HasRunWithoutCrash"
 DYNAMO_ATTRIBUTE_XML_VALUE_TRUE = "True"
 DYNAMO_ATTRIBUTE_XML_VALUE_FALSE = "False"
 
-
 def WithLoadedXmlDocument(xmlDocumentFilePath, action):
     result = None
     doc = XmlDocument()
@@ -58,7 +58,6 @@ def WithLoadedXmlDocument(xmlDocumentFilePath, action):
     except Exception, e:
         result = None
     return result
-
 
 def WithTextFileJsonObject(textFilePath, action):
     result = None
@@ -76,7 +75,6 @@ def WithTextFileJsonObject(textFilePath, action):
         result = None
     return result
 
-
 def WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action, writeBackToFile=False):
     def jobjectAction(jobject):
         viewJObject = jobject[DYNAMO_JOBJECT_VIEW]
@@ -86,36 +84,28 @@ def WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action, writeBackToFile=
             serializedJObjectText = json_util.ToString(jobject, prettyPrint=True)
             text_file_util.WriteToTextFile(dynamoScriptFilePath, serializedJObjectText)
         return result
-
     result = WithTextFileJsonObject(dynamoScriptFilePath, jobjectAction)
     return result
-
 
 def IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
     def action(jobject, dynamoJObject):
         return dynamoJObject is not None
-
     result = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action)
     return result == True
-
 
 def WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action):
     def docAction(doc):
         dynamoWorkspaceXmlNode = doc[DYNAMO_WORKSPACE_XML_NODE]
         result = action(doc, dynamoWorkspaceXmlNode)
         return result
-
     result = WithLoadedXmlDocument(dynamoScriptFilePath, docAction)
     return result
-
 
 def IsDynamoWorkspaceXmlFile(dynamoScriptFilePath):
     def action(doc, dynamoWorkspaceXmlNode):
         return dynamoWorkspaceXmlNode is not None
-
     result = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
     return result == True
-
 
 def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
     prevRunType = None
@@ -124,13 +114,11 @@ def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
             dynamoRunTypeAttribute = dynamoWorkspaceXmlNode.Attributes[DYNAMO_RUNTYPE_ATTRIBUTE]
             prevRunType = dynamoRunTypeAttribute.Value
             dynamoRunTypeAttribute.Value = runType
-            dynamoHasRunWithoutCrashAttribute = dynamoWorkspaceXmlNode.Attributes[
-                DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE]
+            dynamoHasRunWithoutCrashAttribute = dynamoWorkspaceXmlNode.Attributes[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE]
             if dynamoHasRunWithoutCrashAttribute is not None:
                 dynamoHasRunWithoutCrashAttribute.Value = DYNAMO_ATTRIBUTE_XML_VALUE_TRUE
             doc.Save(dynamoScriptFilePath)
             return prevRunType
-
         prevRunType = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
     elif IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
         def action(jobject, dynamoJObject):
@@ -141,10 +129,8 @@ def SetDynamoScriptRunType(dynamoScriptFilePath, runType):
             if dynamoHasRunWithoutCrashJValue is not None:
                 dynamoJObject[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE] = True
             return prevRunType
-
         prevRunType = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action, writeBackToFile=True)
     return prevRunType
-
 
 def GetDynamoScriptRunType(dynamoScriptFilePath):
     runType = None
@@ -152,17 +138,14 @@ def GetDynamoScriptRunType(dynamoScriptFilePath):
         def action(doc, dynamoWorkspaceXmlNode):
             runType = dynamoWorkspaceXmlNode.Attributes[DYNAMO_RUNTYPE_ATTRIBUTE].Value
             return runType
-
         runType = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
     elif IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
         def action(jobject, dynamoJObject):
             runTypeJValue = dynamoJObject[DYNAMO_RUNTYPE_ATTRIBUTE]
             runType = json_util.GetValueFromJValue(runTypeJValue)
             return runType
-
         runType = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action)
     return runType
-
 
 def GetDynamoScriptHasRunWithoutCrash(dynamoScriptFilePath):
     hasRunWithoutCrash = None
@@ -170,17 +153,14 @@ def GetDynamoScriptHasRunWithoutCrash(dynamoScriptFilePath):
         def action(doc, dynamoWorkspaceXmlNode):
             hasRunWithoutCrash = dynamoWorkspaceXmlNode.Attributes[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE].Value
             return hasRunWithoutCrash
-
         hasRunWithoutCrash = WithDynamoWorkspaceXmlNode(dynamoScriptFilePath, action)
     elif IsDynamoWorkspaceJsonFile(dynamoScriptFilePath):
         def action(jobject, dynamoJObject):
             hasRunWithoutCrashJValue = dynamoJObject[DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE]
             hasRunWithoutCrash = json_util.GetValueFromJValue(hasRunWithoutCrashJValue)
             return hasRunWithoutCrash
-
         hasRunWithoutCrash = WithDynamoWorkspaceJsonObject(dynamoScriptFilePath, action)
     return hasRunWithoutCrash
-
 
 # NOTE: Dynamo requires an active UIDocument! The document must be active before executing this function.
 #       The Dynamo script must have been saved with the 'Automatic' run mode!
@@ -190,17 +170,16 @@ def ExecuteDynamoScriptInternal(uiapp, dynamoScriptFilePath, showUI=False):
         raise Exception("Could not determine the Run mode of this Dynamo script!")
     elif dynamoScriptRunType != DYNAMO_RUNTYPE_AUTOMATIC:
         raise Exception(
-            "The Dynamo script has Run mode set to '" + dynamoScriptRunType + "'. " +
-            "It must be set to '" + DYNAMO_RUNTYPE_AUTOMATIC + "' in order for Dynamo script automation to work."
-        )
+                "The Dynamo script has Run mode set to '" + dynamoScriptRunType + "'. " +
+                "It must be set to '" + DYNAMO_RUNTYPE_AUTOMATIC + "' in order for Dynamo script automation to work."
+            )
     hasRunWithoutCrash = GetDynamoScriptHasRunWithoutCrash(dynamoScriptFilePath)
     if hasRunWithoutCrash is not None:
         if hasRunWithoutCrash != DYNAMO_ATTRIBUTE_XML_VALUE_TRUE and hasRunWithoutCrash != True:
             raise Exception(
-                "The Dynamo script has attribute '" + DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE + "' set to '" + str(
-                    hasRunWithoutCrash) + "'. " +
-                "It must be set to '" + DYNAMO_ATTRIBUTE_XML_VALUE_TRUE + "' in order for Dynamo script automation to work."
-            )
+                    "The Dynamo script has attribute '" + DYNAMO_HAS_RUN_WITHOUT_CRASH_ATTRIBUTE + "' set to '" + str(hasRunWithoutCrash) + "'. " +
+                    "It must be set to '" + DYNAMO_ATTRIBUTE_XML_VALUE_TRUE + "' in order for Dynamo script automation to work."
+                )
     revitVersionNumber = uiapp.Application.VersionNumber
     if revitVersionNumber == "2015":
         raise Exception("Automation of Dynamo scripts is not supported in Revit 2015!")
@@ -217,15 +196,14 @@ def ExecuteDynamoScriptInternal(uiapp, dynamoScriptFilePath, showUI=False):
     dynamoRevitCommandData = DynamoRevitCommandData()
     dynamoRevitCommandData.Application = uiapp
     dynamoRevitCommandData.JournalData = {
-        JOURNAL_KEY__AUTOMATION_MODE: True.ToString(),
-        JOURNAL_KEY__SHOW_UI: showUI.ToString(),
-        JOURNAL_KEY__DYN_PATH: dynamoScriptFilePath
-    }
+            JOURNAL_KEY__AUTOMATION_MODE : True.ToString(),
+            JOURNAL_KEY__SHOW_UI : showUI.ToString(),
+            JOURNAL_KEY__DYN_PATH : dynamoScriptFilePath
+        }
 
     dynamoRevit = DynamoRevit()
     externalCommandResult = dynamoRevit.ExecuteCommand(dynamoRevitCommandData)
     return externalCommandResult
-
 
 def ExecuteDynamoScript(uiapp, dynamoScriptFilePath, showUI=False):
     externalCommandResult = None
