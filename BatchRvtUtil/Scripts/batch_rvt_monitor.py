@@ -147,19 +147,19 @@ def GetSupportedRevitFiles(batchRvtConfig):
 
         message = ""
         if nonExistentCount > 0:
-            message += ""
+            message += "\n"
             message += "WARNING: The following Revit Files do not exist (" + str(nonExistentCount) + "):"
             for supportedRevitFileInfo in nonExistentRevitFileList:
                 message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
 
         if unsupportedCount > 0:
-            message += ""
+            message += "\n"
             message += "WARNING: The following Revit Files are of an unsupported version (" + str(unsupportedCount) + "):"
             for supportedRevitFileInfo in unsupportedRevitFileList:
                 message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
 
         if unsupportedRevitFilePathCount > 0:
-            message += ""
+            message += "\n"
             message += "WARNING: The following Revit Files have an unsupported file path (" + str(unsupportedRevitFilePathCount) + "):"
             for supportedRevitFileInfo in unsupportedRevitFilePathRevitFileList:
                 message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
