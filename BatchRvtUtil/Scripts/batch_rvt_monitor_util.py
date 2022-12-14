@@ -44,7 +44,7 @@ REVIT_PROCESS_BEGIN_PROCESSING_TIMEOUT_IN_SECONDS = 5 * SECONDS_PER_MINUTE
 
 
 def ShowSupportedRevitFileInfo(supportedRevitFileInfo):
-    message = ""
+    message = "\n"
     if supportedRevitFileInfo.IsCloudModel():
         revitCloudModelInfo = supportedRevitFileInfo.GetRevitCloudModelInfo()
         projectGuidText = revitCloudModelInfo.GetProjectGuid().ToString()
