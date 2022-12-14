@@ -1,5 +1,6 @@
 
-<span style="color:green; font-size:16px"> ATTENTION: Due to other commitments the original author of Revit Batch Processor (@DanRumery) is unable to support RBP for the future. For questions please seek help from the community such as the Dynamo and Revit API forums.
+<span style="color:green; font-size:16px"> This fork builds on the great work of Dan Rummery and all original project contribuors.
+I've created it to implement unit testing, refactor the project to make it a bit cleaner and improve performance.
 </span>
 
 # Revit Batch Processor (RBP)
