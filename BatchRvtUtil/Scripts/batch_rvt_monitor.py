@@ -145,24 +145,25 @@ def GetSupportedRevitFiles(batchRvtConfig):
         unsupportedCount = len(unsupportedRevitFileList)
         unsupportedRevitFilePathCount = len(unsupportedRevitFilePathRevitFileList)
 
+        message = ""
         if nonExistentCount > 0:
-            Output()
-            Output("WARNING: The following Revit Files do not exist (" + str(nonExistentCount) + "):")
+            message += "\n"
+            message += "WARNING: The following Revit Files do not exist (" + str(nonExistentCount) + "):"
             for supportedRevitFileInfo in nonExistentRevitFileList:
-                batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo, Output)
+                message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
 
         if unsupportedCount > 0:
-            Output()
-            Output("WARNING: The following Revit Files are of an unsupported version (" + str(unsupportedCount) + "):")
+            message += "\n"
+            message += "WARNING: The following Revit Files are of an unsupported version (" + str(unsupportedCount) + "):"
             for supportedRevitFileInfo in unsupportedRevitFileList:
-                batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo, Output)
+                message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
 
         if unsupportedRevitFilePathCount > 0:
-            Output()
-            Output("WARNING: The following Revit Files have an unsupported file path (" + str(unsupportedRevitFilePathCount) + "):")
+            message += "\n"
+            message += "WARNING: The following Revit Files have an unsupported file path (" + str(unsupportedRevitFilePathCount) + "):"
             for supportedRevitFileInfo in unsupportedRevitFilePathRevitFileList:
-                batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo, Output)
-
+                message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
+        Output(message)
     return supportedRevitFileList
 
 def InitializeScriptUtil(batchRvtConfig):
@@ -316,10 +317,10 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
                         " of " + str(totalFilesCount) + ")" +
                         " in Revit " + RevitVersion.GetRevitVersionText(revitVersion) + " session."
                     )
-
+            message = ""
             for supportedRevitFileInfo in sessionRevitFiles:
-                batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo, Output)
-
+                message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
+            Output(message)
             Output()
             Output("Starting Revit " + RevitVersion.GetRevitVersionText(revitVersion) + " session...")
 
@@ -449,9 +450,10 @@ def RunBatchRevitTasks(batchRvtConfig):
     if not aborted:
         Output()
         Output("Revit Files for processing (" + str(supportedCount) + "):")
+        message = ""
         for supportedRevitFileInfo in supportedRevitFileList:
-            batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo, Output)
-       
+            message += batch_rvt_monitor_util.ShowSupportedRevitFileInfo(supportedRevitFileInfo)
+        Output(message)
         try:
             if batchRvtConfig.EnableDataExport:
                 session_data_exporter.ExportSessionFilesData(

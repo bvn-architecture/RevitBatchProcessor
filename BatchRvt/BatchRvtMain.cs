@@ -17,76 +17,68 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using BatchRvtUtil;
 
-namespace BatchRvtCommand
+namespace BatchRvtCommand;
+
+public class BatchRvtMain
 {
-    public class BatchRvtMain
+    private const string BatchRvtConsoleTitle = "Batch Revit File Processor";
+
+    private const int WindowWidth = 160;
+    private const int WindowHeight = 60;
+    private const int BufferWidth = 320;
+    private const int BufferHeight = WindowHeight * 50;
+
+    [STAThread]
+    private static void Main(string[] args)
     {
-        private const string BatchRvtConsoleTitle = "Batch Revit File Processor";
+        Application.EnableVisualStyles();
 
-        private const int WindowWidth = 160;
-        private const int WindowHeight = 60;
-        private const int BufferWidth = 320;
-        private const int BufferHeight = WindowHeight * 50;
+        if (HasConsole()) InitConsole();
 
-        [STAThread]
-        private static void Main(string[] args)
+        var batchRvtFolderPath = GetExecutableFolderPath();
+        BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
+    }
+
+    private static void InitConsole()
+    {
+        Console.Title = BatchRvtConsoleTitle;
+
+        try
         {
-            Application.EnableVisualStyles();
+            Console.SetWindowSize(
+                Math.Min(WindowWidth, Console.LargestWindowWidth),
+                Math.Min(WindowHeight, Console.LargestWindowHeight)
+            );
 
-            if (HasConsole())
-            {
-                InitConsole();
-            }
-
-            var batchRvtFolderPath = GetExecutableFolderPath();
-            BatchRvtUtil.BatchRvt.ExecuteMonitorScript(batchRvtFolderPath);
-
-            return;
+            Console.SetBufferSize(BufferWidth, BufferHeight);
         }
-
-        private static void InitConsole()
+        catch (ArgumentOutOfRangeException e)
         {
-            Console.Title = BatchRvtConsoleTitle;
-
-            try
-            {
-                Console.SetWindowSize(
-                        Math.Min(WindowWidth, Console.LargestWindowWidth),
-                        Math.Min(WindowHeight, Console.LargestWindowHeight)
-                    );
-
-                Console.SetBufferSize(BufferWidth, BufferHeight);
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                // Can occur when output has been redirected via the command-line.
-            }
-            catch (IOException e)
-            {
-                // Can occur when output has been redirected via the command-line.
-            }
-
-            return;
+            // Can occur when output has been redirected via the command-line.
         }
-
-        private static string GetExecutableFolderPath()
+        catch (IOException e)
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            // Can occur when output has been redirected via the command-line.
         }
+    }
 
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetConsoleWindow();
+    private static string GetExecutableFolderPath()
+    {
+        return AppDomain.CurrentDomain.BaseDirectory;
+    }
 
-        private static bool HasConsole()
-        {
-            return (GetConsoleWindow() != IntPtr.Zero);
-        }
+    [DllImport("kernel32.dll")]
+    private static extern IntPtr GetConsoleWindow();
+
+    private static bool HasConsole()
+    {
+        return GetConsoleWindow() != IntPtr.Zero;
     }
 }

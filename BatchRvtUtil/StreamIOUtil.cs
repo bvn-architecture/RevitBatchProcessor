@@ -17,66 +17,62 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+public static class StreamIOUtil
 {
-    public static class StreamIOUtil
+    public static Tuple<List<string>, Task<string>> ReadAvailableLines(StreamReader streamReader,
+        Task<string> pendingReadLineTask = null)
     {
-        public static Tuple<List<string>, Task<string>> ReadAvailableLines(StreamReader streamReader, Task<string> pendingReadLineTask = null)
+        Task<string> nextPendingReadLineTask;
+        var lines = new List<string>();
+
+        Task<string> readLineTask = null;
+
+        readLineTask = pendingReadLineTask ?? streamReader.ReadLineAsync();
+
+        var reachedEndOfStream = false;
+
+        while (readLineTask.Status == TaskStatus.RanToCompletion && !reachedEndOfStream)
         {
-            Task<string> nextPendingReadLineTask = null;
-            var lines = new List<string>();
-
-            Task<string> readLineTask = null;
-
-            if (pendingReadLineTask != null)
+            var line = readLineTask.Result;
+            if (line != null)
             {
-                readLineTask = pendingReadLineTask;
-            }
-            else
-            {
+                lines.Add(line);
                 readLineTask = streamReader.ReadLineAsync();
             }
-
-            bool reachedEndOfStream = false;
-
-            while ((readLineTask.Status == TaskStatus.RanToCompletion) && !reachedEndOfStream)
-            {
-                var line = readLineTask.Result;
-                if (line != null)
-                {
-                    lines.Add(line);
-                    readLineTask = streamReader.ReadLineAsync();
-                }
-                else
-                {
-                    reachedEndOfStream = true;
-                }
-            }
-
-            if (reachedEndOfStream)
-            {
-                nextPendingReadLineTask = null;
-            }
-            else if (readLineTask.Status == TaskStatus.Faulted)
-            {
-                nextPendingReadLineTask = null;
-            }
-            else if (readLineTask.Status == TaskStatus.Canceled)
-            {
-                nextPendingReadLineTask = null;
-            }
             else
             {
-                nextPendingReadLineTask = readLineTask;
+                reachedEndOfStream = true;
+            }
+        }
+
+        if (reachedEndOfStream)
+            nextPendingReadLineTask = null;
+        else
+            switch (readLineTask.Status)
+            {
+                case TaskStatus.Faulted:
+                case TaskStatus.Canceled:
+                    nextPendingReadLineTask = null;
+                    break;
+                case TaskStatus.Created:
+                case TaskStatus.WaitingForActivation:
+                case TaskStatus.WaitingToRun:
+                case TaskStatus.Running:
+                case TaskStatus.WaitingForChildrenToComplete:
+                case TaskStatus.RanToCompletion:
+                default:
+                    nextPendingReadLineTask = readLineTask;
+                    break;
             }
 
-            return Tuple.Create(lines, nextPendingReadLineTask);
-        }
+        return Tuple.Create(lines, nextPendingReadLineTask);
     }
 }

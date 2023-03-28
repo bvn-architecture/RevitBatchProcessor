@@ -17,42 +17,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.IO;
 
-namespace BatchRvt.ScriptHost
+namespace BatchRvt.ScriptHost.Util;
+
+public static class TextFileUtil
 {
-    public static class TextFileUtil
+    public static string ReadAllText(string textFilePath)
     {
-        public static string ReadAllText(string textFilePath)
-        {
-            var text = string.Empty;
-
-            var fileStream = new FileStream(textFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-            try
-            {
-                var textReader = new StreamReader(fileStream);
-
-                try
-                {
-                    text = textReader.ReadToEnd();
-                }
-                finally
-                {
-                    textReader.Close();
-                    textReader.Dispose();
-                }
-            }
-            finally
-            {
-                fileStream.Close();
-                fileStream.Dispose();
-            }
-
-            return text;
-        }
+        using var fileStream = new FileStream(textFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var textReader = new StreamReader(fileStream);
+        return textReader.ReadToEnd();
     }
 }
