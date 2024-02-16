@@ -17,127 +17,110 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace BatchRvtGUI
+namespace BatchRvtGUI;
+
+public partial class RevitFileScanningProgressUI : Form
 {
-    public partial class RevitFileScanningProgressUI : Form
+    private readonly Action<Func<string, bool>> actionWithProgressReporting_;
+    private BackgroundWorker backgroundWorker_;
+    private string currentProgressMessage_ = string.Empty;
+    private bool scanningCancelled_;
+    private bool scanningCompleted_;
+
+    public RevitFileScanningProgressUI(Action<Func<string, bool>> actionWithProgressReporting)
     {
-        Action<Func<string, bool>> actionWithProgressReporting_ = null;
-        BackgroundWorker backgroundWorker_ = null;
-        bool scanningCancelled_ = false;
-        bool scanningCompleted_ = false;
-        string currentProgressMessage_ = string.Empty;
-        Timer progressUpdateTimer_ = null;
+        InitializeComponent();
 
-        public RevitFileScanningProgressUI(Action<Func<string, bool>> actionWithProgressReporting)
+        actionWithProgressReporting_ = actionWithProgressReporting;
+    }
+
+    private void RevitFileScanningProgressUI_Load(object sender, EventArgs e)
+    {
+        backgroundWorker_ = new BackgroundWorker();
+        backgroundWorker_.DoWork += BackgroundWorker__DoWork;
+        backgroundWorker_.ProgressChanged += BackgroundWorker__ProgressChanged;
+        backgroundWorker_.RunWorkerCompleted += BackgroundWorker__RunWorkerCompleted;
+        backgroundWorker_.WorkerReportsProgress = true;
+        backgroundWorker_.RunWorkerAsync();
+
+        /*progressUpdateTimer_ = new Timer();
+        progressUpdateTimer_.Interval = 50;
+        progressUpdateTimer_.Tick += ProgressUpdateTimer__Tick;
+
+        progressUpdateTimer_.Start();*/
+    }
+
+
+    /*private void ProgressUpdateTimer__Tick(object sender, EventArgs e)
+    {
+        progressLabel.Text = currentProgressMessage_;
+    }*/
+
+    private void BackgroundWorker__RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+    {
+        // TODO: determine if the work was cancelled or terminated due to an error
+        //       and return an appropriate dialog result.
+        if (scanningCancelled_) return;
+        scanningCompleted_ = true;
+        DialogResult = DialogResult.OK;
+    }
+
+    private void BackgroundWorker__ProgressChanged(object sender, ProgressChangedEventArgs e)
+    {
+        var progressMessage = e.UserState as string;
+
+        currentProgressMessage_ = progressMessage;
+        ////Test
+        progressLabel.Text = currentProgressMessage_;
+    }
+
+    private void BackgroundWorker__DoWork(object sender, DoWorkEventArgs e)
+    {
+        bool ProgressReporter(string progressMessage)
         {
-            InitializeComponent();
-
-            this.actionWithProgressReporting_ = actionWithProgressReporting;
+            backgroundWorker_.ReportProgress(0, progressMessage);
+            return scanningCancelled_;
         }
 
-        private void RevitFileScanningProgressUI_Load(object sender, EventArgs e)
-        {
-            this.backgroundWorker_ = new BackgroundWorker();
-            this.backgroundWorker_.DoWork += BackgroundWorker__DoWork;
-            this.backgroundWorker_.ProgressChanged += BackgroundWorker__ProgressChanged;
-            this.backgroundWorker_.RunWorkerCompleted += BackgroundWorker__RunWorkerCompleted;
-            this.backgroundWorker_.WorkerReportsProgress = true;
-            this.backgroundWorker_.RunWorkerAsync();
+        actionWithProgressReporting_(ProgressReporter);
+    }
 
-            this.progressUpdateTimer_ = new Timer();
-            this.progressUpdateTimer_.Interval = 50;
-            this.progressUpdateTimer_.Tick += ProgressUpdateTimer__Tick;
+    private void cancelButton_Click(object sender, EventArgs e)
+    {
+        CancelWithConfirmationPrompt();
+    }
 
-            this.progressUpdateTimer_.Start();
-        }
+    private void CancelWithConfirmationPrompt()
+    {
+        var dialogResult = MessageBox.Show(
+            this,
+            @"Are you sure you want to cancel the scan?",
+            string.Empty,
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Asterisk,
+            MessageBoxDefaultButton.Button2
+        );
 
-        private void ProgressUpdateTimer__Tick(object sender, EventArgs e)
-        {
-            this.progressLabel.Text = this.currentProgressMessage_;
-        }
+        if (dialogResult != DialogResult.Yes) return;
+        // TODO: stop the scanning operation?
+        scanningCancelled_ = true;
+        DialogResult = DialogResult.Cancel;
+    }
 
-        private void BackgroundWorker__RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            // TODO: determine if the work was cancelled or terminated due to an error
-            //       and return an appropriate dialog result.
-            if (!scanningCancelled_)
-            {
-                this.scanningCompleted_ = true;
-                this.DialogResult = DialogResult.OK;
-            }
-        }
+    private void RevitFileScanningProgressUI_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (e.CloseReason != CloseReason.UserClosing) return;
+        if (scanningCompleted_ || scanningCancelled_) return;
+        // NOTE: this scenario occurs when the user closes the progress window using Alt+F4.
+        CancelWithConfirmationPrompt();
 
-        private void BackgroundWorker__ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            var progressMessage = e.UserState as string;
+        if (!scanningCancelled_) e.Cancel = true;
 
-            this.currentProgressMessage_ = progressMessage;
-        }
-
-        private void BackgroundWorker__DoWork(object sender, DoWorkEventArgs e)
-        {
-            Func<string, bool> progressReporter = (progressMessage) => {
-                    this.backgroundWorker_.ReportProgress(0, progressMessage);
-                    return this.scanningCancelled_;
-                };
-
-            actionWithProgressReporting_(progressReporter);
-        }
-
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-            CancelWithConfirmationPrompt();
-        }
-
-        private void CancelWithConfirmationPrompt()
-        {
-            var dialogResult = MessageBox.Show(
-                    this,
-                    "Are you sure you want to cancel the scan?",
-                    string.Empty,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Asterisk,
-                    MessageBoxDefaultButton.Button2
-                );
-
-            if (dialogResult == DialogResult.Yes)
-            {
-                // TODO: stop the scanning operation?
-                this.scanningCancelled_ = true;
-                this.DialogResult = DialogResult.Cancel;
-            }
-        }
-
-        private void RevitFileScanningProgressUI_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                if (!this.scanningCompleted_ && !this.scanningCancelled_)
-                {
-                    // NOTE: this scenario occurs when the user closes the progress window using Alt+F4.
-                    CancelWithConfirmationPrompt();
-
-                    if (!this.scanningCancelled_)
-                    {
-                        e.Cancel = true;
-                    }
-                }
-            }
-
-            if (!e.Cancel)
-            {
-                this.progressUpdateTimer_.Stop();
-            }
-        }
+        //if (!e.Cancel) progressUpdateTimer_.Stop();
     }
 }
