@@ -8,9 +8,7 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 ## Latest version (NEW)
 
-[Installer for Revit Batch Processor v1.9.0 beta](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.9.0-beta/RevitBatchProcessorSetup_v1.9.0.exe)
-
-Version 1.9.0 beta release is available, which adds support for Revit 2023.
+Version 1.10.0 beta release is available, which adds support for Revit 2024.  No installer available, must compile in VS.
 
 See the [Releases](https://github.com/bvn-architecture/RevitBatchProcessor/releases) page for more information.
 

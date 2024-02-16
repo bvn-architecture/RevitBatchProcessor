@@ -11,6 +11,9 @@
     <AssemblyName>BatchRvtGUI</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <LangVersion>latestmajor</LangVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>BVN32NewBrand.ico</ApplicationIcon>
@@ -61,12 +64,15 @@
       <HintPath>..\References\IronPython-2.7.3\Microsoft.Scripting.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\JSON.NET\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -120,6 +126,7 @@
     <EmbeddedResource Include="RevitFileScanningProgressUI.resx">
       <DependentUpon>RevitFileScanningProgressUI.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="App.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -138,6 +145,7 @@
     <ProjectReference Include="..\BatchRvtUtil\BatchRvtUtil.csproj">
       <Project>{b880dd15-184b-4ce2-86fc-08bac05e0271}</Project>
       <Name>BatchRvtUtil</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
     <ProjectReference Include="..\BatchRvt\BatchRvt.csproj">
       <Project>{c877620c-de32-455c-bf21-8f3e73e9df68}</Project>
@@ -152,12 +160,23 @@
     <Content Include="BVN32NewBrand.ico" />
     <EmbeddedResource Include="Images\BVN16new.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions">
+      <Version>6.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="Moq">
+      <Version>4.18.3</Version>
+    </PackageReference>
+    <PackageReference Include="xunit">
+      <Version>2.4.2</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+         Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
+    -->
 </Project>
