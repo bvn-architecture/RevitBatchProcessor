@@ -36,7 +36,8 @@ namespace BatchRvtUtil
                 Revit2020 = 5,
                 Revit2021 = 6,
                 Revit2022 = 7,
-                Revit2023 = 8
+                Revit2023 = 8,
+                Revit2024 = 9
         }
 
         private const string REVIT_EXECUTABLE_FILE_NAME = "Revit.exe";
@@ -52,7 +53,8 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2020, @".\Autodesk\Revit\Addins\2020" },
                 { SupportedRevitVersion.Revit2021, @".\Autodesk\Revit\Addins\2021" },
                 { SupportedRevitVersion.Revit2022, @".\Autodesk\Revit\Addins\2022" },
-                { SupportedRevitVersion.Revit2023, @".\Autodesk\Revit\Addins\2023" }
+                { SupportedRevitVersion.Revit2023, @".\Autodesk\Revit\Addins\2023" },
+                { SupportedRevitVersion.Revit2024, @".\Autodesk\Revit\Addins\2024" }
             };
 
         private static readonly Dictionary<SupportedRevitVersion, string> SUPPORTED_REVIT_VERSION_NUMBERS =
@@ -66,7 +68,8 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2020, "2020" },
                 { SupportedRevitVersion.Revit2021, "2021" },
                 { SupportedRevitVersion.Revit2022, "2022" },
-                { SupportedRevitVersion.Revit2023, "2023" }
+                { SupportedRevitVersion.Revit2023, "2023" },
+                { SupportedRevitVersion.Revit2024, "2024" }
             };
 
         private static Dictionary<SupportedRevitVersion,string> REVIT_EXECUTABLE_FOLDER_PATHS()
@@ -158,7 +161,8 @@ namespace BatchRvtUtil
                 { SupportedRevitVersion.Revit2020, @"C:\REVIT_LOCAL2020" },
                 { SupportedRevitVersion.Revit2021, @"C:\REVIT_LOCAL2021" },
                 { SupportedRevitVersion.Revit2022, @"C:\REVIT_LOCAL2022" },
-                { SupportedRevitVersion.Revit2023, @"C:\REVIT_LOCAL2023" }
+                { SupportedRevitVersion.Revit2023, @"C:\REVIT_LOCAL2023" },
+                { SupportedRevitVersion.Revit2024, @"C:\REVIT_LOCAL2024" }
             };
 
         public static string GetRevitExecutableFilePath(SupportedRevitVersion revitVersion)
