@@ -156,6 +156,28 @@ public static class RevitVersion
             : null;
     }
 
+    public static string GetRevitLocalFolderPath(SupportedRevitVersion revitVersion)
+    {
+        return REVIT_LOCAL_FOLDER_PATHS.ContainsKey(revitVersion) ?
+            REVIT_LOCAL_FOLDER_PATHS[revitVersion] : null;
+    }
+
+    public static string GetRevitLocalFilePath(SupportedRevitVersion revitVersion, string centralFilePath)
+    {
+        string localFilePath = null;
+
+        var localFolderPath = GetRevitLocalFolderPath(revitVersion);
+
+        if (localFolderPath != null)
+        {
+            var localFileName = Path.GetFileNameWithoutExtension(centralFilePath) + "_" + Environment.UserName + Path.GetExtension(centralFilePath);
+
+            localFilePath = Path.Combine(localFolderPath, localFileName);
+        }
+
+        return localFilePath;
+    }
+
     public static IEnumerable<SupportedRevitVersion> GetInstalledRevitVersions()
     {
         return REVIT_EXECUTABLE_FOLDER_PATHS().Keys
