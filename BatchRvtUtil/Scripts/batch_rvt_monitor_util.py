@@ -43,32 +43,32 @@ REVIT_PROGRESS_CHECK_INTERVAL_IN_SECONDS = 5
 REVIT_PROCESS_BEGIN_PROCESSING_TIMEOUT_IN_SECONDS = 5 * SECONDS_PER_MINUTE
 
 
-def ShowSupportedRevitFileInfo(supportedRevitFileInfo, output):
-    output()
+def ShowSupportedRevitFileInfo(supportedRevitFileInfo):
+    message = "\n"
     if supportedRevitFileInfo.IsCloudModel():
         revitCloudModelInfo = supportedRevitFileInfo.GetRevitCloudModelInfo()
         projectGuidText = revitCloudModelInfo.GetProjectGuid().ToString()
         modelGuidText = revitCloudModelInfo.GetModelGuid().ToString()
-        output("\t" + "CLOUD MODEL")
-        output("\t" + "Project ID: " + projectGuidText)
-        output("\t" + "Model ID: " + modelGuidText)
+        message += ("\t" + "CLOUD MODEL\n")
+        message += ("\t" + "Project ID: " + projectGuidText + "\n")
+        message += ("\t" + "Model ID: " + modelGuidText + "\n")
         revitVersionText = supportedRevitFileInfo.TryGetRevitVersionText()
         revitVersionText = revitVersionText if not str.IsNullOrWhiteSpace(revitVersionText) else "NOT SPECIFIED!"
-        output("\t" + "Revit version: " + revitVersionText)
+        message += ("\t" + "Revit version: " + revitVersionText + "\n")
     else:
         revitFileInfo = supportedRevitFileInfo.GetRevitFileInfo()
         revitFilePath = revitFileInfo.GetFullPath()
         fileExists = revitFileInfo.Exists()
         fileSize = revitFileInfo.GetFileSize()
         fileSizeText = str.Format("{0:0.00}MB", fileSize / (1024.0 * 1024.0)) if fileSize is not None else "<UNKNOWN>"
-        output("\t" + revitFilePath)
-        output("\t" + "File exists: " + ("YES" if fileExists else "NO"))
-        output("\t" + "File size: " + fileSizeText)
+        message += ("\t" + revitFilePath + "\n")
+        message += ("\t" + "File exists: " + ("YES" if fileExists else "NO") + "\n")
+        message += ("\t" + "File size: " + fileSizeText + "\n")
         if fileExists:
             revitVersionText = revitFileInfo.TryGetRevitVersionText()
             revitVersionText = revitVersionText if not str.IsNullOrWhiteSpace(revitVersionText) else "NOT DETECTED!"
-            output("\t" + "Revit version: " + revitVersionText)
-    return
+            message += ("\t" + "Revit version: " + revitVersionText + "\n")
+    return message
 
 def UsingClientHandle(serverStream, action):
     result = None

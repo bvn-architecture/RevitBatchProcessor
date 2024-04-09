@@ -17,273 +17,224 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using Newtonsoft.Json.Linq;
 
-namespace BatchRvtUtil
-{
-    public class BatchRvtSettings : IPersistent
-    {
-        public const string SETTINGS_FILE_EXTENSION = ".json";
-        public const string SETTINGS_FILE_FILTER = "BatchRvt Settings files (*.json)|*.json";
-        public const string BATCHRVTGUI_SETTINGS_FILENAME = "BatchRvtGui.Settings" + SETTINGS_FILE_EXTENSION;
-        public const string BATCHRVT_SETTINGS_FILENAME = "BatchRvt.Settings" + SETTINGS_FILE_EXTENSION;
+namespace BatchRvtUtil;
 
-        private readonly PersistentSettings persistentSettings;
+public class BatchRvtSettings : IPersistent
+{
+    public const string SETTINGS_FILE_EXTENSION = ".json";
+    public const string SETTINGS_FILE_FILTER = "BatchRvt Settings files (*.json)|*.json";
+    private const string BATCHRVTGUI_SETTINGS_FILENAME = "BatchRvtGui.Settings" + SETTINGS_FILE_EXTENSION;
+    public const string BATCHRVT_SETTINGS_FILENAME = "BatchRvt.Settings" + SETTINGS_FILE_EXTENSION;
+    public readonly BooleanSetting AuditOnOpening = new("auditOnOpening");
+
+    public readonly EnumSetting<RevitVersion.SupportedRevitVersion> BatchRevitTaskRevitVersion =
+        new("batchRevitTaskRevitVersion");
+
+    // Central File Processing settings
+    public readonly EnumSetting<BatchRvt.CentralFileOpenOption> CentralFileOpenOption = new("centralFileOpenOption");
+
+    public readonly StringSetting DataExportFolderPath = new("dataExportFolderPath");
+    public readonly BooleanSetting DeleteLocalAfter = new("deleteLocalAfter");
+    public readonly BooleanSetting DiscardWorksetsOnDetach = new("discardWorksetsOnDetach");
+
+    // Data Export settings
+    public readonly BooleanSetting EnableDataExport = new("enableDataExport");
+
+    // Post-processing Script settings
+    public readonly BooleanSetting ExecutePostProcessingScript = new("executePostProcessingScript");
+
+    // Pre-processing Script settings
+    public readonly BooleanSetting ExecutePreProcessingScript = new("executePreProcessingScript");
+
+    public readonly BooleanSetting IfNotAvailableUseMinimumAvailableRevitVersion =
+        new("ifNotAvailableUseMinimumAvailableRevitVersion");
+
+    public readonly BooleanSetting OpenInUI = new("openInUI");
+
+    public readonly PersistentSettings persistentSettings;
+    public readonly StringSetting PostProcessingScriptFilePath = new("PostProcessingScriptFilePath");
+    public readonly StringSetting PreProcessingScriptFilePath = new("preProcessingScriptFilePath");
+    public readonly IntegerSetting ProcessingTimeOutInMinutes = new("processingTimeOutInMinutes");
+
+    // Revit File List settings
+    public readonly StringSetting RevitFileListFilePath = new("revitFileListFilePath");
+
+    // Batch Revit File Processing settings
+    public readonly EnumSetting<BatchRvt.RevitFileProcessingOption> RevitFileProcessingOption =
+        new("revitFileProcessingOption");
+
+    // Revit Processing settings
+    public readonly EnumSetting<BatchRvt.RevitProcessingOption> RevitProcessingOption = new("revitProcessingOption");
+
+    // Revit Session settings
+    public readonly EnumSetting<BatchRvt.RevitSessionOption> RevitSessionOption = new("revitSessionOption");
+
+    // UI settings
+    public readonly BooleanSetting ShowAdvancedSettings = new("showAdvancedSettings");
+
+    public readonly BooleanSetting ShowMessageBoxOnTaskScriptError = new("showMessageBoxOnTaskScriptError");
+
+    public readonly BooleanSetting ShowRevitProcessErrorMessages = new("showRevitProcessErrorMessages");
+
+    // Single Revit Task Processing settings
+    public readonly EnumSetting<RevitVersion.SupportedRevitVersion> SingleRevitTaskRevitVersion =
+        new("singleRevitTaskRevitVersion");
+
+    // General Task Script settings
+    public readonly StringSetting TaskScriptFilePath = new("taskScriptFilePath");
+
+    public readonly EnumSetting<BatchRvt.WorksetConfigurationOption> WorksetConfigurationOption =
+        new("worksetConfigurationOption");
+
+    public BatchRvtSettings()
+    {
+        persistentSettings = new PersistentSettings(
+            new IPersistent[]
+            {
+                TaskScriptFilePath,
+                ShowMessageBoxOnTaskScriptError,
+                ProcessingTimeOutInMinutes,
+                ShowRevitProcessErrorMessages,
+                RevitFileListFilePath,
+                EnableDataExport,
+                DataExportFolderPath,
+                ExecutePreProcessingScript,
+                PreProcessingScriptFilePath,
+                ExecutePostProcessingScript,
+                PostProcessingScriptFilePath,
+                CentralFileOpenOption,
+                DeleteLocalAfter,
+                DiscardWorksetsOnDetach,
+                WorksetConfigurationOption,
+                RevitSessionOption,
+                RevitProcessingOption,
+                SingleRevitTaskRevitVersion,
+                RevitFileProcessingOption,
+                IfNotAvailableUseMinimumAvailableRevitVersion,
+                BatchRevitTaskRevitVersion,
+                OpenInUI,
+                AuditOnOpening,
+                ShowAdvancedSettings
+            }
+        );
+    }
+
+    public void Load(JObject jobject)
+    {
+        persistentSettings.Load(jobject);
+    }
+
+    public void Store(JObject jobject)
+    {
+        persistentSettings.Store(jobject);
+    }
+
+
+    public bool LoadFromFile(string filePath = null)
+    {
+        
+        filePath = string.IsNullOrWhiteSpace(filePath) ? GetDefaultSettingsFilePath() : filePath;
+
+        if (!File.Exists(filePath)) return false;
+        try
+        {
+            var text = File.ReadAllText(filePath);
+            var jobject = JsonUtil.DeserializeFromJson(text);
+            Load(jobject);
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        
+    }
+
+    public bool SaveToFile(string filePath = null)
+    {
+        var success = false;
+
+        filePath = string.IsNullOrWhiteSpace(filePath) ? GetDefaultSettingsFilePath() : filePath;
+
+        var jobject = new JObject();
+
+        try
+        {
+            Store(jobject);
+            var settingsText = JsonUtil.SerializeToJson(jobject, true);
+            var fileInfo = new FileInfo(filePath);
+            fileInfo.Directory?.Create();
+            File.WriteAllText(fileInfo.FullName, settingsText);
+
+            success = true;
+        }
+        catch (Exception e)
+        {
+            success = false;
+        }
+
+        return success;
+    }
+
+
+    public static BatchRvtSettings Create(
+        string taskScriptFilePath,
+        string revitFileListFilePath,
+        BatchRvt.RevitProcessingOption revitProcessingOption,
+        BatchRvt.CentralFileOpenOption centralFileOpenOption,
+        bool deleteLocalAfter,
+        bool discardWorksetsOnDetach,
+        BatchRvt.RevitSessionOption revitSessionOption,
+        BatchRvt.RevitFileProcessingOption revitFileVersionOption,
+        RevitVersion.SupportedRevitVersion taskRevitVersion,
+        int fileProcessingTimeOutInMinutes,
+        bool fallbackToMinimumAvailableRevitVersion
+    )
+    {
+        var batchRvtSettings = new BatchRvtSettings();
 
         // General Task Script settings
-        public readonly StringSetting TaskScriptFilePath = new StringSetting("taskScriptFilePath");
-        public readonly BooleanSetting ShowMessageBoxOnTaskScriptError = new BooleanSetting("showMessageBoxOnTaskScriptError");
-        public readonly IntegerSetting ProcessingTimeOutInMinutes = new IntegerSetting("processingTimeOutInMinutes");
-        public readonly BooleanSetting ShowRevitProcessErrorMessages = new BooleanSetting("showRevitProcessErrorMessages");
-
-        // Revit File List settings
-        public readonly StringSetting RevitFileListFilePath = new StringSetting("revitFileListFilePath");
-
-        // Data Export settings
-        public readonly BooleanSetting EnableDataExport = new BooleanSetting("enableDataExport");
-        public readonly StringSetting DataExportFolderPath = new StringSetting("dataExportFolderPath");
-
-        // Pre-processing Script settings
-        public readonly BooleanSetting ExecutePreProcessingScript = new BooleanSetting("executePreProcessingScript");
-        public readonly StringSetting PreProcessingScriptFilePath = new StringSetting("preProcessingScriptFilePath");
-        
-        // Post-processing Script settings
-        public readonly BooleanSetting ExecutePostProcessingScript = new BooleanSetting("executePostProcessingScript");
-        public readonly StringSetting PostProcessingScriptFilePath = new StringSetting("PostProcessingScriptFilePath");
-        
-        // Central File Processing settings
-        public readonly EnumSetting<BatchRvt.CentralFileOpenOption> CentralFileOpenOption = new EnumSetting<BatchRvt.CentralFileOpenOption>("centralFileOpenOption");
-        public readonly BooleanSetting DeleteLocalAfter = new BooleanSetting("deleteLocalAfter");
-        public readonly BooleanSetting DiscardWorksetsOnDetach = new BooleanSetting("discardWorksetsOnDetach");
-        public readonly EnumSetting<BatchRvt.WorksetConfigurationOption> WorksetConfigurationOption = new EnumSetting<BatchRvt.WorksetConfigurationOption>("worksetConfigurationOption");
-
-        // Revit Session settings
-        public readonly EnumSetting<BatchRvt.RevitSessionOption> RevitSessionOption = new EnumSetting<BatchRvt.RevitSessionOption>("revitSessionOption");
+        batchRvtSettings.TaskScriptFilePath.SetValue(taskScriptFilePath);
+        batchRvtSettings.ProcessingTimeOutInMinutes.SetValue(fileProcessingTimeOutInMinutes);
 
         // Revit Processing settings
-        public readonly EnumSetting<BatchRvt.RevitProcessingOption> RevitProcessingOption = new EnumSetting<BatchRvt.RevitProcessingOption>("revitProcessingOption");
+        batchRvtSettings.RevitProcessingOption.SetValue(revitProcessingOption);
+
+        // Revit File List settings
+        batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListFilePath);
+
+        // Central File Processing settings
+        batchRvtSettings.CentralFileOpenOption.SetValue(centralFileOpenOption);
+        batchRvtSettings.DeleteLocalAfter.SetValue(deleteLocalAfter);
+        batchRvtSettings.DiscardWorksetsOnDetach.SetValue(discardWorksetsOnDetach);
+
+        // Revit Session settings
+        batchRvtSettings.RevitSessionOption.SetValue(revitSessionOption);
 
         // Single Revit Task Processing settings
-        public readonly EnumSetting<RevitVersion.SupportedRevitVersion> SingleRevitTaskRevitVersion = new EnumSetting<RevitVersion.SupportedRevitVersion>("singleRevitTaskRevitVersion");
+        batchRvtSettings.SingleRevitTaskRevitVersion.SetValue(taskRevitVersion);
 
         // Batch Revit File Processing settings
-        public readonly EnumSetting<BatchRvt.RevitFileProcessingOption> RevitFileProcessingOption = new EnumSetting<BatchRvt.RevitFileProcessingOption>("revitFileProcessingOption");
-        public readonly BooleanSetting IfNotAvailableUseMinimumAvailableRevitVersion = new BooleanSetting("ifNotAvailableUseMinimumAvailableRevitVersion");
-        public readonly EnumSetting<RevitVersion.SupportedRevitVersion> BatchRevitTaskRevitVersion = new EnumSetting<RevitVersion.SupportedRevitVersion>("batchRevitTaskRevitVersion");
-        public readonly BooleanSetting OpenInUI = new BooleanSetting("openInUI");
-        public readonly BooleanSetting AuditOnOpening = new BooleanSetting("auditOnOpening");
+        batchRvtSettings.RevitFileProcessingOption.SetValue(revitFileVersionOption);
+        batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(
+            fallbackToMinimumAvailableRevitVersion);
+        batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(taskRevitVersion);
+        batchRvtSettings.AuditOnOpening.SetValue(false); // TODO: implement this option for this function?
 
-        // UI settings
-        public readonly BooleanSetting ShowAdvancedSettings = new BooleanSetting("showAdvancedSettings");
+        return batchRvtSettings;
+    }
 
-        public BatchRvtSettings()
-        {
-            this.persistentSettings = new PersistentSettings(
-                    new IPersistent[] {
-                        this.TaskScriptFilePath,
-                        this.ShowMessageBoxOnTaskScriptError,
-                        this.ProcessingTimeOutInMinutes,
-                        this.ShowRevitProcessErrorMessages,
-                        this.RevitFileListFilePath,
-                        this.EnableDataExport,
-                        this.DataExportFolderPath,
-                        this.ExecutePreProcessingScript,
-                        this.PreProcessingScriptFilePath,
-                        this.ExecutePostProcessingScript,
-                        this.PostProcessingScriptFilePath,
-                        this.CentralFileOpenOption,
-                        this.DeleteLocalAfter,
-                        this.DiscardWorksetsOnDetach,
-                        this.WorksetConfigurationOption,
-                        this.RevitSessionOption,
-                        this.RevitProcessingOption,
-                        this.SingleRevitTaskRevitVersion,
-                        this.RevitFileProcessingOption,
-                        this.IfNotAvailableUseMinimumAvailableRevitVersion,
-                        this.BatchRevitTaskRevitVersion,
-                        this.OpenInUI,
-                        this.AuditOnOpening,
-                        this.ShowAdvancedSettings
-                    }
-                );
-        }
-
-        public void Load(JObject jobject)
-        {
-            this.persistentSettings.Load(jobject);
-        }
-
-        public void Store(JObject jobject)
-        {
-            this.persistentSettings.Store(jobject);
-        }
-
-        public bool TryLoad(JObject jobject)
-        {
-            bool success = false;
-
-            try
-            {
-                this.Load(jobject);
-                success = true;
-            }
-            catch (Exception e)
-            {
-                success = false;
-            }
-
-            return success;
-        }
-
-        public bool TryStore(JObject jobject)
-        {
-            bool success = false;
-
-            try
-            {
-                this.Store(jobject);
-                success = true;
-            }
-            catch (Exception e)
-            {
-                success = false;
-            }
-
-            return success;
-        }
-
-        public bool LoadFromFile(string filePath = null)
-        {
-            bool success = false;
-
-            filePath = string.IsNullOrWhiteSpace(filePath) ? GetDefaultSettingsFilePath() : filePath;
-
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    var text = File.ReadAllText(filePath);
-                    var jobject = JsonUtil.DeserializeFromJson(text);
-                    this.Load(jobject);
-                    success = true;
-                }
-                catch (Exception e)
-                {
-                    success = false;
-                }
-            }
-
-            return success;
-        }
-
-        public bool SaveToFile(string filePath = null)
-        {
-            bool success = false;
-
-            filePath = string.IsNullOrWhiteSpace(filePath) ? GetDefaultSettingsFilePath() : filePath;
-
-            var jobject = new JObject();
-
-            try
-            {
-                this.Store(jobject);
-                var settingsText = JsonUtil.SerializeToJson(jobject, true);
-                var fileInfo = new FileInfo(filePath);
-                fileInfo.Directory.Create();
-                File.WriteAllText(fileInfo.FullName, settingsText);
-
-                success = true;
-            }
-            catch (Exception e)
-            {
-                success = false;
-            }
-
-            return success;
-        }
-
-        public string ToJsonString()
-        {
-            var jobject = new JObject();
-            this.Store(jobject);
-            return jobject.ToString();
-        }
-
-        public static BatchRvtSettings FromJsonString(string batchRvtSettingsJson)
-        {
-            BatchRvtSettings batchRvtSettings = null;
-
-            try
-            {
-                var jobject = JsonUtil.DeserializeFromJson(batchRvtSettingsJson);
-                batchRvtSettings = new BatchRvtSettings();
-                batchRvtSettings.Load(jobject);
-            }
-            catch (Exception e)
-            {
-                batchRvtSettings = null;
-            }
-
-            return batchRvtSettings;
-        }
-
-        public static BatchRvtSettings Create(
-                string taskScriptFilePath,
-                string revitFileListFilePath,
-                BatchRvt.RevitProcessingOption revitProcessingOption,
-                BatchRvt.CentralFileOpenOption centralFileOpenOption,
-                bool deleteLocalAfter,
-                bool discardWorksetsOnDetach,
-                BatchRvt.RevitSessionOption revitSessionOption,
-                BatchRvt.RevitFileProcessingOption revitFileVersionOption,
-                RevitVersion.SupportedRevitVersion taskRevitVersion,
-                int fileProcessingTimeOutInMinutes,
-                bool fallbackToMinimumAvailableRevitVersion
-            )
-        {
-            var batchRvtSettings = new BatchRvtSettings();
-
-            // General Task Script settings
-            batchRvtSettings.TaskScriptFilePath.SetValue(taskScriptFilePath);
-            batchRvtSettings.ProcessingTimeOutInMinutes.SetValue(fileProcessingTimeOutInMinutes);
-
-            // Revit Processing settings
-            batchRvtSettings.RevitProcessingOption.SetValue(revitProcessingOption);
-
-            // Revit File List settings
-            batchRvtSettings.RevitFileListFilePath.SetValue(revitFileListFilePath);
-
-            // Central File Processing settings
-            batchRvtSettings.CentralFileOpenOption.SetValue(centralFileOpenOption);
-            batchRvtSettings.DeleteLocalAfter.SetValue(deleteLocalAfter);
-            batchRvtSettings.DiscardWorksetsOnDetach.SetValue(discardWorksetsOnDetach);
-
-            // Revit Session settings
-            batchRvtSettings.RevitSessionOption.SetValue(revitSessionOption);
-
-            // Single Revit Task Processing settings
-            batchRvtSettings.SingleRevitTaskRevitVersion.SetValue(taskRevitVersion);
-
-            // Batch Revit File Processing settings
-            batchRvtSettings.RevitFileProcessingOption.SetValue(revitFileVersionOption);
-            batchRvtSettings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(fallbackToMinimumAvailableRevitVersion);
-            batchRvtSettings.BatchRevitTaskRevitVersion.SetValue(taskRevitVersion);
-            batchRvtSettings.AuditOnOpening.SetValue(false); // TODO: implement this option for this function?
-
-            return batchRvtSettings;
-        }
-
-        public static string GetDefaultSettingsFilePath()
-        {
-            return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "BatchRvt",
-                    BATCHRVTGUI_SETTINGS_FILENAME
-                );
-        }
+    public static string GetDefaultSettingsFilePath()
+    {
+        return Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "BatchRvt",
+            BATCHRVTGUI_SETTINGS_FILENAME
+        );
     }
 }

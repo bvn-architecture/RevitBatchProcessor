@@ -17,34 +17,31 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+public static class JsonUtil
 {
-    public static class JsonUtil
+    public static string SerializeToJson(JObject jobject, bool prettyPrint = false)
     {
-        public static string SerializeToJson(JObject jobject, bool prettyPrint = false)
-        {
-            return prettyPrint ? jobject.ToString() : jobject.ToString(Formatting.None);
-        }
+        return prettyPrint ? jobject.ToString() : jobject.ToString(Formatting.None);
+    }
 
-        public static string SerializeToJson(JArray jarray, bool prettyPrint = false)
-        {
-            return prettyPrint ? jarray.ToString() : jarray.ToString(Formatting.None);
-        }
+    public static string SerializeToJson(JArray jarray, bool prettyPrint = false)
+    {
+        return prettyPrint ? jarray.ToString() : jarray.ToString(Formatting.None);
+    }
 
-        public static JObject DeserializeFromJson(string text)
-        {
-            return JsonConvert.DeserializeObject(text) as JObject;
-        }
+    public static JObject DeserializeFromJson(string text)
+    {
+        return JsonConvert.DeserializeObject(text) as JObject;
+    }
 
-        public static JArray DeserializeArrayFromJson(string text) 
-        {
-            return JsonConvert.DeserializeObject(text) as JArray;
-        }
+    public static JArray DeserializeArrayFromJson(string text)
+    {
+        return JsonConvert.DeserializeObject(text) as JArray;
     }
 }

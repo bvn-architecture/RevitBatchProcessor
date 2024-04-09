@@ -17,18 +17,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
 using System.IO;
-using WinForms = System.Windows.Forms;
-
-using Autodesk.Revit.UI;
-using Autodesk.Revit.Attributes;
 using Autodesk.Revit.ApplicationServices;
-
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.UI;
 using BatchRvt.ScriptHost;
+using WinForms = System.Windows.Forms;
 
 namespace BatchRvt.Addin.Revit2016
 {
@@ -38,15 +35,6 @@ namespace BatchRvt.Addin.Revit2016
     [Description("BatchRvtAddin")]
     public class BatchRvtAddinApplication : IExternalApplication
     {
-        private static void SetupBatchScriptHost(ControlledApplication controlledApplication)
-        {
-            var pluginFolderPath = Path.GetDirectoryName(typeof(BatchRvtAddinApplication).Assembly.Location);
-
-            var batchRvtExternalEventHandler = new BatchRvtExternalEventHandler(pluginFolderPath);
-
-            batchRvtExternalEventHandler.Raise();
-        }
-
         public Result OnStartup(UIControlledApplication uiApplication)
         {
             SetupBatchScriptHost(uiApplication.ControlledApplication);
@@ -58,6 +46,15 @@ namespace BatchRvt.Addin.Revit2016
         {
             return Result.Succeeded;
         }
+
+        private static void SetupBatchScriptHost(ControlledApplication controlledApplication)
+        {
+            var pluginFolderPath = Path.GetDirectoryName(typeof(BatchRvtAddinApplication).Assembly.Location);
+
+            var batchRvtExternalEventHandler = new BatchRvtExternalEventHandler(pluginFolderPath);
+
+            batchRvtExternalEventHandler.Raise();
+        }
     }
 
     public class BatchRvtExternalEventHandler : IExternalEventHandler
@@ -67,15 +64,15 @@ namespace BatchRvt.Addin.Revit2016
 
         public BatchRvtExternalEventHandler(string pluginFolderPath)
         {
-            this.externalEvent_ = ExternalEvent.Create(this);
-            this.pluginFolderPath_ = pluginFolderPath;
+            externalEvent_ = ExternalEvent.Create(this);
+            pluginFolderPath_ = pluginFolderPath;
         }
 
         public void Execute(UIApplication uiApp)
         {
             try
             {
-                ScriptHostUtil.ExecuteBatchScriptHost(this.pluginFolderPath_, uiApp);
+                ScriptHostUtil.ExecuteBatchScriptHost(pluginFolderPath_, uiApp);
             }
             catch (Exception e)
             {
@@ -90,7 +87,7 @@ namespace BatchRvt.Addin.Revit2016
 
         public ExternalEventRequest Raise()
         {
-            return this.externalEvent_.Raise();
+            return externalEvent_.Raise();
         }
     }
 }

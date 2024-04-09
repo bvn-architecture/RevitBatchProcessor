@@ -17,94 +17,73 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+public static class CommandLineUtil
 {
-    public static class CommandLineUtil
+    private const string OPTION_SWITCH_PREFIX = "--";
+
+    private static int FindArgOptionSwitch(string[] args, string optionSwitch)
     {
-        public const string OptionSwitchPrefix = "--";
+        return Array.FindIndex(args, 1, arg => arg.ToLower() == OPTION_SWITCH_PREFIX + optionSwitch.ToLower());
+    }
 
-        private static int FindArgOptionSwitch(string[] args, string optionSwitch)
-        {
-            return Array.FindIndex(args, 1, arg => arg.ToLower() == (OptionSwitchPrefix + optionSwitch.ToLower()));
-        }
+    private static string GetArgOptionValue(string[] args, string optionSwitch)
+    {
+        var optionSwitchIndex = FindArgOptionSwitch(args, optionSwitch);
 
-        private static string GetArgOptionValue(string [] args, string optionSwitch)
-        {
-            string optionValue = null;
+        if (optionSwitchIndex == -1) return null;
+        if (optionSwitchIndex + 1 >= args.Length) return null;
+        var optionValue = args[optionSwitchIndex + 1];
 
-            int optionSwitchIndex = FindArgOptionSwitch(args, optionSwitch);
+        if (optionValue is { } && optionValue.StartsWith(OPTION_SWITCH_PREFIX)) optionValue = null;
 
-            if (optionSwitchIndex != -1)
-            {
-                if ((optionSwitchIndex + 1) < args.Length)
-                {
-                    optionValue = args[optionSwitchIndex + 1];
+        return optionValue;
+    }
 
-                    if (optionValue.StartsWith(OptionSwitchPrefix))
-                    {
-                        optionValue = null;
-                    }
-                }
-            }
+    public static bool HaveArguments()
+    {
+        var args = Environment.GetCommandLineArgs();
 
-            return optionValue;
-        }
+        return args.Length > 1;
+    }
 
-        public static bool HaveArguments()
-        {
-            var args = Environment.GetCommandLineArgs();
+    public static string GetCommandLineOption(string optionSwitch, bool expectOptionValue = true)
+    {
+        var args = Environment.GetCommandLineArgs();
 
-            return (args.Length > 1);
-        }
+        if (args.Length <= 1) return null;
+        var optionSwitchIndex = FindArgOptionSwitch(args, optionSwitch);
 
-        public static string GetCommandLineOption(string optionSwitch, bool expectOptionValue = true)
-        {
-            string optionValue = null;
+        if (optionSwitchIndex == -1) return null;
+        var optionValue =
+            expectOptionValue
+                ? GetArgOptionValue(args, optionSwitch)
+                : string.Empty; // Indicates a value-less option exists.
 
-            var args = Environment.GetCommandLineArgs();
+        return optionValue;
+    }
 
-            if (args.Length > 1)
-            {
-                var optionSwitchIndex = FindArgOptionSwitch(args, optionSwitch);
+    public static IEnumerable<string> GetAllCommandLineOptionSwitches()
+    {
+        var allOptionSwitches =
+            Enumerable.Empty<string>();
 
-                if (optionSwitchIndex != -1)
-                {
-                    if (expectOptionValue)
-                    {
-                        optionValue = GetArgOptionValue(args, optionSwitch);
-                    }
-                    else
-                    {
-                        optionValue = string.Empty; // Indicates a value-less option exists.
-                    }
+        var args = Environment.GetCommandLineArgs();
 
-                }
-            }
+        if (args.Length > 1) allOptionSwitches = args.Where(arg => arg.StartsWith(OPTION_SWITCH_PREFIX));
 
-            return optionValue;
-        }
+        return allOptionSwitches
+            .Select(optionSwitch => optionSwitch.Substring(OPTION_SWITCH_PREFIX.Length).ToLower()).ToList();
+    }
 
-        public static IEnumerable<string> GetAllCommandLineOptionSwitches()
-        {
-            var allOptionSwitches = Enumerable.Empty<string>();
-
-            var args = Environment.GetCommandLineArgs();
-
-            if (args.Length > 1)
-            {
-                allOptionSwitches = args.Where(arg => arg.StartsWith(OptionSwitchPrefix));
-            }
-
-            return allOptionSwitches.Select(optionSwitch => optionSwitch.Substring(OptionSwitchPrefix.Length).ToLower()).ToList();
-        }
-
-        public static bool HasCommandLineOption(string optionSwitch, bool expectOptionValue = true)
-        {
-            return GetCommandLineOption(optionSwitch, expectOptionValue) != null;
-        }
+    public static bool HasCommandLineOption(string optionSwitch, bool expectOptionValue = true)
+    {
+        return GetCommandLineOption(optionSwitch, expectOptionValue) != null;
     }
 }

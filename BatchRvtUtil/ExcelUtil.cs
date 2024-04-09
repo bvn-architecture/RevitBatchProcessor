@@ -17,25 +17,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+public static class ExcelUtil
 {
-    public static class ExcelUtil
+    public static bool IsExcelInstalled()
     {
-        public static bool IsExcelInstalled()
-        {
-            return Type.GetTypeFromProgID("Excel.Application") != null;
-        }
+        return Type.GetTypeFromProgID("Excel.Application") != null;
+    }
 
-        public static bool HasExcelExtension(string filePath)
-        {
-            var extension = Path.GetExtension(filePath).ToLower();
+    public static bool HasExcelExtension(string filePath)
+    {
+        var extension = Path.GetExtension(filePath).ToLower();
 
-            return new[] { ".xls", ".xlsx" }.Any(excelExtension => extension == excelExtension.ToLower());
-        }
+        return new[] { ".xls", ".xlsx" }.Any(excelExtension => extension == excelExtension.ToLower());
     }
 }

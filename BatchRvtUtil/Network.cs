@@ -17,76 +17,79 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+/// <summary>
+///     This class is used by Python scripts
+/// </summary>
+public static class Network
 {
-    public static class Network
+    private static IEnumerable<IPAddress> GetGatewayAddresses(
+        NetworkInterface networkInterface
+    )
     {
-        public static IEnumerable<IPAddress> GetGatewayAddresses(
-                NetworkInterface networkInterface
-            )
+        return networkInterface
+            .GetIPProperties()
+            .GatewayAddresses
+            .Select(ga => ga.Address);
+    }
+
+    public static IEnumerable<IPAddress> GetGatewayAddresses()
+    {
+        IEnumerable<IPAddress> gatewayAddresses;
+
+        try
         {
-            return networkInterface
-                .GetIPProperties()
-                .GatewayAddresses
-                .Select(ga => ga.Address);
+            var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(ni => ni.NetworkInterfaceType != NetworkInterfaceType.Loopback);
+
+            gatewayAddresses = networkInterfaces
+                .SelectMany(GetGatewayAddresses)
+                .ToList();
+        }
+        catch (Exception)
+        {
+            gatewayAddresses = Enumerable.Empty<IPAddress>();
         }
 
-        public static IEnumerable<IPAddress> GetGatewayAddresses()
+        return gatewayAddresses;
+    }
+
+    private static IEnumerable<IPAddress> GetIPAddresses(
+        NetworkInterface networkInterface
+    )
+    {
+        return networkInterface
+            .GetIPProperties()
+            .UnicastAddresses
+            .Select(ua => ua.Address);
+    }
+
+    public static IEnumerable<IPAddress> GetIPAddresses()
+    {
+        IEnumerable<IPAddress> ipAddresses;
+
+        try
         {
-            var gatewayAddresses = Enumerable.Empty<IPAddress>();
+            var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(ni => ni.NetworkInterfaceType != NetworkInterfaceType.Loopback);
 
-            try
-            {
-                var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces()
-                    .Where(ni => ni.NetworkInterfaceType != NetworkInterfaceType.Loopback);
-
-                gatewayAddresses = networkInterfaces
-                    .SelectMany(GetGatewayAddresses)
-                    .ToList();
-            }
-            catch (Exception)
-            {
-                gatewayAddresses = Enumerable.Empty<IPAddress>();
-            }
-
-            return gatewayAddresses;
+            ipAddresses = networkInterfaces
+                .SelectMany(GetIPAddresses)
+                .ToList();
+        }
+        catch (Exception)
+        {
+            ipAddresses = Enumerable.Empty<IPAddress>();
         }
 
-        public static IEnumerable<IPAddress> GetIPAddresses(
-                NetworkInterface networkInterface
-            )
-        {
-            return networkInterface
-                .GetIPProperties()
-                .UnicastAddresses
-                .Select(ua => ua.Address);
-        }
-
-        public static IEnumerable<IPAddress> GetIPAddresses()
-        {
-            var ipAddresses = Enumerable.Empty<IPAddress>();
-
-            try
-            {
-                var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces()
-                    .Where(ni => ni.NetworkInterfaceType != NetworkInterfaceType.Loopback);
-
-                ipAddresses = networkInterfaces
-                    .SelectMany(GetIPAddresses)
-                    .ToList();
-            }
-            catch (Exception)
-            {
-                ipAddresses = Enumerable.Empty<IPAddress>();
-            }
-
-            return ipAddresses;
-        }
+        return ipAddresses;
     }
 }

@@ -430,6 +430,7 @@ public partial class BatchRvtGuiForm : Form
     {
         if (!isBatchRvtRunning) return;
 
+
         var message = new StringBuilder();
 
         message.AppendLine("Do you want to terminate the currently running task?");
@@ -453,7 +454,7 @@ public partial class BatchRvtGuiForm : Form
             {
                 // TODO: report failure to kill the process?
             }
-
+        
 
         if (e.Cancel) return;
 
@@ -921,6 +922,7 @@ public partial class BatchRvtGuiForm : Form
         );
     }
 
+
     private void taskScriptNewScriptButton_Click(object sender, EventArgs e)
     {
         BrowseForSaveScriptFile(
@@ -1015,8 +1017,8 @@ public partial class BatchRvtGuiForm : Form
 
         var scriptTemplateFilePath = Path.Combine(BatchRvt.GetBatchRvtScriptsFolderPath(), scriptTemplateFileName);
 
-        var scriptContents = File.ReadAllText(scriptTemplateFilePath);
 
+        var scriptContents = File.ReadAllText(scriptTemplateFilePath);
         try
         {
             File.WriteAllText(scriptFilePath, scriptContents);

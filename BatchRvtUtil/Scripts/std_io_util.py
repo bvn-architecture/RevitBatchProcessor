@@ -47,10 +47,13 @@ def RestoreScriptOutput():
 
 def Output(m="", msgId=""):
     timestamp = time_util.GetDateTimeNow().ToString("HH:mm:ss")
-    message = timestamp + " : " + (("[" + str(msgId) + "]" + " ") if msgId != "" else "") + m + "\n"
+    message = ""
+    for line in m.split("\n"):
+        message += timestamp + " : " + (("[" + str(msgId) + "]" + " ") if msgId != "" else "") + line + "\n"
     if SHOW_OUTPUT:
         ORIGINAL_STDOUT.write(message)
     if logging_util.LOG_FILE[0] is not None:
         logging_util.LOG_FILE[0].WriteMessage({ "msgId" : msgId, "message" : m })
     return
+
 

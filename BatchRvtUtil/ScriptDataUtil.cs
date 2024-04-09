@@ -99,29 +99,26 @@ namespace BatchRvtUtil
 
             public bool LoadFromFile(string filePath)
             {
-                bool success = false;
+                
 
-                if (File.Exists(filePath))
+                if (!File.Exists(filePath)) return false;
+                try
                 {
-                    try
-                    {
-                        var text = File.ReadAllText(filePath);
-                        var jobject = JsonUtil.DeserializeFromJson(text);
-                        this.persistentSettings.Load(jobject);
-                        success = true;
-                    }
-                    catch (Exception e)
-                    {
-                        success = false;
-                    }
+                    var text = File.ReadAllText(filePath);
+                    var jobject = JsonUtil.DeserializeFromJson(text);
+                    this.persistentSettings.Load(jobject);
+                }
+                catch (Exception e)
+                {
+                    return false;
                 }
 
-                return success;
+                return true;
             }
 
             public bool SaveToFile(string filePath)
             {
-                bool success = false;
+                var success = false;
 
                 var jobject = new JObject();
 
@@ -173,37 +170,34 @@ namespace BatchRvtUtil
         {
             List<ScriptData> scriptDatas = null;
 
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath)) return (List<ScriptData>)null;
+            try
             {
-                try
+                var text = File.ReadAllText(filePath);
+
+                var jarray = JsonUtil.DeserializeArrayFromJson(text);
+
+                scriptDatas = new List<ScriptData>();
+
+                foreach (var jtoken in jarray)
                 {
-                    var text = File.ReadAllText(filePath);
+                    var jobject = jtoken as JObject;
 
-                    var jarray = JsonUtil.DeserializeArrayFromJson(text);
+                    if (jobject == null) continue;
+                    var scriptData = new ScriptData();
 
-                    scriptDatas = new List<ScriptData>();
+                    scriptData.Load(jobject);
 
-                    foreach (var jtoken in jarray)
-                    {
-                        var jobject = jtoken as JObject;
-
-                        if (jobject != null)
-                        {
-                            var scriptData = new ScriptData();
-
-                            scriptData.Load(jobject);
-
-                            scriptDatas.Add(scriptData);
-                        }
-                    }
+                    scriptDatas.Add(scriptData);
                 }
-                catch (Exception e)
-                {
-                    scriptDatas = null; // null on failure.
-                }
+                return scriptDatas;
+            }
+            catch (Exception e)
+            {
+                return null; 
             }
 
-            return scriptDatas;
+            
         }
 
         public static bool SaveManyToFile(string filePath, IEnumerable<ScriptData> scriptDatas)
@@ -243,7 +237,7 @@ namespace BatchRvtUtil
 
         public static string GetUniqueScriptDataFilePath()
         {
-            string uniqueId = Guid.NewGuid().ToString();
+            var uniqueId = Guid.NewGuid().ToString();
 
             return Path.Combine(
                     BatchRvt.GetDataFolderPath(),
@@ -253,7 +247,7 @@ namespace BatchRvtUtil
 
         public static string GetProgressRecordFilePath(string scriptDataFilePath)
         {
-            string uniqueId = (
+            var uniqueId = (
                     Path.GetFileNameWithoutExtension(scriptDataFilePath)
                     .Substring(SCRIPT_DATA_FILENAME_PREFIX.Length)
                 );
