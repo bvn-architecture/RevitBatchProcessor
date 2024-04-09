@@ -108,16 +108,6 @@ public static class RevitVersion
         return $"BatchRvtAddin{GetVersionNumber(supportedRevitVersion)}.addin";
     }
 
-    public static Dictionary<SupportedRevitVersion, string> REVIT_EXECUTABLE_FOLDER_PATHS()
-    {
-        return (from versionName in Enum.GetNames(typeof(SupportedRevitVersion))
-            select (SupportedRevitVersion)Enum.Parse(typeof(SupportedRevitVersion), versionName)
-            into enumOfVersion
-            let installLocation = GetRevitInstallPath(enumOfVersion)
-            where installLocation != null
-            select enumOfVersion).ToDictionary(enumOfVersion => enumOfVersion, GetRevitInstallPath);
-    }
-
 
     private static readonly Dictionary<SupportedRevitVersion, string> REVIT_LOCAL_FOLDER_PATHS =
         new Dictionary<SupportedRevitVersion, string>()
@@ -134,7 +124,6 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2024, @"C:\REVIT_LOCAL2024" }
         };
 
-    public static string GetRevitExecutableFilePath(SupportedRevitVersion revitVersion)
 
     public static string GetRevitInstallPath(SupportedRevitVersion supportedRevitVersion)
     {

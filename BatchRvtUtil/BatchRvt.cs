@@ -71,10 +71,7 @@ public static class BatchRvt
             { RevitVersion.SupportedRevitVersion.Revit2024, "BatchRvtAddin2024.addin" }
         };
 
-    private static string ConstructCommandLineArguments(IEnumerable<KeyValuePair<string, string>> arguments)
-    {
-        return string.Join(" ", arguments.Select(arg => "--" + arg.Key + " " + arg.Value));
-    }
+
 
     public enum WorksetConfigurationOption
     {
