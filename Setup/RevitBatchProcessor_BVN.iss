@@ -5,7 +5,7 @@
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 AppId={{B5CA57EA-7BB2-4620-916C-AE98376C1EF1}
 DisableDirPage=auto
 DefaultDirName="C:\Program Files\BVN\RevitBatchProcessor"
