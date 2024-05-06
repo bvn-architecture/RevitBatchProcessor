@@ -63,7 +63,7 @@ IGNORAR_BUTTON_TEXT = "Ignorar y abrir el proyecto"
 NO_BUTTON_TEXT = "No"
 NO_GUARDAR_PROYECTO_BUTTON_TEXT = "No guardar el proyecto"
 OK_BUTTON_TEXT = "OK"
-RHINO_7_BUTTON_TEXT = "Rhino 7"
+RHINO_SELECTION_BUTTON_TEXT = "Rhino 7" #Change this to target a different version of Rhino by default
 STATIC_CONTROL_CLASS_NAME = "Static"
 YES_BUTTON_TEXT = "Yes"
 
@@ -104,7 +104,7 @@ def SendButtonClick(buttons, output):
     noButtons = ui_automation_util.FilterControlsByText(buttons, NO_BUTTON_TEXT)
     noGuardarButtons = ui_automation_util.FilterControlsByText(buttons, NO_GUARDAR_PROYECTO_BUTTON_TEXT)
     okButtons = ui_automation_util.FilterControlsByText(buttons, OK_BUTTON_TEXT)
-    rhino_7_buttons = ui_automation_util.FilterControlsByText(buttons, RHINO_7_BUTTON_TEXT)
+    rhino_selection_buttons = ui_automation_util.FilterControlsByText(buttons, RHINO_SELECTION_BUTTON_TEXT)
 
     if len(okButtons) == 1:
         targetButton = okButtons[0]
@@ -114,8 +114,8 @@ def SendButtonClick(buttons, output):
         targetButton = noButtons[0]
     elif len(alwaysLoadButtons) == 1:
         targetButton = alwaysLoadButtons[0]
-    elif len(rhino_7_buttons) == 1:
-        targetButton = rhino_7_buttons[0]
+    elif len(rhino_selection_buttons) == 1:
+        targetButton = rhino_selection_buttons[0]
     elif len(ignorarButtons) == 1:
         targetButton = ignorarButtons[0]
     elif len(noGuardarButtons) == 1:
