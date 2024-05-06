@@ -17,1243 +17,1186 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text;
-using System.Windows.Forms;
-using System.IO;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using BatchRvtUtil;
 
-namespace BatchRvtGUI
+namespace BatchRvtGUI;
+
+public partial class BatchRvtGuiForm : Form
 {
-    public partial class BatchRvtGuiForm : Form
+    private const string WINDOW_TITLE = "Revit Batch Processor";
+
+    private const string NEW_TASK_SCRIPT_FILENAME = "new_task_script.py";
+    private const string NEW_PREPROCESSING_SCRIPT_FILENAME = "new_pre_processing_script.py";
+    private const string NEW_POSTPROCESSING_SCRIPT_FILENAME = "new_post_processing_script.py";
+
+    private const string TEMPLATE_TASK_SCRIPT_FILENAME = "template_task_script.py";
+    private const string TEMPLATE_PREPROCESSING_SCRIPT_FILENAME = "template_pre_processing_script.py";
+    private const string TEMPLATE_POSTPROCESSING_SCRIPT_FILENAME = "template_post_processing_script.py";
+
+    private const string PYTHON_SCRIPT_EXTENSION = ".py";
+    private const string PYTHON_SCRIPT_FILTER = "Python files (*.py)|*.py";
+    private const string DYNAMO_SCRIPT_EXTENSION = ".dyn";
+    private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
+    private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
+
+    private const int INITIAL_WIDTH = 1040;
+
+    private const int SETUP_HEIGHT = 685;
+    private const int SETUP_INITIAL_WIDTH = INITIAL_WIDTH;
+    private const int SETUP_MINIMUM_WIDTH = INITIAL_WIDTH;
+    private const int SETUP_MAXIMUM_WIDTH = 1600;
+
+    private const int RUNNING_INITIAL_WIDTH = INITIAL_WIDTH;
+    private const int RUNNING_INITIAL_HEIGHT = 875;
+    private const int RUNNING_MINIMUM_HEIGHT = 875;
+    private const int RUNNING_MINIMUM_WIDTH = INITIAL_WIDTH;
+
+    private const int ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE = 275;
+    private const int READ_OUTPUT_INTERVAL_IN_MS = 10;
+
+    private readonly Size RUNNING_INITIAL_SIZE = new(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
+    private readonly Size RUNNING_MAXIMUM_SIZE = new(0, 0); // no maximum size
+    private readonly Size RUNNING_MINIMUM_SIZE = new(RUNNING_MINIMUM_WIDTH, RUNNING_MINIMUM_HEIGHT);
+
+    private readonly Size SETUP_INITIAL_SIZE = new(SETUP_INITIAL_WIDTH, SETUP_HEIGHT);
+    private readonly Size SETUP_MAXIMUM_SIZE = new(SETUP_MAXIMUM_WIDTH, SETUP_HEIGHT);
+    private readonly Size SETUP_MINIMUM_SIZE = new(SETUP_MINIMUM_WIDTH, SETUP_HEIGHT);
+    private readonly UIConfig UIConfiguration;
+
+    private Process batchRvtProcess;
+    private bool isBatchRvtRunning;
+    private bool isUsingRunningSize;
+    private Task<string> pendingErrorReadLineTask;
+
+    private Task<string> pendingOutputReadLineTask;
+    private Timer readBatchRvtOutput_Timer;
+
+    private BatchRvtSettings Settings;
+
+    public BatchRvtGuiForm()
     {
-        public const string WINDOW_TITLE = "Revit Batch Processor";
+        InitializeComponent();
+        Settings = new BatchRvtSettings();
 
-        private BatchRvtSettings Settings;
-        private UIConfig UIConfiguration;
-        private bool isBatchRvtRunning = false;
+        UIConfiguration = new UIConfig(GetUIConfigItems());
+    }
 
-        private const string NEW_TASK_SCRIPT_FILENAME = "new_task_script.py";
-        private const string NEW_PREPROCESSING_SCRIPT_FILENAME = "new_pre_processing_script.py";
-        private const string NEW_POSTPROCESSING_SCRIPT_FILENAME = "new_post_processing_script.py";
-
-        private enum ScriptType { Python = 0, Dynamo = 1, Any = 2 }
-        private enum SaveNewScriptType { TaskScript = 0, PreProcessingScript = 1, PostProcessingScript = 2 }
-
-        private const string TEMPLATE_TASK_SCRIPT_FILENAME = "template_task_script.py";
-        private const string TEMPLATE_PREPROCESSING_SCRIPT_FILENAME = "template_pre_processing_script.py";
-        private const string TEMPLATE_POSTPROCESSING_SCRIPT_FILENAME = "template_post_processing_script.py";
-
-        private const string PYTHON_SCRIPT_EXTENSION = ".py";
-        private const string PYTHON_SCRIPT_FILTER = "Python files (*.py)|*.py";
-        private const string DYNAMO_SCRIPT_EXTENSION = ".dyn";
-        private const string DYNAMO_SCRIPT_FILTER = "Dynamo files (*.dyn)|*.dyn";
-        private const string ANY_SCRIPTS_FILTER = "Script files (*.py;*.dyn)|*.py;*.dyn";
-
-        private const int INITIAL_WIDTH = 1040;
-
-        private const int SETUP_HEIGHT = 685;
-        private const int SETUP_INITIAL_WIDTH = INITIAL_WIDTH;
-        private const int SETUP_MINIMUM_WIDTH = INITIAL_WIDTH;
-        private const int SETUP_MAXIMUM_WIDTH = 1600;
-
-        private readonly System.Drawing.Size SETUP_INITIAL_SIZE = new System.Drawing.Size(SETUP_INITIAL_WIDTH, SETUP_HEIGHT);
-        private readonly System.Drawing.Size SETUP_MINIMUM_SIZE = new System.Drawing.Size(SETUP_MINIMUM_WIDTH, SETUP_HEIGHT);
-        private readonly System.Drawing.Size SETUP_MAXIMUM_SIZE = new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, SETUP_HEIGHT);
-
-        private const int RUNNING_INITIAL_WIDTH = INITIAL_WIDTH;
-        private const int RUNNING_INITIAL_HEIGHT = 875;
-        private const int RUNNING_MINIMUM_HEIGHT = 875;
-        private const int RUNNING_MINIMUM_WIDTH = INITIAL_WIDTH;
-
-        private const int ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE = 275;
-
-        private readonly System.Drawing.Size RUNNING_INITIAL_SIZE = new System.Drawing.Size(RUNNING_INITIAL_WIDTH, RUNNING_INITIAL_HEIGHT);
-        private readonly System.Drawing.Size RUNNING_MINIMUM_SIZE = new System.Drawing.Size(RUNNING_MINIMUM_WIDTH, RUNNING_MINIMUM_HEIGHT);
-        private readonly System.Drawing.Size RUNNING_MAXIMUM_SIZE = new System.Drawing.Size(0, 0); // no maximum size
-        private bool isUsingRunningSize = false;
-
-        private Process batchRvtProcess;
-        private Timer readBatchRvtOutput_Timer;
-        private const int READ_OUTPUT_INTERVAL_IN_MS = 250;
-
-        private Task<string> pendingOutputReadLineTask;
-        private Task<string> pendingErrorReadLineTask;
-
-        public BatchRvtGuiForm()
+    private IEnumerable<IUIConfigItem> GetUIConfigItems()
+    {
+        var iuConfigItems = new IUIConfigItem[]
         {
-            InitializeComponent();
-            this.Settings = new BatchRvtSettings();
-
-            this.UIConfiguration = new UIConfig(GetUIConfigItems());
-        }
-
-        private IEnumerable<IUIConfigItem> GetUIConfigItems()
-        {
-            var iuConfigItems = new IUIConfigItem[] {
-                    
-                    // General Task Script settings
-                    new UIConfigItem(
-                            () => {
-                                UpdateTaskScript(this.Settings.TaskScriptFilePath.GetValue());
-                                this.showMessageBoxOnTaskScriptErrorCheckBox.Checked = this.Settings.ShowMessageBoxOnTaskScriptError.GetValue();
-                            },
-                            () => {
-                                this.Settings.TaskScriptFilePath.SetValue(this.taskScriptTextBox.Text);
-                                this.Settings.ShowMessageBoxOnTaskScriptError.SetValue(this.showMessageBoxOnTaskScriptErrorCheckBox.Checked);
-                            }
-                        ),
-
-                    // Revit File List settings
-                    new UIConfigItem(
-                            () => { this.revitFileListTextBox.Text = this.Settings.RevitFileListFilePath.GetValue(); },
-                            () => { this.Settings.RevitFileListFilePath.SetValue(this.revitFileListTextBox.Text); }
-                        ),
-
-                    // Data Export settings
-                    new UIConfigItem(
-                            () => {
-                                this.enableDataExportCheckBox.Checked = this.Settings.EnableDataExport.GetValue();
-                                this.dataExportFolderTextBox.Text = this.Settings.DataExportFolderPath.GetValue();
-                                UpdateDataExportControls();
-                            },
-                            () => {
-                                this.Settings.EnableDataExport.SetValue(this.enableDataExportCheckBox.Checked);
-                                this.Settings.DataExportFolderPath.SetValue(this.dataExportFolderTextBox.Text);
-                            }
-                        ),
-
-                    // Pre-processing Script settings
-                    new UIConfigItem(
-                            () => {
-                                this.executePreProcessingScriptCheckBox.Checked = this.Settings.ExecutePreProcessingScript.GetValue();
-                                this.preProcessingScriptTextBox.Text = this.Settings.PreProcessingScriptFilePath.GetValue();
-                                UpdatePreProcessingScriptControls();
-                            },
-                            () => {
-                                this.Settings.ExecutePreProcessingScript.SetValue(this.executePreProcessingScriptCheckBox.Checked);
-                                this.Settings.PreProcessingScriptFilePath.SetValue(this.preProcessingScriptTextBox.Text);
-                            }
-                        ),
-
-                    // Post-processing Script settings
-                    new UIConfigItem(
-                            () => {
-                                this.executePostProcessingScriptCheckBox.Checked = this.Settings.ExecutePostProcessingScript.GetValue();
-                                this.postProcessingScriptTextBox.Text = this.Settings.PostProcessingScriptFilePath.GetValue();
-                                UpdatePostProcessingScriptControls();
-                            },
-                            () => {
-                                this.Settings.ExecutePostProcessingScript.SetValue(this.executePostProcessingScriptCheckBox.Checked);
-                                this.Settings.PostProcessingScriptFilePath.SetValue(this.postProcessingScriptTextBox.Text);
-                            }
-                        ),
-
-                    // Central File Processing settings
-                    new UIConfigItem(
-                            () => {
-                                this.detachFromCentralRadioButton.Checked = (this.Settings.CentralFileOpenOption.GetValue() == BatchRvt.CentralFileOpenOption.Detach);
-                                this.createNewLocalRadioButton.Checked = (this.Settings.CentralFileOpenOption.GetValue() == BatchRvt.CentralFileOpenOption.CreateNewLocal);
-                                this.deleteLocalAfterCheckBox.Checked = this.Settings.DeleteLocalAfter.GetValue();
-                                this.discardWorksetsCheckBox.Checked = this.Settings.DiscardWorksetsOnDetach.GetValue();
-                                this.closeAllWorksetsRadioButton.Checked = (this.Settings.WorksetConfigurationOption.GetValue() == BatchRvt.WorksetConfigurationOption.CloseAllWorksets);
-                                this.openAllWorksetsRadioButton.Checked = (this.Settings.WorksetConfigurationOption.GetValue() == BatchRvt.WorksetConfigurationOption.OpenAllWorksets);
-                                this.openLastViewedWorksetsRadioButton.Checked = (this.Settings.WorksetConfigurationOption.GetValue() == BatchRvt.WorksetConfigurationOption.OpenLastViewed);
-                                UpdateCentralFileProcessingControls();
-                            },
-                            () => {
-                                this.Settings.CentralFileOpenOption.SetValue(
-                                        this.createNewLocalRadioButton.Checked ?
-                                        BatchRvt.CentralFileOpenOption.CreateNewLocal :
-                                        BatchRvt.CentralFileOpenOption.Detach
-                                    );
-                                this.Settings.DeleteLocalAfter.SetValue(this.deleteLocalAfterCheckBox.Checked);
-                                this.Settings.DiscardWorksetsOnDetach.SetValue(this.discardWorksetsCheckBox.Checked);
-                                this.Settings.WorksetConfigurationOption.SetValue(
-                                        this.closeAllWorksetsRadioButton.Checked ?
-                                        BatchRvt.WorksetConfigurationOption.CloseAllWorksets :
-                                        (
-                                            this.openAllWorksetsRadioButton.Checked ?
-                                            BatchRvt.WorksetConfigurationOption.OpenAllWorksets :
-                                            BatchRvt.WorksetConfigurationOption.OpenLastViewed
-                                        )
-                                    );
-                            }
-                        ),
-
-                    // Revit Session settings
-                    new UIConfigItem(
-                            () => {
-                                this.useSeparateRevitSessionRadioButton.Checked = (this.Settings.RevitSessionOption.GetValue() == BatchRvt.RevitSessionOption.UseSeparateSessionPerFile);
-                                this.useSameRevitSessionRadioButton.Checked = (this.Settings.RevitSessionOption.GetValue() == BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion);
-                                var processingTimeOutInMinutes = this.Settings.ProcessingTimeOutInMinutes.GetValue();
-                                if (processingTimeOutInMinutes < 0)
-                                {
-                                    processingTimeOutInMinutes = 0;
-                                }
-                                this.perFileProcessingTimeOutCheckBox.Checked = processingTimeOutInMinutes > 0;
-                                this.timeOutNumericUpDown.Value = processingTimeOutInMinutes;
-                                UpdateRevitSessionControls();
-                                
-                                // NOTE: This is done so that the Revit session option is updated according to the script file type.
-                                // NOTE: This is a bit hacky!
-                                UpdateTaskScript(this.taskScriptTextBox.Text);
-                            },
-                            () => {
-                                this.Settings.RevitSessionOption.SetValue(
-                                        this.useSameRevitSessionRadioButton.Checked ?
-                                        BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion :
-                                        BatchRvt.RevitSessionOption.UseSeparateSessionPerFile
-                                    );
-
-                                var processingTimeOutInMinutes = (int)this.timeOutNumericUpDown.Value;
-                                if (processingTimeOutInMinutes < 0)
-                                {
-                                    processingTimeOutInMinutes = 0;
-                                }
-
-                                this.Settings.ProcessingTimeOutInMinutes.SetValue(this.perFileProcessingTimeOutCheckBox.Checked ? processingTimeOutInMinutes : 0);
-                            }
-                        ),
-
-                    // Revit Processing settings
-                    new UIConfigItem(
-                            () => {
-                                this.enableBatchProcessingCheckBox.Checked = (this.Settings.RevitProcessingOption.GetValue() == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing);
-                                this.enableSingleRevitTaskProcessingCheckBox.Checked = (this.Settings.RevitProcessingOption.GetValue() == BatchRvt.RevitProcessingOption.SingleRevitTaskProcessing);
-                                UpdateRevitProcessingControls();
-                            },
-                            () => {
-                                this.Settings.RevitProcessingOption.SetValue(
-                                        this.enableSingleRevitTaskProcessingCheckBox.Checked ?
-                                        BatchRvt.RevitProcessingOption.SingleRevitTaskProcessing :
-                                        BatchRvt.RevitProcessingOption.BatchRevitFileProcessing
-                                    );
-                            }
-                        ),
-
-                    // Single Revit Task Processing settings
-                    new UIConfigItem(
-                            () => {
-                                Populate(
-                                        this.singleRevitTaskRevitVersionComboBox,
-                                        RevitVersion.GetInstalledRevitVersions().Select(RevitVersion.GetRevitVersionText),
-                                        RevitVersion.GetRevitVersionText(this.Settings.SingleRevitTaskRevitVersion.GetValue())
-                                    );
-                            },
-                            () => {
-                                this.Settings.SingleRevitTaskRevitVersion.SetValue(
-                                        RevitVersion.GetSupportedRevitVersion(this.singleRevitTaskRevitVersionComboBox.SelectedItem as string)
-                                    );
-                            }
-                        ),
-
-                    // Batch Revit File Processing settings
-                    new UIConfigItem(
-                            () => {
-                                this.useFileRevitVersionRadioButton.Checked = (this.Settings.RevitFileProcessingOption.GetValue() == BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable);
-                                this.useSpecificRevitVersionRadioButton.Checked = (this.Settings.RevitFileProcessingOption.GetValue() == BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion);
-                                this.useMinimumAvailableVersionCheckBox.Checked = this.Settings.IfNotAvailableUseMinimumAvailableRevitVersion.GetValue();
-                                this.auditOnOpeningCheckBox.Checked = this.Settings.AuditOnOpening.GetValue();
-                                Populate(
-                                        this.specificRevitVersionComboBox,
-                                        RevitVersion.GetInstalledRevitVersions().Select(RevitVersion.GetRevitVersionText),
-                                        RevitVersion.GetRevitVersionText(this.Settings.BatchRevitTaskRevitVersion.GetValue())
-                                    );
-                                UpdateRevitFileProcessingControls();
-                            },
-                            () => {
-                                this.Settings.RevitFileProcessingOption.SetValue(
-                                        this.useSpecificRevitVersionRadioButton.Checked ?
-                                        BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion :
-                                        BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable
-                                    );
-                                this.Settings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(this.useMinimumAvailableVersionCheckBox.Checked);
-                                this.Settings.BatchRevitTaskRevitVersion.SetValue(
-                                        RevitVersion.GetSupportedRevitVersion(this.specificRevitVersionComboBox.SelectedItem as string)
-                                    );
-                                this.Settings.AuditOnOpening.SetValue(this.auditOnOpeningCheckBox.Checked);
-                            }
-                        ),
-
-                    // Show Advanced setting
-                    new UIConfigItem(
-                            () => {
-                                this.showAdvancedSettingsCheckBox.Checked = this.Settings.ShowAdvancedSettings.GetValue();
-                                UpdateAdvancedSettings();
-                            },
-                            () => {
-                                this.Settings.ShowAdvancedSettings.SetValue(this.showAdvancedSettingsCheckBox.Checked);
-                            }
-                        ),
-                };
-
-            return iuConfigItems;
-        }
-
-        private void UpdateTaskScript(string scriptFilePath)
-        {
-            this.taskScriptTextBox.Text = scriptFilePath;
-            
-            var scriptType = GetScriptType(scriptFilePath);
-
-            if (scriptType == ScriptType.Dynamo)
-            {
-                this.useSeparateRevitSessionRadioButton.Checked = true;
-                this.useSameRevitSessionRadioButton.Checked = false;
-                this.useSeparateRevitSessionRadioButton.Enabled = false;
-                this.useSameRevitSessionRadioButton.Enabled = false;
-            }
-            else
-            {
-                this.useSeparateRevitSessionRadioButton.Enabled = true;
-                this.useSameRevitSessionRadioButton.Enabled = true;
-            }
-        }
-
-        private double GetDisplaySettingPercentage()
-        {
-            var graphics = this.CreateGraphics();
-            var dpiX = graphics.DpiX;
-            return dpiX / 96f;
-        }
-
-        private static int Scale(int value, double scale)
-        {
-            return (int)(value * scale);
-        }
-
-        private static System.Drawing.Size Scale(System.Drawing.Size size, double scale)
-        {
-            return new System.Drawing.Size(Scale(size.Width, scale), Scale(size.Height, scale));
-        }
-
-        private void AdjustWindowSizeForDisplaySetting()
-        {
-            var displaySettingPercentage = GetDisplaySettingPercentage();
-
-            this.MinimumSize = Scale(this.MinimumSize, displaySettingPercentage);
-            this.MaximumSize = Scale(this.MaximumSize, displaySettingPercentage);
-            this.Size = Scale(this.Size, displaySettingPercentage);
-        }
-
-        private void BatchRvtGuiForm_Load(object sender, EventArgs e)
-        {
-            this.Text = WINDOW_TITLE;
-
-            this.TopMost = false;
-            this.alwaysOnTopCheckbox.Checked = this.TopMost;
-            this.batchRvtOutputGroupBox.Visible = false;
-
-            this.MinimumSize = SETUP_MINIMUM_SIZE;
-            this.MaximumSize = SETUP_MAXIMUM_SIZE;
-            this.Size = SETUP_INITIAL_SIZE;
-            this.MaximizeBox = false;
-
-            AdjustWindowSizeForDisplaySetting();
-
-            bool isLoaded = LoadSettings();
-
-            // TODO: show error message if load failed!!
-        }
-
-        private bool LoadSettings(string filePath = null)
-        {
-            var newBatchRvtSettings = new BatchRvtSettings();
-
-            bool isLoaded = newBatchRvtSettings.LoadFromFile(filePath);
-
-            if (isLoaded)
-            {
-                this.Settings = newBatchRvtSettings;
-            }
-
-            this.UIConfiguration.UpdateUI();
-
-            VerifyExcelInstallation(this.revitFileListTextBox.Text);
-
-            return isLoaded;
-        }
-
-        private void VerifyExcelInstallation(string filePath)
-        {
-            if (!string.IsNullOrWhiteSpace(filePath))
-            {
-                if (ExcelUtil.HasExcelExtension(filePath) && !ExcelUtil.IsExcelInstalled())
+            // General Task Script settings
+            new UIConfigItem(
+                () =>
                 {
-                    MessageBox.Show(
-                            "WARNING: An Excel installation was not detected! Support for Excel files requires an Excel installation.",
-                            this.Text,
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning
-                        );
+                    UpdateTaskScript(Settings.TaskScriptFilePath.GetValue());
+                    showMessageBoxOnTaskScriptErrorCheckBox.Checked =
+                        Settings.ShowMessageBoxOnTaskScriptError.GetValue();
+                },
+                () =>
+                {
+                    Settings.TaskScriptFilePath.SetValue(taskScriptTextBox.Text);
+                    Settings.ShowMessageBoxOnTaskScriptError.SetValue(showMessageBoxOnTaskScriptErrorCheckBox
+                        .Checked);
                 }
-            }
-        }
+            ),
 
-        private bool SaveSettings(string filePath = null)
-        {
-            this.UIConfiguration.UpdateConfig();
+            // Revit File List settings
+            new UIConfigItem(
+                () => { revitFileListTextBox.Text = Settings.RevitFileListFilePath.GetValue(); },
+                () => { Settings.RevitFileListFilePath.SetValue(revitFileListTextBox.Text); }
+            ),
 
-            bool isSaved = this.Settings.SaveToFile(filePath);
+            // Data Export settings
+            new UIConfigItem(
+                () =>
+                {
+                    enableDataExportCheckBox.Checked = Settings.EnableDataExport.GetValue();
+                    dataExportFolderTextBox.Text = Settings.DataExportFolderPath.GetValue();
+                    UpdateDataExportControls();
+                },
+                () =>
+                {
+                    Settings.EnableDataExport.SetValue(enableDataExportCheckBox.Checked);
+                    Settings.DataExportFolderPath.SetValue(dataExportFolderTextBox.Text);
+                }
+            ),
 
-            return isSaved;
-        }
+            // Pre-processing Script settings
+            new UIConfigItem(
+                () =>
+                {
+                    executePreProcessingScriptCheckBox.Checked = Settings.ExecutePreProcessingScript.GetValue();
+                    preProcessingScriptTextBox.Text = Settings.PreProcessingScriptFilePath.GetValue();
+                    UpdatePreProcessingScriptControls();
+                },
+                () =>
+                {
+                    Settings.ExecutePreProcessingScript.SetValue(executePreProcessingScriptCheckBox.Checked);
+                    Settings.PreProcessingScriptFilePath.SetValue(preProcessingScriptTextBox.Text);
+                }
+            ),
 
-        private void BatchRvtGuiForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (this.isBatchRvtRunning)
-            {
-                var message = new StringBuilder();
+            // Post-processing Script settings
+            new UIConfigItem(
+                () =>
+                {
+                    executePostProcessingScriptCheckBox.Checked = Settings.ExecutePostProcessingScript.GetValue();
+                    postProcessingScriptTextBox.Text = Settings.PostProcessingScriptFilePath.GetValue();
+                    UpdatePostProcessingScriptControls();
+                },
+                () =>
+                {
+                    Settings.ExecutePostProcessingScript.SetValue(executePostProcessingScriptCheckBox.Checked);
+                    Settings.PostProcessingScriptFilePath.SetValue(postProcessingScriptTextBox.Text);
+                }
+            ),
 
-                message.AppendLine("Do you want to terminate the currently running task?");
+            // Central File Processing settings
+            new UIConfigItem(
+                () =>
+                {
+                    detachFromCentralRadioButton.Checked = Settings.CentralFileOpenOption.GetValue() ==
+                                                           BatchRvt.CentralFileOpenOption.Detach;
+                    createNewLocalRadioButton.Checked = Settings.CentralFileOpenOption.GetValue() ==
+                                                        BatchRvt.CentralFileOpenOption.CreateNewLocal;
+                    deleteLocalAfterCheckBox.Checked = Settings.DeleteLocalAfter.GetValue();
+                    discardWorksetsCheckBox.Checked = Settings.DiscardWorksetsOnDetach.GetValue();
+                    closeAllWorksetsRadioButton.Checked = Settings.WorksetConfigurationOption.GetValue() ==
+                                                          BatchRvt.WorksetConfigurationOption.CloseAllWorksets;
+                    openAllWorksetsRadioButton.Checked = Settings.WorksetConfigurationOption.GetValue() ==
+                                                         BatchRvt.WorksetConfigurationOption.OpenAllWorksets;
+                    openLastViewedWorksetsRadioButton.Checked = Settings.WorksetConfigurationOption.GetValue() ==
+                                                                BatchRvt.WorksetConfigurationOption.OpenLastViewed;
+                    UpdateCentralFileProcessingControls();
+                },
+                () =>
+                {
+                    Settings.CentralFileOpenOption.SetValue(
+                        createNewLocalRadioButton.Checked
+                            ? BatchRvt.CentralFileOpenOption.CreateNewLocal
+                            : BatchRvt.CentralFileOpenOption.Detach
+                    );
+                    Settings.DeleteLocalAfter.SetValue(deleteLocalAfterCheckBox.Checked);
+                    Settings.DiscardWorksetsOnDetach.SetValue(discardWorksetsCheckBox.Checked);
+                    Settings.WorksetConfigurationOption.SetValue(
+                        closeAllWorksetsRadioButton.Checked ? BatchRvt.WorksetConfigurationOption.CloseAllWorksets :
+                        openAllWorksetsRadioButton.Checked ? BatchRvt.WorksetConfigurationOption.OpenAllWorksets :
+                        BatchRvt.WorksetConfigurationOption.OpenLastViewed
+                    );
+                }
+            ),
 
-                var dialogResult = MessageBox.Show(
-                        message.ToString(),
-                        this.Text,
-                        MessageBoxButtons.YesNoCancel,
-                        MessageBoxIcon.Asterisk,
-                        MessageBoxDefaultButton.Button3
+            // Revit Session settings
+            new UIConfigItem(
+                () =>
+                {
+                    useSeparateRevitSessionRadioButton.Checked = Settings.RevitSessionOption.GetValue() ==
+                                                                 BatchRvt.RevitSessionOption
+                                                                     .UseSeparateSessionPerFile;
+                    useSameRevitSessionRadioButton.Checked = Settings.RevitSessionOption.GetValue() ==
+                                                             BatchRvt.RevitSessionOption
+                                                                 .UseSameSessionForFilesOfSameVersion;
+                    var processingTimeOutInMinutes = Settings.ProcessingTimeOutInMinutes.GetValue();
+                    if (processingTimeOutInMinutes < 0) processingTimeOutInMinutes = 0;
+                    perFileProcessingTimeOutCheckBox.Checked = processingTimeOutInMinutes > 0;
+                    timeOutNumericUpDown.Value = processingTimeOutInMinutes;
+                    UpdateRevitSessionControls();
+
+                    // NOTE: This is done so that the Revit session option is updated according to the script file type.
+                    // NOTE: This is a bit hacky!
+                    UpdateTaskScript(taskScriptTextBox.Text);
+                },
+                () =>
+                {
+                    Settings.RevitSessionOption.SetValue(
+                        useSameRevitSessionRadioButton.Checked
+                            ? BatchRvt.RevitSessionOption.UseSameSessionForFilesOfSameVersion
+                            : BatchRvt.RevitSessionOption.UseSeparateSessionPerFile
                     );
 
-                if (dialogResult == DialogResult.Cancel)
-                {
-                    e.Cancel = true;
+                    var processingTimeOutInMinutes = (int)timeOutNumericUpDown.Value;
+                    if (processingTimeOutInMinutes < 0) processingTimeOutInMinutes = 0;
+
+                    Settings.ProcessingTimeOutInMinutes.SetValue(perFileProcessingTimeOutCheckBox.Checked
+                        ? processingTimeOutInMinutes
+                        : 0);
                 }
-                else if (dialogResult == DialogResult.Yes)
+            ),
+
+            // Revit Processing settings
+            new UIConfigItem(
+                () =>
                 {
-                    try
-                    {
-                        this.batchRvtProcess.Kill();
-                    }
-                    catch (Exception)
-                    {
-                        // TODO: report failure to kill the process?
-                    }
-                }
-            }
-
-            if (!e.Cancel)
-            {
-                var message = new StringBuilder();
-
-                message.AppendLine("Do you want to save the current settings as default?");
-
-                var dialogResult = MessageBox.Show(
-                        message.ToString(),
-                        this.Text,
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question,
-                        MessageBoxDefaultButton.Button1
+                    enableBatchProcessingCheckBox.Checked = Settings.RevitProcessingOption.GetValue() ==
+                                                            BatchRvt.RevitProcessingOption.BatchRevitFileProcessing;
+                    enableSingleRevitTaskProcessingCheckBox.Checked = Settings.RevitProcessingOption.GetValue() ==
+                                                                      BatchRvt.RevitProcessingOption
+                                                                          .SingleRevitTaskProcessing;
+                    UpdateRevitProcessingControls();
+                },
+                () =>
+                {
+                    Settings.RevitProcessingOption.SetValue(
+                        enableSingleRevitTaskProcessingCheckBox.Checked
+                            ? BatchRvt.RevitProcessingOption.SingleRevitTaskProcessing
+                            : BatchRvt.RevitProcessingOption.BatchRevitFileProcessing
                     );
-
-                if (dialogResult == DialogResult.Yes)
-                {
-                    bool isSaved = SaveSettings();
-
-                    // TODO: show error message if save failed!!
                 }
+            ),
 
-                if (readBatchRvtOutput_Timer != null)
+            // Single Revit Task Processing settings
+            new UIConfigItem(
+                () =>
                 {
-                    this.readBatchRvtOutput_Timer.Stop();
-                    this.readBatchRvtOutput_Timer.Dispose();
-                }
-            }
-        }
-
-        private void alwaysOnTopCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-            this.TopMost = this.alwaysOnTopCheckbox.Checked;
-        }
-
-        private void closeButton_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
-        }
-
-        public static void ShowErrorMessageBox(string errorMessage)
-        {
-            MessageBox.Show(errorMessage, BatchRvtGuiForm.WINDOW_TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        private bool ValidateConfig()
-        {
-            bool validated = false;
-
-            if (!this.enableSingleRevitTaskProcessingCheckBox.Checked && !this.enableBatchProcessingCheckBox.Checked)
-            {
-                ShowErrorMessageBox("ERROR: You must select either Batch Revit File Processing or Single Revit Task Processing!");
-            }
-            else if (!File.Exists(this.Settings.TaskScriptFilePath.GetValue()))
-            {
-                ShowErrorMessageBox("ERROR: You must select an existing Task script!");
-            }
-            else if (
-                    (this.Settings.RevitProcessingOption.GetValue() == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing)
-                    &&
-                    !File.Exists(this.Settings.RevitFileListFilePath.GetValue())
-                )
-            {
-                ShowErrorMessageBox("ERROR: You must select an existing Revit File List!");
-            }
-            else if (
-                    this.Settings.EnableDataExport.GetValue()
-                    &&
-                    !Directory.Exists(this.Settings.DataExportFolderPath.GetValue())
-                )
-            {
-                ShowErrorMessageBox("ERROR: You must select an existing Data Export folder!");
-            }
-            else if (
-                    this.Settings.ExecutePreProcessingScript.GetValue()
-                    &&
-                    !File.Exists(this.Settings.PreProcessingScriptFilePath.GetValue())
-                )
-            {
-                ShowErrorMessageBox("ERROR: You must select an existing Pre-Processing Python script!");
-            }
-            else if (
-                    this.Settings.ExecutePostProcessingScript.GetValue()
-                    &&
-                    !File.Exists(this.Settings.PostProcessingScriptFilePath.GetValue())
-                )
-            {
-                ShowErrorMessageBox("ERROR: You must select an existing Post-Processing Python script!");
-            }
-            else
-            {
-                validated = true;
-            }
-
-            return validated;
-        }
-
-        private void startButton_Click(object sender, EventArgs e)
-        {
-            this.UIConfiguration.UpdateConfig();
-
-            bool validated = ValidateConfig();
-
-            if (validated)
-            {
-                bool isSaved = SaveSettings();
-
-                // TODO: show error message if save failed!!
-
-                var settingsFilePath = BatchRvtSettings.GetDefaultSettingsFilePath();
-
-                this.batchRvtProcess = BatchRvt.StartBatchRvt(settingsFilePath);
-
-                this.readBatchRvtOutput_Timer = new Timer() { Interval = READ_OUTPUT_INTERVAL_IN_MS };
-                this.readBatchRvtOutput_Timer.Tick += readBatchRvtOutput_Timer_Tick;
-
-                this.isBatchRvtRunning = true;
-                this.settingsGroupBox.Enabled = false;
-                this.importSettingsButton.Enabled = false;
-                this.startButton.Enabled = false;
-                this.startButton.Text = "Running...";
-                this.batchRvtOutputGroupBox.Visible = true;
-                this.MinimumSize = RUNNING_MINIMUM_SIZE;
-                this.MaximumSize = RUNNING_MAXIMUM_SIZE;
-                this.Size = RUNNING_INITIAL_SIZE;
-                this.MaximizeBox = true;
-                this.isUsingRunningSize = true;
-
-                UpdateAdvancedSettings();
-
-                readBatchRvtOutput_Timer.Start();
-            }
-        }
-
-        private void readBatchRvtOutput_Timer_Tick(object sender, EventArgs e)
-        {
-            var linesAndPendingTask = StreamIOUtil.ReadAvailableLines(this.batchRvtProcess.StandardOutput, this.pendingOutputReadLineTask);
-            this.pendingOutputReadLineTask = linesAndPendingTask.Item2;
-            var lines = linesAndPendingTask.Item1;
-
-            foreach (var line in lines)
-            {
-                var fullLine = line + Environment.NewLine;
-
-                if (!BatchRvt.IsBatchRvtLine(line))
+                    Populate(
+                        singleRevitTaskRevitVersionComboBox,
+                        RevitVersion.GetInstalledRevitVersions().Select(RevitVersion.GetRevitVersionText),
+                        RevitVersion.GetRevitVersionText(Settings.SingleRevitTaskRevitVersion.GetValue())
+                    );
+                },
+                () =>
                 {
-                    var timestamp = DateTime.Now.ToString("HH:mm:ss");
-
-                    fullLine = timestamp + " : [ REVIT MESSAGE ] : " + fullLine;
+                    Settings.SingleRevitTaskRevitVersion.SetValue(
+                        RevitVersion.GetSupportedRevitVersion(
+                            singleRevitTaskRevitVersionComboBox.SelectedItem as string)
+                    );
                 }
+            ),
 
-                if (BatchRvt.IsBatchRvtLine(line)) // Do not show non-BatchRvt-related output. (TODO: reconsider?)
+            // Batch Revit File Processing settings
+            new UIConfigItem(
+                () =>
                 {
-                    this.batchRvtOutputTextBox.AppendText(fullLine);
-                }
-            }
-
-            linesAndPendingTask = StreamIOUtil.ReadAvailableLines(this.batchRvtProcess.StandardError, this.pendingErrorReadLineTask);
-            this.pendingErrorReadLineTask = linesAndPendingTask.Item2;
-            lines = linesAndPendingTask.Item1;
-
-            foreach (var line in lines)
-            {
-                if (line.StartsWith("log4cplus:")) // ignore pesky log4cplus messages (an Autodesk thing?)
+                    useFileRevitVersionRadioButton.Checked = Settings.RevitFileProcessingOption.GetValue() ==
+                                                             BatchRvt.RevitFileProcessingOption
+                                                                 .UseFileRevitVersionIfAvailable;
+                    useSpecificRevitVersionRadioButton.Checked = Settings.RevitFileProcessingOption.GetValue() ==
+                                                                 BatchRvt.RevitFileProcessingOption
+                                                                     .UseSpecificRevitVersion;
+                    useMinimumAvailableVersionCheckBox.Checked =
+                        Settings.IfNotAvailableUseMinimumAvailableRevitVersion.GetValue();
+                    auditOnOpeningCheckBox.Checked = Settings.AuditOnOpening.GetValue();
+                    Populate(
+                        specificRevitVersionComboBox,
+                        RevitVersion.GetInstalledRevitVersions().Select(RevitVersion.GetRevitVersionText),
+                        RevitVersion.GetRevitVersionText(Settings.BatchRevitTaskRevitVersion.GetValue())
+                    );
+                    UpdateRevitFileProcessingControls();
+                },
+                () =>
                 {
-                    continue;
+                    Settings.RevitFileProcessingOption.SetValue(
+                        useSpecificRevitVersionRadioButton.Checked
+                            ? BatchRvt.RevitFileProcessingOption.UseSpecificRevitVersion
+                            : BatchRvt.RevitFileProcessingOption.UseFileRevitVersionIfAvailable
+                    );
+                    Settings.IfNotAvailableUseMinimumAvailableRevitVersion.SetValue(
+                        useMinimumAvailableVersionCheckBox.Checked);
+                    Settings.BatchRevitTaskRevitVersion.SetValue(
+                        RevitVersion.GetSupportedRevitVersion(specificRevitVersionComboBox.SelectedItem as string)
+                    );
+                    Settings.AuditOnOpening.SetValue(auditOnOpeningCheckBox.Checked);
                 }
+            ),
 
-                if (this.Settings.ShowRevitProcessErrorMessages.GetValue() == true)
+            // Show Advanced setting
+            new UIConfigItem(
+                () =>
                 {
-                    this.batchRvtOutputTextBox.AppendText("[ REVIT ERROR MESSAGE ] : " + line + Environment.NewLine);
-                }
-            }
-
-            if (isBatchRvtRunning)
-            {
-                this.batchRvtProcess.Refresh();
-                if (this.batchRvtProcess.HasExited)
-                {
-                    this.isBatchRvtRunning = false;
-                    this.startButton.Text = "Done!";
-                }
-            }
-        }
-
-        private void browseScriptButton_Click(object sender, EventArgs e)
-        {
-            BrowseForExistingScriptFile(
-                    "Select Task script",
-                    scriptFilePath => { UpdateTaskScript(scriptFilePath); },
-                    ScriptType.Any,
-                    PathUtil.GetExistingFileDirectoryPath(this.taskScriptTextBox.Text)
-                );
-        }
-
-        private void BrowseForSave(string dialogTitle, Action<string> fileAction, string defaultExt, string filter, string initialDirectory = null, string initialFileName = null)
-        {
-            var saveFileDialog = new SaveFileDialog();
-
-            saveFileDialog.DefaultExt = defaultExt;
-            saveFileDialog.Filter = filter;
-            saveFileDialog.Title = dialogTitle;
-
-            if (!string.IsNullOrWhiteSpace(initialDirectory))
-            {
-                saveFileDialog.InitialDirectory = initialDirectory;
-            }
-
-            if (!string.IsNullOrWhiteSpace(initialFileName))
-            {
-                saveFileDialog.FileName = initialFileName;
-            }
-
-            var dialogResult = saveFileDialog.ShowDialog(this);
-
-            if (dialogResult == DialogResult.OK)
-            {
-                var selectedFilePath = saveFileDialog.FileName;
-
-                if (!string.IsNullOrWhiteSpace(selectedFilePath))
-                {
-                    fileAction(selectedFilePath);
-                }
-            }
-
-            return;
-        }
-
-        private void BrowseForFile(string dialogTitle, Action<string> fileAction, string defaultExt, string filter, bool checkFileExists, string initialDirectory = null)
-        {
-            var openFileDialog = new OpenFileDialog();
-
-            openFileDialog.DefaultExt = defaultExt;
-            openFileDialog.Filter = filter;
-            openFileDialog.CheckFileExists = checkFileExists;
-            openFileDialog.ReadOnlyChecked = true;
-            openFileDialog.Multiselect = false;
-            openFileDialog.Title = dialogTitle;
-
-            if (!string.IsNullOrWhiteSpace(initialDirectory))
-            {
-                openFileDialog.InitialDirectory = initialDirectory;
-            }
-
-            var dialogResult = openFileDialog.ShowDialog(this);
-
-            if (dialogResult == DialogResult.OK)
-            {
-                var selectedFilePath = openFileDialog.FileName;
-
-                if (!string.IsNullOrWhiteSpace(selectedFilePath))
-                {
-                    fileAction(selectedFilePath);
-                }
-            }
-
-            return;
-        }
-
-        private void BrowseForExistingScriptFile(
-                string dialogTitle,
-                Action<string> scriptFileAction,
-                ScriptType scriptType,
-                string initialDirectory = null
+                    showAdvancedSettingsCheckBox.Checked = Settings.ShowAdvancedSettings.GetValue();
+                    UpdateAdvancedSettings();
+                },
+                () => { Settings.ShowAdvancedSettings.SetValue(showAdvancedSettingsCheckBox.Checked); }
             )
-        {
-            var scriptDefaultExtension = (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_EXTENSION : PYTHON_SCRIPT_EXTENSION;
-            var scriptFilter = (
-                    (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_FILTER :
-                    (scriptType == ScriptType.Python) ? PYTHON_SCRIPT_FILTER :
-                    ANY_SCRIPTS_FILTER
-                );
+        };
 
-            BrowseForFile(
-                    dialogTitle,
-                    scriptFileAction,
-                    scriptDefaultExtension,
-                    scriptFilter,
-                    true,
-                    initialDirectory
-                );
+        return iuConfigItems;
+    }
+
+    private void UpdateTaskScript(string scriptFilePath)
+    {
+        taskScriptTextBox.Text = scriptFilePath;
+
+        var scriptType = GetScriptType(scriptFilePath);
+
+        if (scriptType == ScriptType.Dynamo)
+        {
+            useSeparateRevitSessionRadioButton.Checked = true;
+            useSameRevitSessionRadioButton.Checked = false;
+            useSeparateRevitSessionRadioButton.Enabled = false;
+            useSameRevitSessionRadioButton.Enabled = false;
         }
-
-        private void browseRevitFileListButton_Click(object sender, EventArgs e)
+        else
         {
-            var openFileDialog = new OpenFileDialog();
-
-            openFileDialog.DefaultExt = ".txt";
-            openFileDialog.Filter = "Revit File List (*.txt;*.xls;*.xlsx;*.csv)|*.txt;*.xls;*.xlsx;*.csv";
-            openFileDialog.CheckFileExists = true;
-            openFileDialog.ReadOnlyChecked = true;
-            openFileDialog.Multiselect = false;
-            openFileDialog.Title = "Select Revit File List";
-
-            string initialDirectory = PathUtil.GetExistingFileDirectoryPath(this.revitFileListTextBox.Text);
-
-            if (initialDirectory != null)
-            {
-                openFileDialog.InitialDirectory = initialDirectory;
-            }
-
-            var dialogResult = openFileDialog.ShowDialog(this);
-
-            if (dialogResult == DialogResult.OK)
-            {
-                var selectedFilePath = openFileDialog.FileName;
-
-                if (!string.IsNullOrWhiteSpace(selectedFilePath))
-                {
-                    this.revitFileListTextBox.Text = selectedFilePath;
-
-                    VerifyExcelInstallation(selectedFilePath);
-                }
-            }
+            useSeparateRevitSessionRadioButton.Enabled = true;
+            useSameRevitSessionRadioButton.Enabled = true;
         }
+    }
 
-        private void browseDataExportFolderButton_Click(object sender, EventArgs e)
-        {
-            var folderBrowserDialog = new FolderBrowserDialog();
+    private double GetDisplaySettingPercentage()
+    {
+        var graphics = CreateGraphics();
+        var dpiX = graphics.DpiX;
+        return dpiX / 96f;
+    }
 
-            folderBrowserDialog.Description = "Select Data Export folder";
+    private static int Scale(int value, double scale)
+    {
+        return (int)(value * scale);
+    }
 
-            var currentFolderPath = this.dataExportFolderTextBox.Text;
+    private static Size Scale(Size size, double scale)
+    {
+        return new Size(Scale(size.Width, scale), Scale(size.Height, scale));
+    }
 
-            if (Directory.Exists(currentFolderPath))
-            {
-                folderBrowserDialog.SelectedPath = currentFolderPath;
-            }
+    private void AdjustWindowSizeForDisplaySetting()
+    {
+        var displaySettingPercentage = GetDisplaySettingPercentage();
 
-            var dialogResult = folderBrowserDialog.ShowDialog(this);
+        MinimumSize = Scale(MinimumSize, displaySettingPercentage);
+        MaximumSize = Scale(MaximumSize, displaySettingPercentage);
+        Size = Scale(Size, displaySettingPercentage);
+    }
 
-            if (dialogResult == DialogResult.OK)
-            {
-                var selectedFolderPath = folderBrowserDialog.SelectedPath;
+    private void BatchRvtGuiForm_Load(object sender, EventArgs e)
+    {
+        Text = WINDOW_TITLE;
 
-                if (!string.IsNullOrWhiteSpace(selectedFolderPath))
-                {
-                    this.dataExportFolderTextBox.Text = selectedFolderPath;
-                }
-            }
-        }
+        TopMost = false;
+        alwaysOnTopCheckbox.Checked = TopMost;
+        batchRvtOutputGroupBox.Visible = false;
 
-        private void batchRvtOutputTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyData == (Keys.Control | Keys.A))
-            {
-                this.batchRvtOutputTextBox.SelectAll();
-                e.SuppressKeyPress = true;
-            }
-        }
+        MinimumSize = SETUP_MINIMUM_SIZE;
+        MaximumSize = SETUP_MAXIMUM_SIZE;
+        Size = SETUP_INITIAL_SIZE;
+        MaximizeBox = false;
 
-        private void executePreProcessingScriptCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdatePreProcessingScriptControls();
-        }
+        AdjustWindowSizeForDisplaySetting();
 
-        private void executePostProcessingScriptCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdatePostProcessingScriptControls();
-        }
+        var isLoaded = LoadSettings();
 
-        private void preProcessingScriptBrowseButton_Click(object sender, EventArgs e)
-        {
-            BrowseForExistingScriptFile(
-                    "Select Pre-Processing Python script",
-                    scriptFilePath => { this.preProcessingScriptTextBox.Text = scriptFilePath; },
-                    ScriptType.Python,
-                    PathUtil.GetExistingFileDirectoryPath(this.preProcessingScriptTextBox.Text)
-                );
-        }
+        // TODO: show error message if load failed!!
+    }
 
-        private void postProcessingScriptBrowseButton_Click(object sender, EventArgs e)
-        {
-            BrowseForExistingScriptFile(
-                    "Select Post-Processing Python script",
-                    scriptFilePath => { this.postProcessingScriptTextBox.Text = scriptFilePath; },
-                    ScriptType.Python,
-                    PathUtil.GetExistingFileDirectoryPath(this.postProcessingScriptTextBox.Text)
-                );
-        }
+    private bool LoadSettings(string filePath = null)
+    {
+        var newBatchRvtSettings = new BatchRvtSettings();
 
-        private void enableBatchProcessingCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (this.enableBatchProcessingCheckBox.Checked)
-            {
-                this.enableSingleRevitTaskProcessingCheckBox.Checked = false;
-            }
+        var isLoaded = newBatchRvtSettings.LoadFromFile(filePath);
 
-            UpdateRevitProcessingControls();
-        }
+        if (isLoaded) Settings = newBatchRvtSettings;
 
-        private void enableSingleRevitTaskProcessingCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (this.enableSingleRevitTaskProcessingCheckBox.Checked)
-            {
-                this.enableBatchProcessingCheckBox.Checked = false;
-            }
+        UIConfiguration.UpdateUI();
 
-            UpdateRevitProcessingControls();
-        }
+        VerifyExcelInstallation(revitFileListTextBox.Text);
 
-        private static ScriptType GetScriptType(string scriptFilePath)
-        {
-            return (
-                    PathUtil.HasExtension(scriptFilePath, PYTHON_SCRIPT_EXTENSION) ?
-                    ScriptType.Python :
-                    PathUtil.HasExtension(scriptFilePath, DYNAMO_SCRIPT_EXTENSION) ?
-                    ScriptType.Dynamo :
-                    ScriptType.Any
-                );
-        }
+        return isLoaded;
+    }
 
-        private void UpdateRevitProcessingControls()
-        {
-            bool batchTaskEnabled = this.enableBatchProcessingCheckBox.Checked;
-            this.revitFileListLabel.Enabled = batchTaskEnabled;
-            this.revitFileListTextBox.Enabled = batchTaskEnabled;
-            this.browseRevitFileListButton.Enabled = batchTaskEnabled;
-
-            this.centralFileProcessingGroupBox.Enabled = batchTaskEnabled;
-            this.revitFileProcessingGroupBox.Enabled = batchTaskEnabled;
-            this.revitSessionGroupBox.Enabled = batchTaskEnabled;
-
-            bool singleTaskEnabled = this.enableSingleRevitTaskProcessingCheckBox.Checked;
-            this.singleRevitTaskRevitVersionLabel.Enabled = singleTaskEnabled;
-            this.singleRevitTaskRevitVersionComboBox.Enabled = singleTaskEnabled;
-        }
-
-        private void perFileProcessingTimeOutCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRevitSessionControls();
-        }
-
-        private void UpdateRevitSessionControls()
-        {
-            bool perFileProcessingTimeOutEnabled = this.perFileProcessingTimeOutCheckBox.Checked;
-
-            if (perFileProcessingTimeOutEnabled)
-            {
-                // If time-out option is enabled but the current numeric value is 0, set a sensible default / initial value for the time-out.
-                if (this.timeOutNumericUpDown.Value == 0)
-                {
-                    this.timeOutNumericUpDown.Value = 15;
-                }
-            }
-            this.timeOutNumericUpDown.Enabled = perFileProcessingTimeOutEnabled;
-        }
-
-        private void UpdatePreProcessingScriptControls()
-        {
-            var isChecked = this.executePreProcessingScriptCheckBox.Checked;
-            this.preProcessingScriptTextBox.Enabled = isChecked;
-            this.preProcessingScriptBrowseButton.Enabled = isChecked;
-            this.preProcessingScriptNewScriptButton.Enabled = isChecked;
-        }
-
-        private void UpdatePostProcessingScriptControls()
-        {
-            var isChecked = this.executePostProcessingScriptCheckBox.Checked;
-            this.postProcessingScriptTextBox.Enabled = isChecked;
-            this.postProcessingScriptBrowseButton.Enabled = isChecked;
-            this.postProcessingScriptNewScriptButton.Enabled = isChecked;
-        }
-
-        private static void Populate<T>(ComboBox comboBox, IEnumerable<T> items, T selectedItem)
-        {
-            var itemsList = items.ToList();
-
-            comboBox.Items.Clear();
-
-            foreach (var item in itemsList)
-            {
-                comboBox.Items.Add(item);
-            }
-
-            int selectedIndex = itemsList.IndexOf(selectedItem);
-
-            comboBox.SelectedIndex = selectedIndex >= 0 ? selectedIndex : 0;
-        }
-
-        private void createNewLocalRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCentralFileProcessingControls();
-        }
-
-        private void detachFromCentralRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCentralFileProcessingControls();
-        }
-
-        private void UpdateCentralFileProcessingControls()
-        {
-            this.deleteLocalAfterCheckBox.Enabled = this.createNewLocalRadioButton.Checked;
-            this.discardWorksetsCheckBox.Enabled = this.detachFromCentralRadioButton.Checked;
-            this.worksetConfigurationGroupBox.Enabled = !(this.detachFromCentralRadioButton.Checked && this.discardWorksetsCheckBox.Checked);
-        }
-
-        private void useFileRevitVersionRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRevitFileProcessingControls();
-        }
-
-        private void UpdateRevitFileProcessingControls()
-        {
-            this.useMinimumAvailableVersionCheckBox.Enabled = this.useFileRevitVersionRadioButton.Checked;
-            this.specificRevitVersionComboBox.Enabled = this.useSpecificRevitVersionRadioButton.Checked;
-        }
-
-        private void enableDataExportCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateDataExportControls();
-        }
-
-        private void UpdateDataExportControls()
-        {
-            var isChecked = this.enableDataExportCheckBox.Checked;
-            this.dataExportBaseFolderLabel.Enabled = isChecked;
-            this.dataExportFolderTextBox.Enabled = isChecked;
-            this.browseDataExportFolderButton.Enabled = isChecked;
-        }
-
-        private void useSpecificRevitVersionRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRevitFileProcessingControls();
-        }
-
-        private void importSettingsButton_Click(object sender, EventArgs e)
-        {
-            BrowseForFile(
-                "Import BatchRvt Settings file",
-                scriptFilePath => { this.LoadSettings(scriptFilePath); },
-                BatchRvtSettings.SETTINGS_FILE_EXTENSION,
-                BatchRvtSettings.SETTINGS_FILE_FILTER,
-                true
+    private void VerifyExcelInstallation(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath)) return;
+        if (ExcelUtil.HasExcelExtension(filePath) && !ExcelUtil.IsExcelInstalled())
+            MessageBox.Show(
+                "WARNING: An Excel installation was not detected! Support for Excel files requires an Excel installation.",
+                Text,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
             );
-        }
+    }
 
-        private void exportSettingsButton_Click(object sender, EventArgs e)
-        {
-            BrowseForSave(
-                "Export BatchRvt Settings file",
-                scriptFilePath => { this.SaveSettings(scriptFilePath); },
-                BatchRvtSettings.SETTINGS_FILE_EXTENSION,
-                BatchRvtSettings.SETTINGS_FILE_FILTER,
-                initialFileName: BatchRvtSettings.BATCHRVT_SETTINGS_FILENAME
-            );
-        }
+    private bool SaveSettings(string filePath = null)
+    {
+        UIConfiguration.UpdateConfig();
 
-        private void taskScriptNewScriptButton_Click(object sender, EventArgs e)
-        {
-            BrowseForSaveScriptFile(
-                    "Save New Task Script",
-                    scriptFilePath => {
-                        bool isSaved = this.SaveNewScript(scriptFilePath, SaveNewScriptType.TaskScript );
+        var isSaved = Settings.SaveToFile(filePath);
 
-                        if (isSaved)
-                        {
-                            UpdateTaskScript(scriptFilePath);
-                        }
-                        else
-                        {
-                            ShowErrorMessageBox("ERROR: Failed to Save the new script!");
-                        }
-                    },
-                    ScriptType.Python,
-                    PathUtil.GetExistingFileDirectoryPath(this.taskScriptTextBox.Text),
-                    NEW_TASK_SCRIPT_FILENAME
-                );
-        }
+        return isSaved;
+    }
 
-        private void preProcessingScriptNewScriptButton_Click(object sender, EventArgs e)
-        {
-            BrowseForSaveScriptFile(
-                    "Save New Pre-Processing Script",
-                    scriptFilePath => {
-                        bool isSaved = this.SaveNewScript(scriptFilePath, SaveNewScriptType.PreProcessingScript );
+    private void BatchRvtGuiForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (!isBatchRvtRunning) return;
 
-                        if (isSaved)
-                        {
-                            this.preProcessingScriptTextBox.Text = scriptFilePath;
-                        }
-                        else
-                        {
-                            ShowErrorMessageBox("ERROR: Failed to Save the new script!");
-                        }
-                    },
-                    ScriptType.Python,
-                    PathUtil.GetExistingFileDirectoryPath(this.preProcessingScriptTextBox.Text),
-                    NEW_PREPROCESSING_SCRIPT_FILENAME
-                );
-        }
 
-        private void postProcessingScriptNewScriptButton_Click(object sender, EventArgs e)
-        {
-            BrowseForSaveScriptFile(
-                    "Save New Post-Processing Script",
-                    scriptFilePath => {
-                        bool isSaved = this.SaveNewScript(scriptFilePath, SaveNewScriptType.PostProcessingScript);
+        var message = new StringBuilder();
 
-                        if (isSaved)
-                        {
-                            this.postProcessingScriptTextBox.Text = scriptFilePath;
-                        }
-                        else
-                        {
-                            ShowErrorMessageBox("ERROR: Failed to Save the new script!");
-                        }
-                    },
-                    ScriptType.Python,
-                    PathUtil.GetExistingFileDirectoryPath(this.postProcessingScriptTextBox.Text),
-                    NEW_POSTPROCESSING_SCRIPT_FILENAME
-                );
-        }
+        message.AppendLine("Do you want to terminate the currently running task?");
 
-        private void BrowseForSaveScriptFile(
-                string dialogTitle,
-                Action<string> scriptFileAction,
-                ScriptType scriptType,
-                string initialDirectory = null,
-                string initialFileName = null
-            )
-        {
-            var scriptDefaultExtension = (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_EXTENSION : PYTHON_SCRIPT_EXTENSION;
-            var scriptFilter = (scriptType == ScriptType.Dynamo) ? DYNAMO_SCRIPT_FILTER : PYTHON_SCRIPT_FILTER;
+        var dialogResult = MessageBox.Show(
+            message.ToString(),
+            Text,
+            MessageBoxButtons.YesNoCancel,
+            MessageBoxIcon.Asterisk,
+            MessageBoxDefaultButton.Button3
+        );
 
-            BrowseForSave(
-                    dialogTitle,
-                    scriptFileAction,
-                    scriptDefaultExtension,
-                    scriptFilter,
-                    initialDirectory,
-                    initialFileName
-                );
-        }
-
-        private bool SaveNewScript(string scriptFilePath, SaveNewScriptType saveNewScriptType)
-        {
-            bool success = false;
-
-            string scriptTemplateFileName = null;
-
-            if (saveNewScriptType == SaveNewScriptType.TaskScript)
-            {
-                scriptTemplateFileName = TEMPLATE_TASK_SCRIPT_FILENAME;
-            }
-            else if (saveNewScriptType == SaveNewScriptType.PreProcessingScript)
-            {
-                scriptTemplateFileName = TEMPLATE_PREPROCESSING_SCRIPT_FILENAME;
-            }
-            else if (saveNewScriptType == SaveNewScriptType.PostProcessingScript)
-            {
-                scriptTemplateFileName = TEMPLATE_POSTPROCESSING_SCRIPT_FILENAME;
-            }
-
-            var scriptTemplateFilePath = Path.Combine(BatchRvt.GetBatchRvtScriptsFolderPath(), scriptTemplateFileName);
-
-            var scriptContents = File.ReadAllText(scriptTemplateFilePath);
-
+        if (dialogResult == DialogResult.Cancel)
+            e.Cancel = true;
+        else if (dialogResult == DialogResult.Yes)
             try
             {
-                File.WriteAllText(scriptFilePath, scriptContents);
-                success = true;
+                batchRvtProcess.Kill();
             }
             catch (Exception)
             {
-                success = false;
+                // TODO: report failure to kill the process?
+            }
+        
+
+        if (e.Cancel) return;
+
+
+        message.AppendLine("Do you want to save the current settings as default?");
+
+        var dialogResult2 = MessageBox.Show(
+            message.ToString(),
+            Text,
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question,
+            MessageBoxDefaultButton.Button1
+        );
+
+        if (dialogResult2 == DialogResult.Yes)
+        {
+            var isSaved = SaveSettings();
+
+            // TODO: show error message if save failed!!
+        }
+
+        if (readBatchRvtOutput_Timer == null) return;
+        readBatchRvtOutput_Timer.Stop();
+        readBatchRvtOutput_Timer.Dispose();
+    }
+
+    private void alwaysOnTopCheckbox_CheckedChanged(object sender, EventArgs e)
+    {
+        TopMost = alwaysOnTopCheckbox.Checked;
+    }
+
+    private void closeButton_Click(object sender, EventArgs e)
+    {
+        DialogResult = DialogResult.Cancel;
+        Close();
+    }
+
+    public static void ShowErrorMessageBox(string errorMessage)
+    {
+        MessageBox.Show(errorMessage, WINDOW_TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+
+    private bool ValidateConfig()
+    {
+        var validated = false;
+
+        if (!enableSingleRevitTaskProcessingCheckBox.Checked && !enableBatchProcessingCheckBox.Checked)
+            ShowErrorMessageBox(
+                "ERROR: You must select either Batch Revit File Processing or Single Revit Task Processing!");
+        else if (!File.Exists(Settings.TaskScriptFilePath.GetValue()))
+            ShowErrorMessageBox("ERROR: You must select an existing Task script!");
+        else if (
+            Settings.RevitProcessingOption.GetValue() == BatchRvt.RevitProcessingOption.BatchRevitFileProcessing
+            &&
+            !File.Exists(Settings.RevitFileListFilePath.GetValue())
+        )
+            ShowErrorMessageBox("ERROR: You must select an existing Revit File List!");
+        else if (
+            Settings.EnableDataExport.GetValue()
+            &&
+            !Directory.Exists(Settings.DataExportFolderPath.GetValue())
+        )
+            ShowErrorMessageBox("ERROR: You must select an existing Data Export folder!");
+        else if (
+            Settings.ExecutePreProcessingScript.GetValue()
+            &&
+            !File.Exists(Settings.PreProcessingScriptFilePath.GetValue())
+        )
+            ShowErrorMessageBox("ERROR: You must select an existing Pre-Processing Python script!");
+        else if (
+            Settings.ExecutePostProcessingScript.GetValue()
+            &&
+            !File.Exists(Settings.PostProcessingScriptFilePath.GetValue())
+        )
+            ShowErrorMessageBox("ERROR: You must select an existing Post-Processing Python script!");
+        else
+            validated = true;
+
+        return validated;
+    }
+
+    private void startButton_Click(object sender, EventArgs e)
+    {
+        UIConfiguration.UpdateConfig();
+
+        var validated = ValidateConfig();
+
+        if (!validated) return;
+        var isSaved = SaveSettings();
+
+        // TODO: show error message if save failed!!
+
+        var settingsFilePath = BatchRvtSettings.GetDefaultSettingsFilePath();
+
+        batchRvtProcess = BatchRvt.StartBatchRvt(settingsFilePath);
+
+        readBatchRvtOutput_Timer = new Timer { Interval = READ_OUTPUT_INTERVAL_IN_MS };
+        readBatchRvtOutput_Timer.Tick += readBatchRvtOutput_Timer_Tick;
+
+        isBatchRvtRunning = true;
+        settingsGroupBox.Enabled = false;
+        importSettingsButton.Enabled = false;
+        startButton.Enabled = false;
+        startButton.Text = @"Running...";
+        batchRvtOutputGroupBox.Visible = true;
+        MinimumSize = RUNNING_MINIMUM_SIZE;
+        MaximumSize = RUNNING_MAXIMUM_SIZE;
+        Size = RUNNING_INITIAL_SIZE;
+        MaximizeBox = true;
+        isUsingRunningSize = true;
+
+        UpdateAdvancedSettings();
+
+        readBatchRvtOutput_Timer.Start();
+    }
+
+    private void readBatchRvtOutput_Timer_Tick(object sender, EventArgs e)
+    {
+        var linesAndPendingTask =
+            StreamIOUtil.ReadAvailableLines(batchRvtProcess.StandardOutput, pendingOutputReadLineTask);
+        pendingOutputReadLineTask = linesAndPendingTask.Item2;
+        var lines = linesAndPendingTask.Item1;
+
+        foreach (var line in lines)
+        {
+            var fullLine = line + Environment.NewLine;
+
+            if (!BatchRvt.IsBatchRvtLine(line))
+            {
+                var timestamp = DateTime.Now.ToString("HH:mm:ss");
+
+                fullLine = timestamp + " : [ REVIT MESSAGE ] : " + fullLine;
             }
 
-            return success;
+            if (BatchRvt.IsBatchRvtLine(line)) // Do not show non-BatchRvt-related output. (TODO: reconsider?)
+                batchRvtOutputTextBox.AppendText(fullLine);
         }
 
-        private void showAdvancedSettingsCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateAdvancedSettings();
-        }
+        linesAndPendingTask =
+            StreamIOUtil.ReadAvailableLines(batchRvtProcess.StandardError, pendingErrorReadLineTask);
+        pendingErrorReadLineTask = linesAndPendingTask.Item2;
+        lines = linesAndPendingTask.Item1;
 
-        private void UpdateAdvancedSettings()
-        {
-            var advancedSettingsIsChecked = this.showAdvancedSettingsCheckBox.Checked;
-            this.singleRevitTaskProcessingGroupBox.Visible = advancedSettingsIsChecked;
-            this.dataExportGroupBox.Visible = advancedSettingsIsChecked;
-            this.showMessageBoxOnTaskScriptErrorCheckBox.Visible = advancedSettingsIsChecked;
-            this.preAndPostProcessingGroupBox.Visible = advancedSettingsIsChecked;
+        foreach (var line in lines.Where(line => !line.StartsWith("log4cplus:"))
+                     .Where(line => Settings.ShowRevitProcessErrorMessages.GetValue()))
+            batchRvtOutputTextBox.AppendText("[ REVIT ERROR MESSAGE ] : " + line + Environment.NewLine);
 
-            var displaySettingPercentage = GetDisplaySettingPercentage();
+        if (!isBatchRvtRunning) return;
+        batchRvtProcess.Refresh();
+        if (!batchRvtProcess.HasExited) return;
+        isBatchRvtRunning = false;
+        startButton.Text = @"Done!";
+    }
 
-            int minimumWindowHeight = this.isUsingRunningSize ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
+    private void browseScriptButton_Click(object sender, EventArgs e)
+    {
+        BrowseForExistingScriptFile(
+            "Select Task script",
+            UpdateTaskScript,
+            ScriptType.Any,
+            PathUtil.GetExistingFileDirectoryPath(taskScriptTextBox.Text)
+        );
+    }
 
-            this.MinimumSize = Scale(
-                    new System.Drawing.Size(Scale(SETUP_MINIMUM_WIDTH, displaySettingPercentage), advancedSettingsIsChecked ? minimumWindowHeight : minimumWindowHeight - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE),
-                    displaySettingPercentage
-                );
+    private void BrowseForSave(string dialogTitle, Action<string> fileAction, string defaultExt, string filter,
+        string initialDirectory = null, string initialFileName = null)
+    {
+        var saveFileDialog = new SaveFileDialog();
 
-            if (!this.isUsingRunningSize)
+        saveFileDialog.DefaultExt = defaultExt;
+        saveFileDialog.Filter = filter;
+        saveFileDialog.Title = dialogTitle;
+
+        if (!string.IsNullOrWhiteSpace(initialDirectory)) saveFileDialog.InitialDirectory = initialDirectory;
+
+        if (!string.IsNullOrWhiteSpace(initialFileName)) saveFileDialog.FileName = initialFileName;
+
+        var dialogResult = saveFileDialog.ShowDialog(this);
+
+        if (dialogResult != DialogResult.OK) return;
+
+        var selectedFilePath = saveFileDialog.FileName;
+
+        if (!string.IsNullOrWhiteSpace(selectedFilePath)) fileAction(selectedFilePath);
+    }
+
+    private void BrowseForFile(string dialogTitle, Action<string> fileAction, string defaultExt, string filter,
+        bool checkFileExists, string initialDirectory = null)
+    {
+        var openFileDialog = new OpenFileDialog();
+
+        openFileDialog.DefaultExt = defaultExt;
+        openFileDialog.Filter = filter;
+        openFileDialog.CheckFileExists = checkFileExists;
+        openFileDialog.ReadOnlyChecked = true;
+        openFileDialog.Multiselect = false;
+        openFileDialog.Title = dialogTitle;
+
+        if (!string.IsNullOrWhiteSpace(initialDirectory)) openFileDialog.InitialDirectory = initialDirectory;
+
+        var dialogResult = openFileDialog.ShowDialog(this);
+
+        if (dialogResult != DialogResult.OK) return;
+
+        var selectedFilePath = openFileDialog.FileName;
+
+        if (!string.IsNullOrWhiteSpace(selectedFilePath)) fileAction(selectedFilePath);
+    }
+
+    private void BrowseForExistingScriptFile(
+        string dialogTitle,
+        Action<string> scriptFileAction,
+        ScriptType scriptType,
+        string initialDirectory = null
+    )
+    {
+        var scriptDefaultExtension =
+            scriptType == ScriptType.Dynamo ? DYNAMO_SCRIPT_EXTENSION : PYTHON_SCRIPT_EXTENSION;
+        var scriptFilter = scriptType == ScriptType.Dynamo ? DYNAMO_SCRIPT_FILTER :
+            scriptType == ScriptType.Python ? PYTHON_SCRIPT_FILTER :
+            ANY_SCRIPTS_FILTER;
+
+        BrowseForFile(
+            dialogTitle,
+            scriptFileAction,
+            scriptDefaultExtension,
+            scriptFilter,
+            true,
+            initialDirectory
+        );
+    }
+
+    private void browseRevitFileListButton_Click(object sender, EventArgs e)
+    {
+        var openFileDialog = new OpenFileDialog();
+
+        openFileDialog.DefaultExt = ".txt";
+        openFileDialog.Filter = "Revit File List (*.txt;*.xls;*.xlsx;*.csv)|*.txt;*.xls;*.xlsx;*.csv";
+        openFileDialog.CheckFileExists = true;
+        openFileDialog.ReadOnlyChecked = true;
+        openFileDialog.Multiselect = false;
+        openFileDialog.Title = "Select Revit File List";
+
+        var initialDirectory = PathUtil.GetExistingFileDirectoryPath(revitFileListTextBox.Text);
+
+        if (initialDirectory != null) openFileDialog.InitialDirectory = initialDirectory;
+
+        var dialogResult = openFileDialog.ShowDialog(this);
+
+        if (dialogResult != DialogResult.OK) return;
+        var selectedFilePath = openFileDialog.FileName;
+
+        if (string.IsNullOrWhiteSpace(selectedFilePath)) return;
+
+        revitFileListTextBox.Text = selectedFilePath;
+
+        VerifyExcelInstallation(selectedFilePath);
+    }
+
+    private void browseDataExportFolderButton_Click(object sender, EventArgs e)
+    {
+        var folderBrowserDialog = new FolderBrowserDialog();
+
+        folderBrowserDialog.Description = "Select Data Export folder";
+
+        var currentFolderPath = dataExportFolderTextBox.Text;
+
+        if (Directory.Exists(currentFolderPath)) folderBrowserDialog.SelectedPath = currentFolderPath;
+
+        var dialogResult = folderBrowserDialog.ShowDialog(this);
+
+        if (dialogResult != DialogResult.OK) return;
+
+        var selectedFolderPath = folderBrowserDialog.SelectedPath;
+
+        if (!string.IsNullOrWhiteSpace(selectedFolderPath)) dataExportFolderTextBox.Text = selectedFolderPath;
+    }
+
+    private void batchRvtOutputTextBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyData != (Keys.Control | Keys.A)) return;
+
+        batchRvtOutputTextBox.SelectAll();
+        e.SuppressKeyPress = true;
+    }
+
+    private void executePreProcessingScriptCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdatePreProcessingScriptControls();
+    }
+
+    private void executePostProcessingScriptCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdatePostProcessingScriptControls();
+    }
+
+    private void preProcessingScriptBrowseButton_Click(object sender, EventArgs e)
+    {
+        BrowseForExistingScriptFile(
+            "Select Pre-Processing Python script",
+            scriptFilePath => { preProcessingScriptTextBox.Text = scriptFilePath; },
+            ScriptType.Python,
+            PathUtil.GetExistingFileDirectoryPath(preProcessingScriptTextBox.Text)
+        );
+    }
+
+    private void postProcessingScriptBrowseButton_Click(object sender, EventArgs e)
+    {
+        BrowseForExistingScriptFile(
+            "Select Post-Processing Python script",
+            scriptFilePath => { postProcessingScriptTextBox.Text = scriptFilePath; },
+            ScriptType.Python,
+            PathUtil.GetExistingFileDirectoryPath(postProcessingScriptTextBox.Text)
+        );
+    }
+
+    private void enableBatchProcessingCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (enableBatchProcessingCheckBox.Checked) enableSingleRevitTaskProcessingCheckBox.Checked = false;
+
+        UpdateRevitProcessingControls();
+    }
+
+    private void enableSingleRevitTaskProcessingCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (enableSingleRevitTaskProcessingCheckBox.Checked) enableBatchProcessingCheckBox.Checked = false;
+
+        UpdateRevitProcessingControls();
+    }
+
+    private static ScriptType GetScriptType(string scriptFilePath)
+    {
+        return PathUtil.HasExtension(scriptFilePath, PYTHON_SCRIPT_EXTENSION) ? ScriptType.Python :
+            PathUtil.HasExtension(scriptFilePath, DYNAMO_SCRIPT_EXTENSION) ? ScriptType.Dynamo :
+            ScriptType.Any;
+    }
+
+    private void UpdateRevitProcessingControls()
+    {
+        var batchTaskEnabled = enableBatchProcessingCheckBox.Checked;
+        revitFileListLabel.Enabled = batchTaskEnabled;
+        revitFileListTextBox.Enabled = batchTaskEnabled;
+        browseRevitFileListButton.Enabled = batchTaskEnabled;
+
+        centralFileProcessingGroupBox.Enabled = batchTaskEnabled;
+        revitFileProcessingGroupBox.Enabled = batchTaskEnabled;
+        revitSessionGroupBox.Enabled = batchTaskEnabled;
+
+        var singleTaskEnabled = enableSingleRevitTaskProcessingCheckBox.Checked;
+        singleRevitTaskRevitVersionLabel.Enabled = singleTaskEnabled;
+        singleRevitTaskRevitVersionComboBox.Enabled = singleTaskEnabled;
+    }
+
+    private void perFileProcessingTimeOutCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateRevitSessionControls();
+    }
+
+    private void UpdateRevitSessionControls()
+    {
+        var perFileProcessingTimeOutEnabled = perFileProcessingTimeOutCheckBox.Checked;
+
+        if (perFileProcessingTimeOutEnabled)
+            // If time-out option is enabled but the current numeric value is 0, set a sensible default / initial value for the time-out.
+            if (timeOutNumericUpDown.Value == 0)
+                timeOutNumericUpDown.Value = 15;
+        timeOutNumericUpDown.Enabled = perFileProcessingTimeOutEnabled;
+    }
+
+    private void UpdatePreProcessingScriptControls()
+    {
+        var isChecked = executePreProcessingScriptCheckBox.Checked;
+        preProcessingScriptTextBox.Enabled = isChecked;
+        preProcessingScriptBrowseButton.Enabled = isChecked;
+        preProcessingScriptNewScriptButton.Enabled = isChecked;
+    }
+
+    private void UpdatePostProcessingScriptControls()
+    {
+        var isChecked = executePostProcessingScriptCheckBox.Checked;
+        postProcessingScriptTextBox.Enabled = isChecked;
+        postProcessingScriptBrowseButton.Enabled = isChecked;
+        postProcessingScriptNewScriptButton.Enabled = isChecked;
+    }
+
+    private static void Populate<T>(ComboBox comboBox, IEnumerable<T> items, T selectedItem)
+    {
+        var itemsList = items.ToList();
+
+        comboBox.Items.Clear();
+
+        foreach (var item in itemsList) comboBox.Items.Add(item);
+
+        var selectedIndex = itemsList.IndexOf(selectedItem);
+
+        comboBox.SelectedIndex = selectedIndex >= 0 ? selectedIndex : 0;
+    }
+
+    private void createNewLocalRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateCentralFileProcessingControls();
+    }
+
+    private void detachFromCentralRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateCentralFileProcessingControls();
+    }
+
+    private void UpdateCentralFileProcessingControls()
+    {
+        deleteLocalAfterCheckBox.Enabled = createNewLocalRadioButton.Checked;
+        discardWorksetsCheckBox.Enabled = detachFromCentralRadioButton.Checked;
+        worksetConfigurationGroupBox.Enabled =
+            !(detachFromCentralRadioButton.Checked && discardWorksetsCheckBox.Checked);
+    }
+
+    private void useFileRevitVersionRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateRevitFileProcessingControls();
+    }
+
+    private void UpdateRevitFileProcessingControls()
+    {
+        useMinimumAvailableVersionCheckBox.Enabled = useFileRevitVersionRadioButton.Checked;
+        specificRevitVersionComboBox.Enabled = useSpecificRevitVersionRadioButton.Checked;
+    }
+
+    private void enableDataExportCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateDataExportControls();
+    }
+
+    private void UpdateDataExportControls()
+    {
+        var isChecked = enableDataExportCheckBox.Checked;
+        dataExportBaseFolderLabel.Enabled = isChecked;
+        dataExportFolderTextBox.Enabled = isChecked;
+        browseDataExportFolderButton.Enabled = isChecked;
+    }
+
+    private void useSpecificRevitVersionRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateRevitFileProcessingControls();
+    }
+
+    private void importSettingsButton_Click(object sender, EventArgs e)
+    {
+        BrowseForFile(
+            "Import BatchRvt Settings file",
+            scriptFilePath => { LoadSettings(scriptFilePath); },
+            BatchRvtSettings.SETTINGS_FILE_EXTENSION,
+            BatchRvtSettings.SETTINGS_FILE_FILTER,
+            true
+        );
+    }
+
+    private void exportSettingsButton_Click(object sender, EventArgs e)
+    {
+        BrowseForSave(
+            "Export BatchRvt Settings file",
+            scriptFilePath => { SaveSettings(scriptFilePath); },
+            BatchRvtSettings.SETTINGS_FILE_EXTENSION,
+            BatchRvtSettings.SETTINGS_FILE_FILTER,
+            initialFileName: BatchRvtSettings.BATCHRVT_SETTINGS_FILENAME
+        );
+    }
+
+
+    private void taskScriptNewScriptButton_Click(object sender, EventArgs e)
+    {
+        BrowseForSaveScriptFile(
+            "Save New Task Script",
+            scriptFilePath =>
             {
-                this.Size = new System.Drawing.Size(this.Size.Width, advancedSettingsIsChecked ? SETUP_HEIGHT : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE);
-                this.MaximumSize = Scale(
-                        new System.Drawing.Size(SETUP_MAXIMUM_WIDTH, advancedSettingsIsChecked ? SETUP_HEIGHT : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE),
-                        displaySettingPercentage
-                    );
-            }
+                var isSaved = SaveNewScript(scriptFilePath, SaveNewScriptType.TaskScript);
+
+                if (isSaved)
+                    UpdateTaskScript(scriptFilePath);
+                else
+                    ShowErrorMessageBox("ERROR: Failed to Save the new script!");
+            },
+            ScriptType.Python,
+            PathUtil.GetExistingFileDirectoryPath(taskScriptTextBox.Text),
+            NEW_TASK_SCRIPT_FILENAME
+        );
+    }
+
+    private void preProcessingScriptNewScriptButton_Click(object sender, EventArgs e)
+    {
+        BrowseForSaveScriptFile(
+            "Save New Pre-Processing Script",
+            scriptFilePath =>
+            {
+                var isSaved = SaveNewScript(scriptFilePath, SaveNewScriptType.PreProcessingScript);
+
+                if (isSaved)
+                    preProcessingScriptTextBox.Text = scriptFilePath;
+                else
+                    ShowErrorMessageBox("ERROR: Failed to Save the new script!");
+            },
+            ScriptType.Python,
+            PathUtil.GetExistingFileDirectoryPath(preProcessingScriptTextBox.Text),
+            NEW_PREPROCESSING_SCRIPT_FILENAME
+        );
+    }
+
+    private void postProcessingScriptNewScriptButton_Click(object sender, EventArgs e)
+    {
+        BrowseForSaveScriptFile(
+            "Save New Post-Processing Script",
+            scriptFilePath =>
+            {
+                var isSaved = SaveNewScript(scriptFilePath, SaveNewScriptType.PostProcessingScript);
+
+                if (isSaved)
+                    postProcessingScriptTextBox.Text = scriptFilePath;
+                else
+                    ShowErrorMessageBox("ERROR: Failed to Save the new script!");
+            },
+            ScriptType.Python,
+            PathUtil.GetExistingFileDirectoryPath(postProcessingScriptTextBox.Text),
+            NEW_POSTPROCESSING_SCRIPT_FILENAME
+        );
+    }
+
+    private void BrowseForSaveScriptFile(
+        string dialogTitle,
+        Action<string> scriptFileAction,
+        ScriptType scriptType,
+        string initialDirectory = null,
+        string initialFileName = null
+    )
+    {
+        var scriptDefaultExtension =
+            scriptType == ScriptType.Dynamo ? DYNAMO_SCRIPT_EXTENSION : PYTHON_SCRIPT_EXTENSION;
+        var scriptFilter = scriptType == ScriptType.Dynamo ? DYNAMO_SCRIPT_FILTER : PYTHON_SCRIPT_FILTER;
+
+        BrowseForSave(
+            dialogTitle,
+            scriptFileAction,
+            scriptDefaultExtension,
+            scriptFilter,
+            initialDirectory,
+            initialFileName
+        );
+    }
+
+    private bool SaveNewScript(string scriptFilePath, SaveNewScriptType saveNewScriptType)
+    {
+        var success = false;
+
+        string scriptTemplateFileName = null;
+
+        if (saveNewScriptType == SaveNewScriptType.TaskScript)
+            scriptTemplateFileName = TEMPLATE_TASK_SCRIPT_FILENAME;
+        else if (saveNewScriptType == SaveNewScriptType.PreProcessingScript)
+            scriptTemplateFileName = TEMPLATE_PREPROCESSING_SCRIPT_FILENAME;
+        else if (saveNewScriptType == SaveNewScriptType.PostProcessingScript)
+            scriptTemplateFileName = TEMPLATE_POSTPROCESSING_SCRIPT_FILENAME;
+
+        var scriptTemplateFilePath = Path.Combine(BatchRvt.GetBatchRvtScriptsFolderPath(), scriptTemplateFileName);
+
+
+        var scriptContents = File.ReadAllText(scriptTemplateFilePath);
+        try
+        {
+            File.WriteAllText(scriptFilePath, scriptContents);
+            success = true;
+        }
+        catch (Exception)
+        {
+            success = false;
         }
 
-        private void timeOutNumericUpDown_ValueChanged(object sender, EventArgs e)
+        return success;
+    }
+
+    private void showAdvancedSettingsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateAdvancedSettings();
+    }
+
+    private void UpdateAdvancedSettings()
+    {
+        var advancedSettingsIsChecked = showAdvancedSettingsCheckBox.Checked;
+        singleRevitTaskProcessingGroupBox.Visible = advancedSettingsIsChecked;
+        dataExportGroupBox.Visible = advancedSettingsIsChecked;
+        showMessageBoxOnTaskScriptErrorCheckBox.Visible = advancedSettingsIsChecked;
+        preAndPostProcessingGroupBox.Visible = advancedSettingsIsChecked;
+
+        var displaySettingPercentage = GetDisplaySettingPercentage();
+
+        var minimumWindowHeight = isUsingRunningSize ? RUNNING_MINIMUM_HEIGHT : SETUP_HEIGHT;
+
+        MinimumSize = Scale(
+            new Size(Scale(SETUP_MINIMUM_WIDTH, displaySettingPercentage),
+                advancedSettingsIsChecked
+                    ? minimumWindowHeight
+                    : minimumWindowHeight - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE),
+            displaySettingPercentage
+        );
+
+        if (isUsingRunningSize) return;
+        Size = Size with
         {
-            if (this.perFileProcessingTimeOutCheckBox.Checked && this.timeOutNumericUpDown.Value == 0)
-            {
-                this.perFileProcessingTimeOutCheckBox.Checked = false;
-                UpdateRevitSessionControls();
-            }
+            Height = advancedSettingsIsChecked
+                ? SETUP_HEIGHT
+                : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE
+        };
+        MaximumSize = Scale(
+            new Size(SETUP_MAXIMUM_WIDTH,
+                advancedSettingsIsChecked
+                    ? SETUP_HEIGHT
+                    : SETUP_HEIGHT - ADVANCED_SETTINGS_VISIBLE_SIZE_DIFFERENCE),
+            displaySettingPercentage
+        );
+    }
+
+    private void timeOutNumericUpDown_ValueChanged(object sender, EventArgs e)
+    {
+        if (!perFileProcessingTimeOutCheckBox.Checked || timeOutNumericUpDown.Value != 0) return;
+        perFileProcessingTimeOutCheckBox.Checked = false;
+        UpdateRevitSessionControls();
+    }
+
+    private void timeOutNumericUpDown_Leave(object sender, EventArgs e)
+    {
+        // Detect if the numeric time-out value was left blank and set it to 0.
+        if (string.IsNullOrWhiteSpace(timeOutNumericUpDown.Controls[1].Text)) timeOutNumericUpDown.Value = 0;
+    }
+
+    private void newRevitFileListButton_Click(object sender, EventArgs e)
+    {
+        var folderBrowserDialog = new FolderBrowserDialog
+        {
+            Site = null,
+            Tag = null,
+            ShowNewFolderButton = false,
+            SelectedPath = "",
+            RootFolder = Environment.SpecialFolder.MyComputer,
+            Description = @"Select a folder containing Revit files"
+        };
+
+
+        var dialogResult = folderBrowserDialog.ShowDialog(this);
+
+        if (dialogResult != DialogResult.OK) return;
+
+        var selectedFolderPath = folderBrowserDialog.SelectedPath;
+
+        if (string.IsNullOrWhiteSpace(selectedFolderPath)) return;
+
+        RevitFileScanning.RevitFileType selectedRevitFileType;
+        SearchOption selectedSearchOption;
+        bool expandNetworkPaths;
+        bool extractRevitVersionInfo;
+        bool ignoreRevitBackupFiles;
+        using (var revitFileScanningOptionsUi = new RevitFileScanningOptionsUI())
+        {
+            var optionsDialogResult = revitFileScanningOptionsUi.ShowDialog(this);
+
+            if (optionsDialogResult != DialogResult.OK) return;
+
+            selectedRevitFileType = revitFileScanningOptionsUi.GetSelectedRevitFileType();
+
+            var includeSubfolders = revitFileScanningOptionsUi.IncludeSubfolders();
+
+            selectedSearchOption = includeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+            expandNetworkPaths = revitFileScanningOptionsUi.ExpandNetworkPaths();
+            extractRevitVersionInfo = revitFileScanningOptionsUi.ExtractRevitVersionInfo();
+            ignoreRevitBackupFiles = revitFileScanningOptionsUi.IgnoreRevitBackupFiles();
         }
 
-        private void timeOutNumericUpDown_Leave(object sender, EventArgs e)
+        var rows = Enumerable.Empty<IEnumerable<string>>();
+
+        void RevitFileScanningProgressReporter(Func<string, bool> progressReporter)
         {
-            // Detect if the numeric time-out value was left blank and set it to 0.
-            if (string.IsNullOrWhiteSpace(this.timeOutNumericUpDown.Controls[1].Text))
-            {
-                this.timeOutNumericUpDown.Value = 0;
-            }
+            rows = RevitFileScanning.FindAndExtractRevitFilesInfoWithProgressReporting(
+                selectedFolderPath,
+                selectedSearchOption,
+                selectedRevitFileType,
+                expandNetworkPaths,
+                extractRevitVersionInfo,
+                ignoreRevitBackupFiles,
+                progressReporter);
         }
 
-        private void newRevitFileListButton_Click(object sender, EventArgs e)
+        DialogResult scanningDialogResult;
+        using (var revitFileScanningProgressUi = new RevitFileScanningProgressUI(RevitFileScanningProgressReporter))
         {
-            var folderBrowserDialog = new FolderBrowserDialog();
+            scanningDialogResult = revitFileScanningProgressUi.ShowDialog(this);
+        }
 
-            folderBrowserDialog.Description = "Select a folder containing Revit files";
+        if (scanningDialogResult != DialogResult.OK) return;
 
-            // TODO: remember last folder path and assign it to folderBrowserDialog.SelectedPath
+        var initialDirectory = PathUtil.GetExistingFileDirectoryPath(revitFileListTextBox.Text);
 
-            var dialogResult = folderBrowserDialog.ShowDialog(this);
-
-            if (dialogResult == DialogResult.OK)
+        BrowseForSave(
+            "Save New Revit file list",
+            revitFileListPath =>
             {
-                var selectedFolderPath = folderBrowserDialog.SelectedPath;
+                var isSaved = false;
 
-                if (!string.IsNullOrWhiteSpace(selectedFolderPath))
+                try
                 {
-                    var revitFileScanningOptionsUI = new RevitFileScanningOptionsUI();
-
-                    var optionsDialogResult = revitFileScanningOptionsUI.ShowDialog(this);
-
-                    if (optionsDialogResult == DialogResult.OK)
-                    {
-                        var selectedRevitFileType = revitFileScanningOptionsUI.GetSelectedRevitFileType();
-
-                        bool includeSubfolders = revitFileScanningOptionsUI.IncludeSubfolders();
-
-                        var selectedSearchOption = includeSubfolders ?
-                            SearchOption.AllDirectories :
-                            SearchOption.TopDirectoryOnly;
-
-                        bool expandNetworkPaths = revitFileScanningOptionsUI.ExpandNetworkPaths();
-                        bool extractRevitVersionInfo = revitFileScanningOptionsUI.ExtractRevitVersionInfo();
-                        bool ignoreRevitBackupFiles = revitFileScanningOptionsUI.IgnoreRevitBackupFiles();
-
-                        var rows = Enumerable.Empty<IEnumerable<string>>();
-
-                        Action<Func<string, bool>> revitFileScanningProgressReporter =
-                            (progressReporter) => {
-                                rows = RevitFileScanning.FindAndExtractRevitFilesInfoWithProgressReporting(
-                                    selectedFolderPath,
-                                    selectedSearchOption,
-                                    selectedRevitFileType,
-                                    expandNetworkPaths,
-                                    extractRevitVersionInfo,
-                                    ignoreRevitBackupFiles,
-                                    progressReporter
-                                );
-                            };
-
-                        var revitFileScanningProgressUI = new RevitFileScanningProgressUI(revitFileScanningProgressReporter);
-
-                        var scanningDialogResult = revitFileScanningProgressUI.ShowDialog(this);
-
-                        if (scanningDialogResult == DialogResult.OK)
-                        {
-                            var initialDirectory = PathUtil.GetExistingFileDirectoryPath(this.revitFileListTextBox.Text);
-
-                            BrowseForSave(
-                                    "Save New Revit file list",
-                                    revitFileListPath => {
-
-                                        bool isSaved = false;
-
-                                        try
-                                        {
-                                            TextFileUtil.WriteToTabDelimitedTxtFile(rows, revitFileListPath);
-                                            isSaved = true;
-                                        }
-                                        catch (Exception)
-                                        {
-                                            isSaved = false;
-                                        }
-
-                                        if (isSaved)
-                                        {
-                                            this.revitFileListTextBox.Text = revitFileListPath;
-                                        }
-                                        else
-                                        {
-                                            ShowErrorMessageBox("ERROR: Failed to Save the new Revit file list!");
-                                        }
-                                    },
-                                    TextFileUtil.TEXT_FILE_EXTENSION,
-                                    TextFileUtil.TEXT_FILE_FILTER,
-                                    initialDirectory,
-                                    initialFileName: "revit_file_list.txt"
-                                );
-                        }
-                    }
+                    TextFileUtil.WriteToTabDelimitedTxtFile(rows, revitFileListPath);
+                    isSaved = true;
                 }
-            }
-        }
+                catch (Exception)
+                {
+                    isSaved = false;
+                }
 
-        private void discardWorksetsCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCentralFileProcessingControls();
-        }
+                if (isSaved)
+                    revitFileListTextBox.Text = revitFileListPath;
+                else
+                    ShowErrorMessageBox("ERROR: Failed to Save the new Revit file list!");
+            },
+            TextFileUtil.TEXT_FILE_EXTENSION,
+            TextFileUtil.TEXT_FILE_FILTER,
+            initialDirectory,
+            "revit_file_list.txt"
+        );
+    }
+
+    private void discardWorksetsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateCentralFileProcessingControls();
+    }
+
+    private enum ScriptType
+    {
+        Python = 0,
+        Dynamo = 1,
+        Any = 2
+    }
+
+    private enum SaveNewScriptType
+    {
+        TaskScript = 0,
+        PreProcessingScript = 1,
+        PostProcessingScript = 2
     }
 }

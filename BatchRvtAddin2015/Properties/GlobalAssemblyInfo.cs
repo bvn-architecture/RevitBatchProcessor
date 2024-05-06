@@ -6,6 +6,8 @@
 //      Revision
 //
 
-[assembly: System.Reflection.AssemblyVersion("1.8.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersion("1.8.0.0")]
-[assembly: System.Reflection.AssemblyFileVersion("1.8.0.0")]
+using System.Reflection;
+
+[assembly: AssemblyVersion("1.8.0.0")]
+[assembly: AssemblyInformationalVersion("1.8.0.0")]
+[assembly: AssemblyFileVersion("1.8.0.0")]

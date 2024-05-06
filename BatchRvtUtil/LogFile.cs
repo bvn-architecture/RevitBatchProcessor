@@ -17,214 +17,201 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+public class LogFile
 {
-    public class LogFile
+    private const string DateFormat = "dd/MM/yyyy";
+    private const string TimeFormat = "HH:mm:ss";
+    private static readonly string SessionId = Guid.NewGuid().ToString();
+    private readonly string logFileName_;
+    private readonly string logFilePath_;
+
+    private readonly string logFolderPath_;
+    private readonly string logName_;
+
+    private StreamWriter appendTextStreamWriter_;
+
+    public LogFile(string logName, string logFolderPath, bool includeUsernamePrefix = true)
     {
-        private static readonly string SessionId = Guid.NewGuid().ToString();
+        logFolderPath_ = logFolderPath;
+        logName_ = logName;
 
-        private const string DateFormat = "dd/MM/yyyy";
-        private const string TimeFormat = "HH:mm:ss";
+        var logFilenamePrefix = includeUsernamePrefix ? Environment.UserName : string.Empty;
+        var separator = logFilenamePrefix != string.Empty ? "_" : string.Empty;
 
-        private readonly string logFolderPath_;
-        private readonly string logFileName_;
-        private readonly string logFilePath_;
-        private readonly string logName_;
+        logFileName_ = logFilenamePrefix + separator + logName + ".log";
 
-        private StreamWriter appendTextStreamWriter_ = null;
+        logFilePath_ = Path.Combine(
+            logFolderPath_,
+            logFileName_
+        );
+    }
 
-        public LogFile(string logName, string logFolderPath, bool includeUsernamePrefix = true)
+    private void Open()
+    {
+        Close();
+
+        try
         {
-            this.logFolderPath_ = logFolderPath;
-            this.logName_ = logName;
-
-            var logFilenamePrefix = includeUsernamePrefix ? Environment.UserName : String.Empty;
-            var separator = (logFilenamePrefix != String.Empty) ? "_" : String.Empty;
-
-            this.logFileName_ = logFilenamePrefix + separator + logName + ".log";
-
-            this.logFilePath_ = Path.Combine(
-                    this.logFolderPath_,
-                    this.logFileName_
-                );
+            appendTextStreamWriter_ = new FileInfo(logFilePath_).AppendText();
         }
-
-        public void Open()
+        catch (Exception)
         {
-            Close();
+            appendTextStreamWriter_ = null;
+        }
+    }
+
+    private static string GetSerializedLogEntry(DateTime dateTime, string sessionId, object message)
+    {
+        return SerializeAsJson(
+            GetLogObject(dateTime, sessionId, message)
+        );
+    }
+
+    public string GetLogFilePath()
+    {
+        return logFilePath_;
+    }
+
+    private static object GetLogObject(DateTime dateTime, string sessionId, object message)
+    {
+        var utcDateTime = dateTime.ToUniversalTime();
+
+        var logEntry = new
+        {
+            date = new
+            {
+                local = dateTime.ToString(DateFormat),
+                utc = utcDateTime.ToString(DateFormat)
+            },
+            time = new
+            {
+                local = dateTime.ToString(TimeFormat),
+                utc = utcDateTime.ToString(TimeFormat)
+            },
+            sessionId,
+            message
+        };
+
+        return logEntry;
+    }
+
+    private static string SerializeAsJson(object logObject)
+    {
+        return JObject.FromObject(logObject).ToString(Formatting.None);
+    }
+
+    private bool WriteMessage(string sessionId, object message)
+    {
+        var success = false;
+
+        var useExistingOpenStream = appendTextStreamWriter_ != null;
+
+        try
+        {
+            var dateTimeNow = DateTime.Now;
+
+            string logEntry = null;
 
             try
             {
-                appendTextStreamWriter_ = new FileInfo(this.logFilePath_).AppendText();
-            }
-            catch (Exception)
-            {
-                appendTextStreamWriter_ = null;
-            }
-        }
-
-        public static string GetSerializedLogEntry(DateTime dateTime, string sessionId, object message)
-        {
-            return SerializeAsJson(
-                    GetLogObject(dateTime, sessionId, message)
-                );
-        }
-
-        public string GetLogFilePath()
-        {
-            return this.logFilePath_;
-        }
-
-        private static object GetLogObject(DateTime dateTime, string sessionId, object message)
-        {
-            var utcDateTime = dateTime.ToUniversalTime();
-
-            var logEntry = new
-            {
-                date = new
-                {
-                    local = dateTime.ToString(DateFormat),
-                    utc = utcDateTime.ToString(DateFormat)
-                },
-                time = new
-                {
-                    local = dateTime.ToString(TimeFormat),
-                    utc = utcDateTime.ToString(TimeFormat)
-                },
-                sessionId = sessionId,
-                message = message
-            };
-
-            return logEntry;
-        }
-
-        private static string SerializeAsJson(object logObject)
-        {
-            return JObject.FromObject(logObject).ToString(Formatting.None);
-        }
-
-        public bool WriteMessage(string sessionId, object message)
-        {
-            bool success = false;
-
-            bool useExistingOpenStream = (appendTextStreamWriter_ != null);
-
-            try
-            {
-                var dateTimeNow = DateTime.Now;
-
-                string logEntry = null;
-
-                try
-                {
-                    logEntry = GetSerializedLogEntry(dateTimeNow, sessionId, message);
-                }
-                catch (Exception e)
-                {
-                    var errorMessage = new
-                    {
-                        error = "FAILED TO PARSE LOG MESSAGE OBJECT",
-                        exceptionType = e.GetType(),
-                        exceptionMessage = e.Message
-                    };
-
-                    logEntry = GetSerializedLogEntry(dateTimeNow, sessionId, errorMessage);
-                }
-
-                if (!useExistingOpenStream)
-                {
-                    Open();
-                }
-
-                appendTextStreamWriter_.WriteLine(logEntry);
-                appendTextStreamWriter_.Flush();
-
-                success = true;
-            }
-            catch (Exception)
-            {
-                success = false;
-            }
-
-            if (!useExistingOpenStream)
-            {
-                Close();
-            }
-
-            return success;
-        }
-
-        public bool WriteMessage(object message)
-        {
-            return WriteMessage(GetSessionId(), message);
-        }
-
-        public void Close()
-        {
-            if (appendTextStreamWriter_ != null)
-            {
-                try
-                {
-                    appendTextStreamWriter_.Close();
-                }
-                catch (Exception)
-                {
-                }
-                appendTextStreamWriter_ = null;
-            }
-
-            return;
-        }
-
-        private static string GetSessionId()
-        {
-            return SessionId;
-        }
-
-        private static string ReadLineAsPlainText(string logLine, bool useUniversalTime)
-        {
-            var plainTextLine = logLine;
-
-            var jobject = JsonUtil.DeserializeFromJson(logLine);
-
-            if (jobject != null)
-            {
-                var dateString = jobject["date"][useUniversalTime ? "utc" : "local"];
-                var timeString = jobject["time"][useUniversalTime ? "utc" : "local"];
-                var message = jobject["message"]["message"];
-
-                plainTextLine = dateString + " " + timeString + " : " + message;
-            }
-
-            return plainTextLine;
-        }
-
-        public static IEnumerable<string> ReadLinesAsPlainText(string logFilePath, bool useUniversalTime = false)
-        {
-            IEnumerable<string> lines = null;
-
-            try
-            {
-                lines = (
-                        File.ReadAllLines(logFilePath)
-                        .Select(line => ReadLineAsPlainText(line, useUniversalTime))
-                        .ToList()
-                    );
+                logEntry = GetSerializedLogEntry(dateTimeNow, sessionId, message);
             }
             catch (Exception e)
             {
-                lines = null;
+                var errorMessage = new
+                {
+                    error = "FAILED TO PARSE LOG MESSAGE OBJECT",
+                    exceptionType = e.GetType(),
+                    exceptionMessage = e.Message
+                };
+
+                logEntry = GetSerializedLogEntry(dateTimeNow, sessionId, errorMessage);
             }
 
-            return lines;
+            if (!useExistingOpenStream) Open();
+
+            if (appendTextStreamWriter_ != null)
+            {
+                appendTextStreamWriter_.WriteLine(logEntry);
+                appendTextStreamWriter_.Flush();
+            }
+
+            success = true;
         }
+        catch (Exception)
+        {
+            success = false;
+        }
+
+        if (!useExistingOpenStream) Close();
+
+        return success;
+    }
+
+    public bool WriteMessage(object message)
+    {
+        return WriteMessage(GetSessionId(), message);
+    }
+
+    private void Close()
+    {
+        if (appendTextStreamWriter_ == null) return;
+        try
+        {
+            appendTextStreamWriter_.Close();
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+
+        appendTextStreamWriter_ = null;
+    }
+
+    private static string GetSessionId()
+    {
+        return SessionId;
+    }
+
+    private static string ReadLineAsPlainText(string logLine, bool useUniversalTime)
+    {
+        var plainTextLine = logLine;
+
+        var jobject = JsonUtil.DeserializeFromJson(logLine);
+
+        if (jobject == null) return plainTextLine;
+        var dateString = jobject["date"][useUniversalTime ? "utc" : "local"];
+        var timeString = jobject["time"][useUniversalTime ? "utc" : "local"];
+        var message = jobject["message"]["message"];
+
+        plainTextLine = dateString + " " + timeString + " : " + message;
+
+        return plainTextLine;
+    }
+
+    public static IEnumerable<string> ReadLinesAsPlainText(string logFilePath, bool useUniversalTime = false)
+    {
+        try
+        {
+            return File.ReadAllLines(logFilePath)
+                .Select(line => ReadLineAsPlainText(line, useUniversalTime))
+                .ToList();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+
+
     }
 }

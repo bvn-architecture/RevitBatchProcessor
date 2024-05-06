@@ -17,46 +17,39 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-using System;
+
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Text;
 
-namespace BatchRvtUtil
+namespace BatchRvtUtil;
+
+public static class TextFileUtil
 {
-    public static class TextFileUtil
+    public const string TEXT_FILE_EXTENSION = ".txt";
+    public const string TEXT_FILE_FILTER = "Text files (*.txt)|*.txt";
+
+    private static void WriteToCsvFile(
+        IEnumerable<IEnumerable<object>> rows,
+        string csvFilePath,
+        string delimiter,
+        Encoding encoding
+    )
     {
-        public const string TEXT_FILE_EXTENSION = ".txt";
-        public const string TEXT_FILE_FILTER = "Text files (*.txt)|*.txt";
+        var lines = rows
+            .Select(row => string.Join(delimiter, row.Select(value => value.ToString())))
+            .ToList();
 
-        public static void WriteToCSVFile(
-                IEnumerable<IEnumerable<object>> rows,
-                string csvFilePath,
-                string delimiter,
-                Encoding encoding
-            )
-        {
-            var lines = (
-                    rows
-                    .Select(row => string.Join(delimiter, row.Select(value => value.ToString())))
-                    .ToList()
-                );
+        File.WriteAllLines(csvFilePath, lines, encoding);
+    }
 
-            File.WriteAllLines(csvFilePath, lines, encoding);
-
-            return;
-        }
-
-        public static void WriteToTabDelimitedTxtFile(
-                IEnumerable<IEnumerable<object>> rows,
-                string txtFilePath,
-                Encoding encoding = null
-            )
-        {
-            WriteToCSVFile(rows, txtFilePath, "\t", encoding ?? Encoding.UTF8);
-
-            return;
-        }
+    public static void WriteToTabDelimitedTxtFile(
+        IEnumerable<IEnumerable<object>> rows,
+        string txtFilePath,
+        Encoding encoding = null
+    )
+    {
+        WriteToCsvFile(rows, txtFilePath, "\t", encoding ?? Encoding.UTF8);
     }
 }

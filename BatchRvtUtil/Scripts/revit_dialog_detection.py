@@ -28,53 +28,54 @@ import global_test_mode
 
 REVIT_DIALOG_MESSAGE_HANDLER_PREFIX = "[ REVIT DIALOG BOX HANDLER ]"
 
-MODEL_UPGRADE_WINDOW_TITLE = "Model Upgrade"
-LOAD_LINK_WINDOW_TITLE = "Load Link"
-CHANGES_NOT_SAVED_TITLE = "Changes Not Saved"
-CLOSE_PROJECT_WITHOUT_SAVING_TITLE = "Close Project Without Saving"
-CERRAR_PROYECTO_SIN_GUARDAR = "Cerrar proyecto sin guardar"
-SAVE_FILE_WINDOW_TITLE = "Save File"
-EDITABLE_ELEMENTS_TITLE = "Editable Elements"
 AUTODESK_CUSTOMER_INVOLVEMENT_PROGRAM_TITLE = "Autodesk Customer Involvement Program"
 CAMBIOS_NO_GUARDADOS_TITLE = "Cambios no guardados"
-ELEMENTS_LOST_ON_IMPORT_TITLE = "Elements Lost on Import"
-REFERENCIAS_TITLE = "Referencias sin resolver"
 CAMBIOS_TITLE = "Cambios locales no sincronizados con archivo central"
+CERRAR_PROYECTO_SIN_GUARDAR = "Cerrar proyecto sin guardar"
+CHANGES_NOT_SAVED_TITLE = "Changes Not Saved"
 CHANGES_TITLE = "Local Changes Not Synchronized with Central"
+CLOSE_PROJECT_WITHOUT_SAVING_TITLE = "Close Project Without Saving"
+EDITABLE_ELEMENTS_TITLE = "Editable Elements"
+ELEMENTS_LOST_ON_IMPORT_TITLE = "Elements Lost on Import"
+LOAD_LINK_WINDOW_TITLE = "Load Link"
+MODEL_UPGRADE_WINDOW_TITLE = "Model Upgrade"
 NWC_TITLE = "Navisworks NWC Exporter"
+REFERENCIAS_TITLE = "Referencias sin resolver"
 REVIT_TITLE = "Revit"
-OPENING_WORKSETS_TITLES = [
-        "Worksets",
-        "Opening Worksets"
-    ]
+SAVE_FILE_WINDOW_TITLE = "Save File"
 
-DIRECTUI_CLASS_NAME = "DirectUIHWND"
-CTRLNOTIFYSINK_CLASS_NAME = "CtrlNotifySink"
-BUTTON_CLASS_NAME = "Button"
-STATIC_CONTROL_CLASS_NAME = "Static"
-CANCELAR_BUTTON_TEXT = "Cancelar"
-CLOSE_BUTTON_TEXT = "Close"
-CERRAR_BUTTON_TEXT = "Cerrar"
+
 ACEPTAR_BUTTON_TEXT = "Aceptar"
-CEDER_TODO_BUTTON_TEXT = "Ceder todos los elementos y subproyectos"
-CEDER_BUTTON_TEXT = "Ceder los elementos y subproyectos"
-OK_BUTTON_TEXT = "OK"
-IGNORAR_BUTTON_TEXT = "Ignorar y abrir el proyecto"
-NO_GUARDAR_PROYECTO_BUTTON_TEXT = "No guardar el proyecto"
-NO_BUTTON_TEXT = "No"
-YES_BUTTON_TEXT = "Yes"
 ALWAYS_LOAD_BUTTON_TEXT = "Always Load"
+BUTTON_CLASS_NAME = "Button"
 CANCEL_LINK_BUTTON_TEXT = "Cancel Link"
-DO_NOT_SAVE_THE_PROJECT_TEXT = "Do not save the project"
+CANCELAR_BUTTON_TEXT = "Cancelar"
+CEDER_BUTTON_TEXT = "Ceder los elementos y subproyectos"
+CEDER_TODO_BUTTON_TEXT = "Ceder todos los elementos y subproyectos"
 CERRAR_ARCHIVO_LOCAL_BUTTON_TEXT = "Cerrar el archivo local"
+CERRAR_BUTTON_TEXT = "Cerrar"
+CLOSE_BUTTON_TEXT = "Close"
 CLOSE_LOCAL_FILE_BUTTON_TEXT = "Close the local file"
+CTRLNOTIFYSINK_CLASS_NAME = "CtrlNotifySink"
+DIRECTUI_CLASS_NAME = "DirectUIHWND"
+DO_NOT_SAVE_THE_PROJECT_TEXT = "Do not save the project"
+IGNORAR_BUTTON_TEXT = "Ignorar y abrir el proyecto"
+NO_BUTTON_TEXT = "No"
+NO_GUARDAR_PROYECTO_BUTTON_TEXT = "No guardar el proyecto"
+OK_BUTTON_TEXT = "OK"
+RHINO_SELECTION_BUTTON_TEXT = "Rhino 7" #Change this to target a different version of Rhino by default
+STATIC_CONTROL_CLASS_NAME = "Static"
+YES_BUTTON_TEXT = "Yes"
 
 RELINQUISH_ALL_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish all elements and worksets"
 RELINQUISH_ELEMENTS_AND_WORKSETS_TEXT = "Relinquish elements and worksets"
 
 
 HAVE_REPORTED_BATCH_RVT_ERROR_WINDOW_DETECTION = [False]
-
+OPENING_WORKSETS_TITLES = [
+        "Worksets",
+        "Opening Worksets"
+    ]
 
 class RevitDialogInfo:
     def __init__(self, dialogHwnd):
@@ -92,17 +93,18 @@ class RevitDialogInfo:
         return
 
 def SendButtonClick(buttons, output):
-    okButtons = ui_automation_util.FilterControlsByText(buttons, OK_BUTTON_TEXT)
     aceptarButtons = ui_automation_util.FilterControlsByText(buttons, ACEPTAR_BUTTON_TEXT)
-    ignorarButtons = ui_automation_util.FilterControlsByText(buttons, IGNORAR_BUTTON_TEXT)
+    alwaysLoadButtons = ui_automation_util.FilterControlsByText(buttons, ALWAYS_LOAD_BUTTON_TEXT)
     cederButtons = ui_automation_util.FilterControlsByText(buttons, CEDER_BUTTON_TEXT)
     cerrarButtons = ui_automation_util.FilterControlsByText(buttons, CERRAR_BUTTON_TEXT)
-    noGuardarButtons = ui_automation_util.FilterControlsByText(buttons, NO_GUARDAR_PROYECTO_BUTTON_TEXT)
-    closeButtons = ui_automation_util.FilterControlsByText(buttons, CLOSE_BUTTON_TEXT)
-    noButtons = ui_automation_util.FilterControlsByText(buttons, NO_BUTTON_TEXT)
-    alwaysLoadButtons = ui_automation_util.FilterControlsByText(buttons, ALWAYS_LOAD_BUTTON_TEXT)
     cerrarLocalButtons = ui_automation_util.FilterControlsByText(buttons, CERRAR_ARCHIVO_LOCAL_BUTTON_TEXT)
+    closeButtons = ui_automation_util.FilterControlsByText(buttons, CLOSE_BUTTON_TEXT)
     closeLocalButtons = ui_automation_util.FilterControlsByText(buttons, CLOSE_LOCAL_FILE_BUTTON_TEXT)
+    ignorarButtons = ui_automation_util.FilterControlsByText(buttons, IGNORAR_BUTTON_TEXT)
+    noButtons = ui_automation_util.FilterControlsByText(buttons, NO_BUTTON_TEXT)
+    noGuardarButtons = ui_automation_util.FilterControlsByText(buttons, NO_GUARDAR_PROYECTO_BUTTON_TEXT)
+    okButtons = ui_automation_util.FilterControlsByText(buttons, OK_BUTTON_TEXT)
+    rhino_selection_buttons = ui_automation_util.FilterControlsByText(buttons, RHINO_SELECTION_BUTTON_TEXT)
 
     if len(okButtons) == 1:
         targetButton = okButtons[0]
@@ -112,6 +114,8 @@ def SendButtonClick(buttons, output):
         targetButton = noButtons[0]
     elif len(alwaysLoadButtons) == 1:
         targetButton = alwaysLoadButtons[0]
+    elif len(rhino_selection_buttons) == 1:
+        targetButton = rhino_selection_buttons[0]
     elif len(ignorarButtons) == 1:
         targetButton = ignorarButtons[0]
     elif len(noGuardarButtons) == 1:

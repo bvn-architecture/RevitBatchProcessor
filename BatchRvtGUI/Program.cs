@@ -17,39 +17,39 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using BatchRvtUtil;
 
-namespace BatchRvtGUI
+namespace BatchRvtGUI;
+
+internal static class Program
 {
-    static class Program
+    /// <summary>
+    ///     The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    private static void Main()
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+
+        if (!RevitVersion.GetInstalledRevitVersions().Any())
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            var errorMessage = new StringBuilder();
+            errorMessage.AppendLine(
+                "ERROR: Could not detect the BatchRvt addin for any version of Revit installed on this machine!");
+            errorMessage.AppendLine();
+            errorMessage.AppendLine("You must first install the BatchRvt addin for at least one version of Revit.");
 
-            if (!RevitVersion.GetInstalledRevitVersions().Any())
-            {
-                var errorMessage = new StringBuilder();
-                errorMessage.AppendLine("ERROR: Could not detect the BatchRvt addin for any version of Revit installed on this machine!");
-                errorMessage.AppendLine();
-                errorMessage.AppendLine("You must first install the BatchRvt addin for at least one version of Revit.");
-
-                BatchRvtGuiForm.ShowErrorMessageBox(errorMessage.ToString());
-            }
-            else
-            {
-                Application.Run(new BatchRvtGuiForm());
-            }
+            BatchRvtGuiForm.ShowErrorMessageBox(errorMessage.ToString());
+        }
+        else
+        {
+            Application.Run(new BatchRvtGuiForm());
         }
     }
 }
