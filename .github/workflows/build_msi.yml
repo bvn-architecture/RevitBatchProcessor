@@ -1,0 +1,89 @@
+name: Build and Package
+
+on:
+  release:
+    types:
+      [released]
+  
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Setup MSBuild path
+        uses: microsoft/setup-msbuild@v2     
+
+      - name: Restore NuGet packages
+        run: nuget restore "RevitBatchProcessor.sln"
+      
+      - name: Setup Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+          
+      - name: Build solution
+        run: |
+            msbuild "RevitBatchProcessor.sln" /p:Configuration=Release 
+          
+      - name: Get version number
+        id: version_num_set
+        run: |
+          echo "Version number from tag is ${{github.event.release.tag_name}}"
+            $versionNum = "${{github.event.release.tag_name}}"
+            $versionNum = $versionNum -replace "-beta", ""
+            $version_number = $versionNum -replace "v", ""
+            echo "Numeric only from that is $version_number"
+            echo "version=$version_number" >> $env:GITHUB_OUTPUT
+          
+      - name: Update installer config
+        run: |
+            $content = Get-Content -Path Setup/RevitBatchProcessor.iss -Raw
+            echo "Input installer config is $content"
+            $tag = "${{ github.event.release.tag_name }}"
+            if ($tag -like "*-beta") {
+                $replaceWord = 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta'
+            } else {
+                $replaceWord = 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}'
+            }
+            $content = $content -replace '#define AppVersion ".*"', '#define AppVersion "${{steps.version_num_set.outputs.version}}"'
+            $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta', $replaceWord
+            $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}', $replaceWord
+            echo "Updated installer config is $content"
+            Set-Content -Path Setup/RevitBatchProcessor.iss -Value $content
+          
+      - name: Create installer file
+        id: create_installer_file
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with: 
+          path: Setup/RevitBatchProcessor.iss
+          
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: Setup\Output\RevitBatchProcessorSetup_${{github.event.release.tag_name}}.exe
+          asset_name: RevitBatchProcessorSetup_${{github.event.release.tag_name}}.exe
+          asset_content_type: application/octet-stream
+
+      - name: Update readme with new version
+        env:
+          VERSION_NUM: ${{ steps.version_num_set.outputs.version }}
+          TAG_VALUE: ${{ github.event.release.tag_name }}
+        run: |
+          python $env:GITHUB_WORKSPACE\.github\workflows\update_readme.py
+          
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update version to ${{github.event.release.tag_name}} in README and .iss file"
+          title: '[Actions] Update README and .iss file'
+          body: 'Update version in README'
+          branch: github-actions/update-readme 
