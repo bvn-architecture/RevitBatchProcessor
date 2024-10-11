@@ -51,7 +51,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtUtil.Tests", "BatchRvtUtil.Tests\BatchRvtUtil.Tests.csproj", "{BFD3D072-42A4-4B86-B225-73139D6C95D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9507B984-1FEE-4C24-B8E6-F305588E26DD}"
-
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2025", "BatchRvtAddin2025\BatchRvtAddin2025.csproj", "{F9C773C0-A288-4821-9DC0-E131745B3F39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,14 +190,22 @@ Global
 		{BFD3D072-42A4-4B86-B225-73139D6C95D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BFD3D072-42A4-4B86-B225-73139D6C95D9}.Release|x64.ActiveCfg = Release|Any CPU
 		{BFD3D072-42A4-4B86-B225-73139D6C95D9}.Release|x64.Build.0 = Release|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Debug|x64.Build.0 = Debug|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Release|x64.ActiveCfg = Release|Any CPU
+		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {1D981AC6-C42D-4297-9B98-43CD6A4C78A3}
-	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BFD3D072-42A4-4B86-B225-73139D6C95D9} = {9507B984-1FEE-4C24-B8E6-F305588E26DD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D981AC6-C42D-4297-9B98-43CD6A4C78A3}
 	EndGlobalSection
 EndGlobal

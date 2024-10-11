@@ -68,7 +68,8 @@ public static class BatchRvt
             { RevitVersion.SupportedRevitVersion.Revit2021, "BatchRvtAddin2021.addin" },
             { RevitVersion.SupportedRevitVersion.Revit2022, "BatchRvtAddin2022.addin" },
             { RevitVersion.SupportedRevitVersion.Revit2023, "BatchRvtAddin2023.addin" },
-            { RevitVersion.SupportedRevitVersion.Revit2024, "BatchRvtAddin2024.addin" }
+            { RevitVersion.SupportedRevitVersion.Revit2024, "BatchRvtAddin2024.addin" },
+            { RevitVersion.SupportedRevitVersion.Revit2025, "BatchRvtAddin2025.addin" },
         };
 
 
