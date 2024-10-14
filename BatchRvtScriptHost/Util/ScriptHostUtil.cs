@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 
 namespace BatchRvt.ScriptHost;
@@ -32,11 +31,13 @@ public static class ScriptHostUtil
     public const string BATCH_RVT_ERROR_WINDOW_TITLE = "BatchRvt Script Error";
 
     private const string BatchScriptHostFilename = "revit_script_host.py";
+    private const string BatchScriptHostFilename_2025 = "revit_script_host_2025.py";
     private const string BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = "BATCHRVT__SCRIPTS_FOLDER_PATH";
 
     public static void ExecuteBatchScriptHost(
         string pluginFolderPath,
-        object uiApplicationObject
+        object uiApplicationObject,
+        bool netCore = false
     )
     {
         var environmentVariables = GetEnvironmentVariables();
@@ -57,7 +58,9 @@ public static class ScriptHostUtil
         var mainModuleScope = ScriptUtil.CreateMainModule(engine);
 
         var pluginFullFolderPath = Path.GetFullPath(pluginFolderPath);
-        var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, BatchScriptHostFilename);
+
+        var scriptName = netCore ? BatchScriptHostFilename_2025 : BatchScriptHostFilename;
+        var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, scriptName);
         var batchRvtFolderPath = GetBatchRvtFolderPath(environmentVariables);
 
         ScriptUtil.AddSearchPaths(engine, new[]
@@ -108,18 +111,20 @@ public static class ScriptHostUtil
 
     private static StringDictionary GetEnvironmentVariables()
     {
-        StringDictionary environmentVariables = null;
-
-        // NOTE: Have encountered (at least once) a NullReferenceException upon accessing the EnvironmentVariables property!
         try
         {
-            environmentVariables = Process.GetCurrentProcess().StartInfo.EnvironmentVariables;
-        }
-        catch (NullReferenceException e)
-        {
-            environmentVariables = null;
-        }
+            var environmentVariables = new StringDictionary();
+            var ev = Environment.GetEnvironmentVariables();
+            foreach (string key in ev.Keys)
+            {
+                environmentVariables[key] = ev[key].ToString();
+            }
 
-        return environmentVariables;
+            return environmentVariables;
+        }
+        catch (NullReferenceException)
+        {
+            return null;
+        }
     }
 }
