@@ -244,7 +244,7 @@ def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
             revitVersionNumberText = "2023"
         elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2024):
             revitVersionNumberText = "2024"
-		elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2025):
+        elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2025):
             revitVersionNumberText = "2025"
     return revitVersionNumberText
 
