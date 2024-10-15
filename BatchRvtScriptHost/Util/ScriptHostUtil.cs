@@ -31,7 +31,6 @@ public static class ScriptHostUtil
     public const string BATCH_RVT_ERROR_WINDOW_TITLE = "BatchRvt Script Error";
 
     private const string BatchScriptHostFilename = "revit_script_host.py";
-    private const string BatchScriptHostFilename_2025 = "revit_script_host_2025.py";
     private const string BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = "BATCHRVT__SCRIPTS_FOLDER_PATH";
 
     public static void ExecuteBatchScriptHost(
@@ -52,15 +51,15 @@ public static class ScriptHostUtil
             engine,
             new Dictionary<string, object>
             {
-                { "__revit__", uiApplicationObject }
+                { "__revit__", uiApplicationObject },
+                { "__netCore__", netCore },
             });
 
         var mainModuleScope = ScriptUtil.CreateMainModule(engine);
 
         var pluginFullFolderPath = Path.GetFullPath(pluginFolderPath);
 
-        var scriptName = netCore ? BatchScriptHostFilename_2025 : BatchScriptHostFilename;
-        var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, scriptName);
+        var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, BatchScriptHostFilename);
         var batchRvtFolderPath = GetBatchRvtFolderPath(environmentVariables);
 
         ScriptUtil.AddSearchPaths(engine, new[]

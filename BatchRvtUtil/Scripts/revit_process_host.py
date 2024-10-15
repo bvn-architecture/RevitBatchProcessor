@@ -22,7 +22,9 @@ import clr
 import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
-from System.Diagnostics import Process
+
+if "__netCore__" in globals() and __netCore__:
+    clr.AddReference("System.Diagnostics.Process")
 
 import revit_process
 import script_environment
@@ -47,7 +49,7 @@ def IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
         except Exception, e:
             isTargetProcess = False
         return isTargetProcess
-    batchRvtProcess = Process.GetProcesses().FirstOrDefault(IsBatchRvtProcess)
+    batchRvtProcess = System.Diagnostics.Process.GetProcesses().FirstOrDefault(IsBatchRvtProcess)
     return (batchRvtProcess is not None)
 
 def StartHostRevitProcess(
@@ -59,7 +61,7 @@ def StartHostRevitProcess(
         scriptOutputPipeHandleString,
         testModeFolderPath
     ):
-    batchRvtProcessUniqueId = GetUniqueIdForProcess(Process.GetCurrentProcess())
+    batchRvtProcessUniqueId = GetUniqueIdForProcess(System.Diagnostics.Process.GetCurrentProcess())
     def initEnvironmentVariables(environmentVariables):
         script_environment.InitEnvironmentVariables(
                 environmentVariables,

@@ -20,19 +20,21 @@
 
 import clr
 import System
-from System.Diagnostics import Process, ProcessStartInfo
+
+if "__netCore__" in globals() and __netCore__:
+    clr.AddReference("System.Diagnostics.Process")
 
 import batch_rvt_util
 from batch_rvt_util import RevitVersion
 
 def StartRevitProcess(revitVersion, initEnvironmentVariables):
     revitExecutableFilePath = RevitVersion.GetRevitExecutableFilePath(revitVersion)
-    psi = ProcessStartInfo(revitExecutableFilePath)
+    psi = System.Diagnostics.ProcessStartInfo(revitExecutableFilePath)
     psi.UseShellExecute = False
     psi.RedirectStandardError = True
     psi.RedirectStandardOutput = True
     psi.WorkingDirectory = RevitVersion.GetRevitExecutableFolderPath(revitVersion)
     initEnvironmentVariables(psi.EnvironmentVariables)
-    revitProcess = Process.Start(psi)
+    revitProcess = System.Diagnostics.Process.Start(psi)
     return revitProcess
 

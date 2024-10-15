@@ -169,9 +169,6 @@
     <Content Include="Scripts\global_test_mode.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\revit_script_host_2025.py">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Scripts\test_mode_util.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

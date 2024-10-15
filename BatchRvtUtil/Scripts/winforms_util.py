@@ -20,7 +20,9 @@
 
 import clr
 import System
-from System.Diagnostics import Process
+
+if "__netCore__" in globals() and __netCore__:
+    clr.AddReference("System.Diagnostics.Process")
 
 clr.AddReference("System.Windows.Forms")
 from System.Windows.Forms import MessageBox, IWin32Window, Cursor
@@ -35,7 +37,7 @@ class WindowHandleWrapper(IWin32Window):
         return self.hwnd
     @staticmethod
     def GetMainWindowHandle():
-        return WindowHandleWrapper(Process.GetCurrentProcess().MainWindowHandle)
+        return WindowHandleWrapper(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle)
 
 def SetMousePosition(x, y):
     Cursor.Position = Point(x, y)
