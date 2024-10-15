@@ -72,7 +72,7 @@ namespace BatchRvt.Addin.Revit2025
         {
             try
             {
-                ScriptHostUtil.ExecuteBatchScriptHost(pluginFolderPath_, uiApp, true);
+                ScriptHostUtil.ExecuteBatchScriptHost(pluginFolderPath_, uiApp);
             }
             catch (Exception e)
             {

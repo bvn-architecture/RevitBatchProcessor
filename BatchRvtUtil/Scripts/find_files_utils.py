@@ -21,8 +21,9 @@
 import clr
 import System
 
-if "__netCore__" in globals() and __netCore__:
+try:
     clr.AddReference("System.Diagnostics.Process")
+except: pass
 
 from System.Text import Encoding
 

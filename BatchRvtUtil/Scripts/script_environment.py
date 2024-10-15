@@ -22,8 +22,9 @@ import clr
 import System
 from System import NullReferenceException
 
-if "__netCore__" in globals() and __netCore__:
+try:
 	clr.AddReference("System.Runtime")
+except: pass
 
 
 BATCHRVT_SCRIPTS_FOLDER_PATH__ENVIRONMENT_VARIABLE_NAME = "BATCHRVT__SCRIPTS_FOLDER_PATH"

@@ -35,8 +35,7 @@ public static class ScriptHostUtil
 
     public static void ExecuteBatchScriptHost(
         string pluginFolderPath,
-        object uiApplicationObject,
-        bool netCore = false
+        object uiApplicationObject
     )
     {
         var environmentVariables = GetEnvironmentVariables();
@@ -52,7 +51,6 @@ public static class ScriptHostUtil
             new Dictionary<string, object>
             {
                 { "__revit__", uiApplicationObject },
-                { "__netCore__", netCore },
             });
 
         var mainModuleScope = ScriptUtil.CreateMainModule(engine);

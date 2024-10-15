@@ -23,8 +23,9 @@ import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
-if "__netCore__" in globals() and __netCore__:
+try:
     clr.AddReference("System.Diagnostics.Process")
+except: pass
 
 clr.AddReference("System.Windows.Forms")
 from System.Windows.Forms import Application
