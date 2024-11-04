@@ -25,7 +25,11 @@ from System import EventHandler
 from System.Text import StringBuilder
 
 clr.AddReference("RevitAPIUI")
-from Autodesk.Revit.UI.Events import DialogBoxShowingEventArgs, TaskDialogShowingEventArgs, MessageBoxShowingEventArgs
+from Autodesk.Revit.UI.Events import (
+    DialogBoxShowingEventArgs,
+    TaskDialogShowingEventArgs,
+    MessageBoxShowingEventArgs,
+)
 
 import exception_util
 
@@ -35,6 +39,7 @@ IDYES = 6
 IDNO = 7
 IDCLOSE = 8
 
+
 def Try(action):
     result = None
     try:
@@ -42,6 +47,7 @@ def Try(action):
     except:
         pass
     return result
+
 
 def DialogShowingEventHandler(sender, eventArgs, output):
     try:
@@ -53,21 +59,23 @@ def DialogShowingEventHandler(sender, eventArgs, output):
         if isinstance(eventArgs, TaskDialogShowingEventArgs):
             msg.AppendLine("\tMessage: " + str(eventArgs.Message))
             if eventArgs.DialogId == "TaskDialog_Missing_Third_Party_Updater":
-                dialogResult = 1001 # Continue working with the file.
+                dialogResult = 1001  # Continue working with the file.
             elif eventArgs.DialogId == "TaskDialog_Location_Position_Changed":
-                dialogResult = 1002 # Do not save.
+                dialogResult = 1002  # Do not save.
         elif isinstance(eventArgs, MessageBoxShowingEventArgs):
             msg.AppendLine("\tMessage: " + str(eventArgs.Message))
             msg.AppendLine("\tDialogType: " + str(eventArgs.DialogType))
-        dialogId = Try(lambda: eventArgs.DialogId) # Available on DialogBoxShowingEventArgs in Revit 2017+
+        dialogId = Try(
+            lambda: eventArgs.DialogId
+        )  # Available on DialogBoxShowingEventArgs in Revit 2017+
         if dialogId is not None:
             msg.AppendLine("\tDialogId: " + str(dialogId))
-        helpId = Try(lambda: eventArgs.HelpId) # No longer available in Revit 2018+
+        helpId = Try(lambda: eventArgs.HelpId)  # No longer available in Revit 2018+
         if helpId is not None:
             msg.AppendLine("\tHelpId: " + str(helpId))
         output(msg.ToString())
         eventArgs.OverrideResult(dialogResult)
-    except Exception, e:
+    except Exception as e:
         errorMsg = StringBuilder()
         errorMsg.AppendLine()
         errorMsg.AppendLine("Caught exception in dialog event handler!")
@@ -76,17 +84,15 @@ def DialogShowingEventHandler(sender, eventArgs, output):
         exception_util.LogOutputErrorDetails(e, output)
     return
 
+
 def WithDialogBoxShowingHandler(uiapp, action, output):
     result = None
-    dialogShowingEventHandler = (
-            EventHandler[DialogBoxShowingEventArgs](
-                    lambda sender, eventArgs: DialogShowingEventHandler(sender, eventArgs, output)
-                )
-        )
+    dialogShowingEventHandler = EventHandler[DialogBoxShowingEventArgs](
+        lambda sender, eventArgs: DialogShowingEventHandler(sender, eventArgs, output)
+    )
     uiapp.DialogBoxShowing += dialogShowingEventHandler
     try:
         result = action()
     finally:
         uiapp.DialogBoxShowing -= dialogShowingEventHandler
     return result
-

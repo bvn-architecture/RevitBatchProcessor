@@ -29,7 +29,7 @@
             
             try:
                 raise Exception()
-            except Exception, e:
+            except Exception as e:
                 # do something here
                 raise
                 

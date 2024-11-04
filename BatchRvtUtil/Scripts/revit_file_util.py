@@ -328,7 +328,7 @@ def TryGetBasicFileInfo(revitFilePath):
     basicFileInfo = None
     try:
         basicFileInfo = BasicFileInfo.Extract(revitFilePath)
-    except Exception, e:
+    except Exception as e:
         basicfileInfo = None
     return basicFileInfo
 

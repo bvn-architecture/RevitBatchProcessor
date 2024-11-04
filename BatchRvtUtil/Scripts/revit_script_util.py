@@ -163,7 +163,7 @@ def WithExceptionLogging(action, output):
     result = None
     try:
         result = action()
-    except Exception, e:
+    except Exception as e:
         exception_util.LogOutputErrorDetails(e, output)
         raise
     return result
@@ -210,7 +210,7 @@ def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
         output("WARNING: Couldn't close the document!")
         output()
         output(str(e.Message))
-    except Exception, e:
+    except Exception as e:
         output()
         output("WARNING: Couldn't close the document!")
         exception_util.LogOutputErrorDetails(e, output, False)

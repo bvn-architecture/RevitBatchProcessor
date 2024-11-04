@@ -35,31 +35,47 @@ import exception_util
 
 REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX = "[ REVIT WARNINGS HANDLER ]"
 
+
 def ElementIdsToSemicolonDelimitedText(elementIds):
     return str.Join("; ", [str(elementId.IntegerValue) for elementId in elementIds])
+
 
 def ReportFailureWarning(failure, failureDefinition, output):
     failureSeverity = failure.GetSeverity()
     # TODO: more thorough reporting?
     output()
     output(
-            "\t" +
-            str(failureSeverity) +
-            " - " +
-            str(failure.GetDescriptionText()) +
-            " - " +
-            "(" + "GUID: " + str(failure.GetFailureDefinitionId().Guid) + ")"
-        )
+        "\t"
+        + str(failureSeverity)
+        + " - "
+        + str(failure.GetDescriptionText())
+        + " - "
+        + "("
+        + "GUID: "
+        + str(failure.GetFailureDefinitionId().Guid)
+        + ")"
+    )
 
-    if failureSeverity == FailureSeverity.Error or failureSeverity == FailureSeverity.Warning:
+    if (
+        failureSeverity == FailureSeverity.Error
+        or failureSeverity == FailureSeverity.Warning
+    ):
         failingElementIds = failure.GetFailingElementIds()
         if len(failingElementIds) > 0:
             output()
-            output("\t" + "Failing element ids: " + ElementIdsToSemicolonDelimitedText(failingElementIds))
+            output(
+                "\t"
+                + "Failing element ids: "
+                + ElementIdsToSemicolonDelimitedText(failingElementIds)
+            )
         additionalElementIds = failure.GetAdditionalElementIds()
         if len(additionalElementIds) > 0:
             output()
-            output("\t" + "Additional element ids: " + ElementIdsToSemicolonDelimitedText(additionalElementIds))
+            output(
+                "\t"
+                + "Additional element ids: "
+                + ElementIdsToSemicolonDelimitedText(additionalElementIds)
+            )
 
     if failureSeverity == FailureSeverity.Error:
         if failure.HasResolutions():
@@ -69,17 +85,24 @@ def ReportFailureWarning(failure, failureDefinition, output):
             defaultResolutionType = failureDefinition.GetDefaultResolutionType()
             for resolutionType in failureDefinition.GetApplicableResolutionTypes():
                 output(
-                        "\t\t" +
-                        str(resolutionType) +
-                        (" (Default)" if (resolutionType == defaultResolutionType) else str.Empty) +
-                        " - " +
-                        "'" + failureDefinition.GetResolutionCaption(resolutionType) + "'"
+                    "\t\t"
+                    + str(resolutionType)
+                    + (
+                        " (Default)"
+                        if (resolutionType == defaultResolutionType)
+                        else str.Empty
                     )
+                    + " - "
+                    + "'"
+                    + failureDefinition.GetResolutionCaption(resolutionType)
+                    + "'"
+                )
         else:
             output()
             output("\t" + "WARNING: no resolutions available")
 
     return
+
 
 def ProcessFailures(failuresAccessor, output, rollBackOnWarning=False):
     try:
@@ -90,46 +113,71 @@ def ProcessFailures(failuresAccessor, output, rollBackOnWarning=False):
         failures = failuresAccessor.GetFailureMessages()
         if failures.Any():
             output()
-            output("Processing Revit document warnings / failures (" + str(failures.Count) + "):")
+            output(
+                "Processing Revit document warnings / failures ("
+                + str(failures.Count)
+                + "):"
+            )
             for failure in failures:
-                failureDefinition = failureReg.FindFailureDefinition(failure.GetFailureDefinitionId())
+                failureDefinition = failureReg.FindFailureDefinition(
+                    failure.GetFailureDefinitionId()
+                )
                 ReportFailureWarning(failure, failureDefinition, output)
                 failureSeverity = failure.GetSeverity()
                 if failureSeverity == FailureSeverity.Warning and not rollBackOnWarning:
                     failuresAccessor.DeleteWarning(failure)
                 elif (
-                        failureSeverity == FailureSeverity.Error
-                        and
-                        failure.HasResolutions()
-                        and
-                        result != FailureProcessingResult.ProceedWithRollBack
-                        and
-                        not rollBackOnWarning
-                    ):
+                    failureSeverity == FailureSeverity.Error
+                    and failure.HasResolutions()
+                    and result != FailureProcessingResult.ProceedWithRollBack
+                    and not rollBackOnWarning
+                ):
                     # If Unlock Constraints is a valid resolution type for the current failure, use it.
-                    if failure.HasResolutionOfType(FailureResolutionType.UnlockConstraints):
-                        failure.SetCurrentResolutionType(FailureResolutionType.UnlockConstraints)
-                    elif failureDefinition.IsResolutionApplicable(FailureResolutionType.UnlockConstraints):
+                    if failure.HasResolutionOfType(
+                        FailureResolutionType.UnlockConstraints
+                    ):
+                        failure.SetCurrentResolutionType(
+                            FailureResolutionType.UnlockConstraints
+                        )
+                    elif failureDefinition.IsResolutionApplicable(
+                        FailureResolutionType.UnlockConstraints
+                    ):
                         output()
-                        output("\t" + "WARNING: UnlockConstraints is not a valid resolution for this failure despite the definition reporting that it is an applicable resolution!")
-                    elif failure.HasResolutionOfType(FailureResolutionType.DetachElements):
-                        failure.SetCurrentResolutionType(FailureResolutionType.DetachElements)
-                    elif failure.HasResolutionOfType(FailureResolutionType.SkipElements):
-                        failure.SetCurrentResolutionType(FailureResolutionType.SkipElements)
+                        output(
+                            "\t"
+                            + "WARNING: UnlockConstraints is not a valid resolution for this failure despite the definition reporting that it is an applicable resolution!"
+                        )
+                    elif failure.HasResolutionOfType(
+                        FailureResolutionType.DetachElements
+                    ):
+                        failure.SetCurrentResolutionType(
+                            FailureResolutionType.DetachElements
+                        )
+                    elif failure.HasResolutionOfType(
+                        FailureResolutionType.SkipElements
+                    ):
+                        failure.SetCurrentResolutionType(
+                            FailureResolutionType.SkipElements
+                        )
                     output()
-                    output("\t" + "Attempting to resolve error using resolution: " + str(failure.GetCurrentResolutionType()))
+                    output(
+                        "\t"
+                        + "Attempting to resolve error using resolution: "
+                        + str(failure.GetCurrentResolutionType())
+                    )
                     failuresAccessor.ResolveFailure(failure)
                     result = FailureProcessingResult.ProceedWithCommit
                 else:
                     result = FailureProcessingResult.ProceedWithRollBack
         else:
             result = FailureProcessingResult.Continue
-    except Exception, e:
+    except Exception as e:
         output()
         output("ERROR: the failure handler generated an error!")
         exception_util.LogOutputErrorDetails(e, output)
         result = FailureProcessingResult.Continue
     return result
+
 
 class FailuresPreprocessor(IFailuresPreprocessor):
     def __init__(self, output):
@@ -140,6 +188,7 @@ class FailuresPreprocessor(IFailuresPreprocessor):
         result = ProcessFailures(failuresAccessor, self.output)
         return result
 
+
 def SetTransactionFailureOptions(transaction, output):
     failureOptions = transaction.GetFailureHandlingOptions()
     failureOptions.SetForcedModalHandling(True)
@@ -148,12 +197,14 @@ def SetTransactionFailureOptions(transaction, output):
     transaction.SetFailureHandlingOptions(failureOptions)
     return
 
+
 def SetFailuresAccessorFailureOptions(failuresAccessor):
     failureOptions = failuresAccessor.GetFailureHandlingOptions()
     failureOptions.SetForcedModalHandling(True)
     failureOptions.SetClearAfterRollback(True)
     failuresAccessor.SetFailureHandlingOptions(failureOptions)
     return
+
 
 def FailuresProcessingEventHandler(sender, args, output):
     app = sender
@@ -163,18 +214,18 @@ def FailuresProcessingEventHandler(sender, args, output):
     args.SetProcessingResult(result)
     return
 
+
 def WithFailuresProcessingHandler(app, action, output_):
-    output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX)
+    output = global_test_mode.PrefixedOutputForGlobalTestMode(
+        output_, REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX
+    )
     result = None
-    failuresProcessingEventHandler = (
-            EventHandler[FailuresProcessingEventArgs](
-                    lambda sender, args: FailuresProcessingEventHandler(sender, args, output)
-                )
-        )
+    failuresProcessingEventHandler = EventHandler[FailuresProcessingEventArgs](
+        lambda sender, args: FailuresProcessingEventHandler(sender, args, output)
+    )
     app.FailuresProcessing += failuresProcessingEventHandler
     try:
         result = action()
     finally:
         app.FailuresProcessing -= failuresProcessingEventHandler
     return result
-

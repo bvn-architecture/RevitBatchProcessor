@@ -20,12 +20,14 @@
 
 import clr
 import System
+
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
 try:
     clr.AddReference("System.Diagnostics.Process")
-except: pass
+except:
+    pass
 
 import revit_process
 import script_environment
@@ -37,43 +39,51 @@ PROCESS_UNIQUE_ID_DELIMITER = "|"
 
 def GetUniqueIdForProcess(process):
     return str.Join(
-            PROCESS_UNIQUE_ID_DELIMITER,
-            process.Id.ToString(),
-            time_util.GetISO8601FormattedUtcDate(process.StartTime)
-        )
+        PROCESS_UNIQUE_ID_DELIMITER,
+        process.Id.ToString(),
+        time_util.GetISO8601FormattedUtcDate(process.StartTime),
+    )
+
 
 def IsBatchRvtProcessRunning(batchRvtProcessUniqueId):
     def IsBatchRvtProcess(process):
         isTargetProcess = False
         try:
-            isTargetProcess = (GetUniqueIdForProcess(process) == batchRvtProcessUniqueId)
-        except Exception, e:
+            isTargetProcess = GetUniqueIdForProcess(process) == batchRvtProcessUniqueId
+        except Exception as e:
             isTargetProcess = False
         return isTargetProcess
-    batchRvtProcess = System.Diagnostics.Process.GetProcesses().FirstOrDefault(IsBatchRvtProcess)
-    return (batchRvtProcess is not None)
+
+    batchRvtProcess = System.Diagnostics.Process.GetProcesses().FirstOrDefault(
+        IsBatchRvtProcess
+    )
+    return batchRvtProcess is not None
+
 
 def StartHostRevitProcess(
-        revitVersion,
-        batchRvtScriptsFolderPath,
-        scriptFilePath,
-        scriptDataFilePath,
-        progressNumber,
-        scriptOutputPipeHandleString,
-        testModeFolderPath
-    ):
-    batchRvtProcessUniqueId = GetUniqueIdForProcess(System.Diagnostics.Process.GetCurrentProcess())
+    revitVersion,
+    batchRvtScriptsFolderPath,
+    scriptFilePath,
+    scriptDataFilePath,
+    progressNumber,
+    scriptOutputPipeHandleString,
+    testModeFolderPath,
+):
+    batchRvtProcessUniqueId = GetUniqueIdForProcess(
+        System.Diagnostics.Process.GetCurrentProcess()
+    )
+
     def initEnvironmentVariables(environmentVariables):
         script_environment.InitEnvironmentVariables(
-                environmentVariables,
-                batchRvtScriptsFolderPath,
-                scriptFilePath,
-                scriptDataFilePath,
-                progressNumber,
-                scriptOutputPipeHandleString,
-                batchRvtProcessUniqueId,
-                testModeFolderPath
-            )
+            environmentVariables,
+            batchRvtScriptsFolderPath,
+            scriptFilePath,
+            scriptDataFilePath,
+            progressNumber,
+            scriptOutputPipeHandleString,
+            batchRvtProcessUniqueId,
+            testModeFolderPath,
+        )
         return
-    return revit_process.StartRevitProcess(revitVersion, initEnvironmentVariables)
 
+    return revit_process.StartRevitProcess(revitVersion, initEnvironmentVariables)

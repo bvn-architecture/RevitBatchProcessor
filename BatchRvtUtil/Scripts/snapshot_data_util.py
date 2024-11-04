@@ -37,73 +37,99 @@ SNAPSHOT_DATA_FILENAME = "snapshot.json"
 TEMP_SNAPSHOT_DATA_FILENAME = "temp_snapshot.json"
 SNAPSHOT_DATA__REVIT_JOURNAL_FILE = "revitJournalFile"
 
+
 def GetUnknownProjectUniqueFolderName():
     return Path.GetRandomFileName().Replace(".", str.Empty).ToUpper()
+
 
 def GetSnapshotFolderName(timestamp):
     folderName = timestamp.ToString(SNAPSHOT_FOLDER_NAME_FORMAT)
     return folderName
 
+
 def GetRevitModelName(revitFilePath):
     return Path.GetFileNameWithoutExtension(revitFilePath)
+
 
 def GetRevitFileVersionDetails(revitFilePath):
     revitFileInfo = revit_file_list.RevitFileInfo(revitFilePath)
     revitFileVersionDetails = revitFileInfo.TryGetRevitVersionText()
     return revitFileVersionDetails
 
+
 def GetSnapshotFolderPath(
-        dataExportFolderPath,
-        revitFilePath,
-        isCloudModel,
-        cloudProjectId,
-        cloudModelId,
-        timestamp
-    ):
+    dataExportFolderPath,
+    revitFilePath,
+    isCloudModel,
+    cloudProjectId,
+    cloudModelId,
+    timestamp,
+):
     snapshotFolderName = GetSnapshotFolderName(timestamp.ToLocalTime())
     if isCloudModel:
-        snapshotFolderPath = Path.Combine(dataExportFolderPath, cloudProjectId, cloudModelId, snapshotFolderName)
+        snapshotFolderPath = Path.Combine(
+            dataExportFolderPath, cloudProjectId, cloudModelId, snapshotFolderName
+        )
     else:
-        projectFolderName = path_util.GetProjectFolderNameFromRevitProjectFilePath(revitFilePath)
+        projectFolderName = path_util.GetProjectFolderNameFromRevitProjectFilePath(
+            revitFilePath
+        )
         if projectFolderName is None:
             projectFolderName = GetUnknownProjectUniqueFolderName()
         modelName = GetRevitModelName(revitFilePath)
-        snapshotFolderPath = Path.Combine(dataExportFolderPath, projectFolderName, modelName, snapshotFolderName)
+        snapshotFolderPath = Path.Combine(
+            dataExportFolderPath, projectFolderName, modelName, snapshotFolderName
+        )
     return snapshotFolderPath
+
 
 def GetSnapshotDataFilePath(snapshotDataFolderPath):
     return Path.Combine(snapshotDataFolderPath, SNAPSHOT_DATA_FILENAME)
 
+
 def GetTemporarySnapshotDataFilePath(snapshotDataFolderPath):
     return Path.Combine(snapshotDataFolderPath, TEMP_SNAPSHOT_DATA_FILENAME)
+
 
 def ReadSnapshotDataRevitJournalFilePath(snapshotDataFilePath):
     text = text_file_util.ReadFromTextFile(snapshotDataFilePath)
     jobjectSnapshotData = json_util.DeserializeToJObject(text)
     return jobjectSnapshotData[SNAPSHOT_DATA__REVIT_JOURNAL_FILE].ToObject[str]()
 
+
 def CopySnapshotRevitJournalFile(snapshotDataFolderPath, output):
     revitJournalFilePath = None
     try:
         snapshotDataFilePath = GetSnapshotDataFilePath(snapshotDataFolderPath)
-        revitJournalFilePath = ReadSnapshotDataRevitJournalFilePath(snapshotDataFilePath)
-    except Exception, e:
+        revitJournalFilePath = ReadSnapshotDataRevitJournalFilePath(
+            snapshotDataFilePath
+        )
+    except Exception as e:
         output()
         output("WARNING: failed to read journal file path from snapshot data file.")
         exception_util.LogOutputErrorDetails(e, output)
         output()
-        output("Attempting to read journal file path from temporary snapshot data file instead.")
+        output(
+            "Attempting to read journal file path from temporary snapshot data file instead."
+        )
         snapshotDataFilePath = GetTemporarySnapshotDataFilePath(snapshotDataFolderPath)
-        revitJournalFilePath = ReadSnapshotDataRevitJournalFilePath(snapshotDataFilePath)
+        revitJournalFilePath = ReadSnapshotDataRevitJournalFilePath(
+            snapshotDataFilePath
+        )
     revitJournalFileName = Path.GetFileName(revitJournalFilePath)
-    snapshotRevitJournalFilePath = Path.Combine(snapshotDataFolderPath, revitJournalFileName)
+    snapshotRevitJournalFilePath = Path.Combine(
+        snapshotDataFolderPath, revitJournalFileName
+    )
     File.Copy(revitJournalFilePath, snapshotRevitJournalFilePath)
     return
+
 
 def ConsolidateSnapshotData(dataExportFolderPath, output):
     try:
         snapshotDataFilePath = GetSnapshotDataFilePath(dataExportFolderPath)
-        temporarySnapshotDataFilePath = GetTemporarySnapshotDataFilePath(dataExportFolderPath)
+        temporarySnapshotDataFilePath = GetTemporarySnapshotDataFilePath(
+            dataExportFolderPath
+        )
         if File.Exists(snapshotDataFilePath):
             if File.Exists(temporarySnapshotDataFilePath):
                 File.Delete(temporarySnapshotDataFilePath)
@@ -111,14 +137,15 @@ def ConsolidateSnapshotData(dataExportFolderPath, output):
             File.Move(temporarySnapshotDataFilePath, snapshotDataFilePath)
         else:
             output()
-            output("WARNING: could not find snapshot data file in snapshot data folder:")
+            output(
+                "WARNING: could not find snapshot data file in snapshot data folder:"
+            )
             output()
             output("\t" + dataExportFolderPath)
-    except Exception, e:
+    except Exception as e:
         output()
         output("WARNING: failed to properly consolidate the snapshot data in folder:")
         output()
         output("\t" + dataExportFolderPath)
         exception_util.LogOutputErrorDetails(e, output)
     return
-

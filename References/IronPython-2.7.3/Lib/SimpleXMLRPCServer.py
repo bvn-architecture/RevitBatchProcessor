@@ -502,7 +502,7 @@ class SimpleXMLRPCRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             response = self.server._marshaled_dispatch(
                     data, getattr(self, '_dispatch', None), self.path
                 )
-        except Exception, e: # This should only happen if the module is buggy
+        except Exception as e: # This should only happen if the module is buggy
             # internal error, report as HTTP server error
             self.send_response(500)
 

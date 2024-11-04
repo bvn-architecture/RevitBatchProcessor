@@ -20,6 +20,7 @@
 
 import clr
 import System
+
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
@@ -49,26 +50,39 @@ def ShowSupportedRevitFileInfo(supportedRevitFileInfo):
         revitCloudModelInfo = supportedRevitFileInfo.GetRevitCloudModelInfo()
         projectGuidText = revitCloudModelInfo.GetProjectGuid().ToString()
         modelGuidText = revitCloudModelInfo.GetModelGuid().ToString()
-        message += ("\t" + "CLOUD MODEL\n")
-        message += ("\t" + "Project ID: " + projectGuidText + "\n")
-        message += ("\t" + "Model ID: " + modelGuidText + "\n")
+        message += "\t" + "CLOUD MODEL\n"
+        message += "\t" + "Project ID: " + projectGuidText + "\n"
+        message += "\t" + "Model ID: " + modelGuidText + "\n"
         revitVersionText = supportedRevitFileInfo.TryGetRevitVersionText()
-        revitVersionText = revitVersionText if not str.IsNullOrWhiteSpace(revitVersionText) else "NOT SPECIFIED!"
-        message += ("\t" + "Revit version: " + revitVersionText + "\n")
+        revitVersionText = (
+            revitVersionText
+            if not str.IsNullOrWhiteSpace(revitVersionText)
+            else "NOT SPECIFIED!"
+        )
+        message += "\t" + "Revit version: " + revitVersionText + "\n"
     else:
         revitFileInfo = supportedRevitFileInfo.GetRevitFileInfo()
         revitFilePath = revitFileInfo.GetFullPath()
         fileExists = revitFileInfo.Exists()
         fileSize = revitFileInfo.GetFileSize()
-        fileSizeText = str.Format("{0:0.00}MB", fileSize / (1024.0 * 1024.0)) if fileSize is not None else "<UNKNOWN>"
-        message += ("\t" + revitFilePath + "\n")
-        message += ("\t" + "File exists: " + ("YES" if fileExists else "NO") + "\n")
-        message += ("\t" + "File size: " + fileSizeText + "\n")
+        fileSizeText = (
+            str.Format("{0:0.00}MB", fileSize / (1024.0 * 1024.0))
+            if fileSize is not None
+            else "<UNKNOWN>"
+        )
+        message += "\t" + revitFilePath + "\n"
+        message += "\t" + "File exists: " + ("YES" if fileExists else "NO") + "\n"
+        message += "\t" + "File size: " + fileSizeText + "\n"
         if fileExists:
             revitVersionText = revitFileInfo.TryGetRevitVersionText()
-            revitVersionText = revitVersionText if not str.IsNullOrWhiteSpace(revitVersionText) else "NOT DETECTED!"
-            message += ("\t" + "Revit version: " + revitVersionText + "\n")
+            revitVersionText = (
+                revitVersionText
+                if not str.IsNullOrWhiteSpace(revitVersionText)
+                else "NOT DETECTED!"
+            )
+            message += "\t" + "Revit version: " + revitVersionText + "\n"
     return message
+
 
 def UsingClientHandle(serverStream, action):
     result = None
@@ -78,76 +92,92 @@ def UsingClientHandle(serverStream, action):
         serverStream.DisposeLocalCopyOfClientHandle()
     return result
 
+
 def ShowRevitScriptOutput(scriptOutputStream, output, pendingReadLineTask=None):
-    outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(scriptOutputStream, pendingReadLineTask)
+    outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(
+        scriptOutputStream, pendingReadLineTask
+    )
     if outputLines.Any():
         for line in outputLines:
             output("\t" + "- " + line)
     return pendingReadLineTask
 
+
 def ShowRevitProcessOutput(processOutputStream, output, pendingReadLineTask=None):
-    outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(processOutputStream, pendingReadLineTask)
+    outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(
+        processOutputStream, pendingReadLineTask
+    )
     if outputLines.Any():
         for line in outputLines:
-            if False: # Change to True to see Revit standard output (non-script output)
+            if False:  # Change to True to see Revit standard output (non-script output)
                 output("\t" + "- [ REVIT MESSAGE ] : " + line)
     return pendingReadLineTask
 
-def ShowRevitProcessError(processErrorStream, showRevitProcessErrorMessages, output, pendingReadLineTask=None):
-    outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(processErrorStream, pendingReadLineTask)
+
+def ShowRevitProcessError(
+    processErrorStream, showRevitProcessErrorMessages, output, pendingReadLineTask=None
+):
+    outputLines, pendingReadLineTask = stream_io_util.ReadAvailableLines(
+        processErrorStream, pendingReadLineTask
+    )
     if outputLines.Any():
         for line in outputLines:
-            if line.StartsWith("log4cplus:"): # ignore pesky log4cplus messages (an Autodesk thing?)
+            if line.StartsWith(
+                "log4cplus:"
+            ):  # ignore pesky log4cplus messages (an Autodesk thing?)
                 pass
             elif showRevitProcessErrorMessages:
                 output("\t" + "- [ REVIT ERROR MESSAGE ] : " + line)
     return pendingReadLineTask
 
+
 def TerminateHostRevitProcess(hostRevitProcess, output):
     try:
         hostRevitProcess.Kill()
-    except Exception, e:
+    except Exception as e:
         output()
         output("ERROR: an error occurred while attempting to kill the Revit process!")
         exception_util.LogOutputErrorDetails(e, output)
     return
 
+
 def RunScriptedRevitSession(
-        revitVersion,
-        batchRvtScriptsFolderPath,
-        scriptFilePath,
-        scriptDatas,
-        progressNumber,
-        processingTimeOutInMinutes,
-        showRevitProcessErrorMessages,
-        testModeFolderPath,
-        output
-    ):
+    revitVersion,
+    batchRvtScriptsFolderPath,
+    scriptFilePath,
+    scriptDatas,
+    progressNumber,
+    processingTimeOutInMinutes,
+    showRevitProcessErrorMessages,
+    testModeFolderPath,
+    output,
+):
     scriptDataFilePath = ScriptDataUtil.GetUniqueScriptDataFilePath()
     ScriptDataUtil.SaveManyToFile(scriptDataFilePath, scriptDatas)
-    progressRecordFilePath = ScriptDataUtil.GetProgressRecordFilePath(scriptDataFilePath)
+    progressRecordFilePath = ScriptDataUtil.GetProgressRecordFilePath(
+        scriptDataFilePath
+    )
 
     serverStream = server_util.CreateAnonymousPipeServer(
-            server_util.IN,
-            server_util.HandleInheritability.Inheritable
-        )
-    
+        server_util.IN, server_util.HandleInheritability.Inheritable
+    )
+
     def serverStreamAction():
         scriptOutputStreamReader = stream_io_util.GetStreamReader(serverStream)
-        
+
         def streamReaderAction():
             scriptOutputPipeHandleString = serverStream.GetClientHandleAsString()
 
             def clientHandleAction():
                 hostRevitProcess = revit_process_host.StartHostRevitProcess(
-                        revitVersion,
-                        batchRvtScriptsFolderPath,
-                        scriptFilePath,
-                        scriptDataFilePath,
-                        progressNumber,
-                        scriptOutputPipeHandleString,
-                        testModeFolderPath
-                    )
+                    revitVersion,
+                    batchRvtScriptsFolderPath,
+                    scriptFilePath,
+                    scriptDataFilePath,
+                    progressNumber,
+                    scriptOutputPipeHandleString,
+                    testModeFolderPath,
+                )
                 return hostRevitProcess
 
             hostRevitProcess = UsingClientHandle(serverStream, clientHandleAction)
@@ -157,75 +187,131 @@ def RunScriptedRevitSession(
             global_test_mode.ExportRevitProcessId(hostRevitProcessId)
 
             snapshotDataFilePaths = [
-                    snapshot_data_util.GetSnapshotDataFilePath(scriptData.DataExportFolderPath.GetValue())
-                    for scriptData in scriptDatas
-                ]
+                snapshot_data_util.GetSnapshotDataFilePath(
+                    scriptData.DataExportFolderPath.GetValue()
+                )
+                for scriptData in scriptDatas
+            ]
 
-            pendingReadLineTask = [None] # Needs to be a list so it can be captured by reference in closures.
-            pendingProcessOutputReadLineTask = [None] # As above.
-            pendingProcessErrorReadLineTask = [None] # As above.
-            
-            snapshotDataFilesExistTimestamp = [None] # Needs to be a list so it can be captured by reference in closures.
+            pendingReadLineTask = [
+                None
+            ]  # Needs to be a list so it can be captured by reference in closures.
+            pendingProcessOutputReadLineTask = [None]  # As above.
+            pendingProcessErrorReadLineTask = [None]  # As above.
 
-            currentProgressRecordNumber = [0]  # Needs to be a list so it can be captured by reference in closures.
-            progressRecordCheckTimeUtc = [time_util.GetDateTimeUtcNow()] # As above.
-            progressRecordChangedTimeUtc = [time_util.GetDateTimeUtcNow()] # As above.
+            snapshotDataFilesExistTimestamp = [
+                None
+            ]  # Needs to be a list so it can be captured by reference in closures.
+
+            currentProgressRecordNumber = [
+                0
+            ]  # Needs to be a list so it can be captured by reference in closures.
+            progressRecordCheckTimeUtc = [time_util.GetDateTimeUtcNow()]  # As above.
+            progressRecordChangedTimeUtc = [time_util.GetDateTimeUtcNow()]  # As above.
 
             def monitoringAction():
-                pendingProcessOutputReadLineTask[0] = ShowRevitProcessOutput(hostRevitProcess.StandardOutput, output, pendingProcessOutputReadLineTask[0])
-                pendingProcessErrorReadLineTask[0] = ShowRevitProcessError(hostRevitProcess.StandardError, showRevitProcessErrorMessages, output, pendingProcessErrorReadLineTask[0])
-                pendingReadLineTask[0] = ShowRevitScriptOutput(scriptOutputStreamReader, output, pendingReadLineTask[0])
-                
-                if time_util.GetSecondsElapsedSinceUtc(progressRecordCheckTimeUtc[0]) > REVIT_PROGRESS_CHECK_INTERVAL_IN_SECONDS:
+                pendingProcessOutputReadLineTask[0] = ShowRevitProcessOutput(
+                    hostRevitProcess.StandardOutput,
+                    output,
+                    pendingProcessOutputReadLineTask[0],
+                )
+                pendingProcessErrorReadLineTask[0] = ShowRevitProcessError(
+                    hostRevitProcess.StandardError,
+                    showRevitProcessErrorMessages,
+                    output,
+                    pendingProcessErrorReadLineTask[0],
+                )
+                pendingReadLineTask[0] = ShowRevitScriptOutput(
+                    scriptOutputStreamReader, output, pendingReadLineTask[0]
+                )
+
+                if (
+                    time_util.GetSecondsElapsedSinceUtc(progressRecordCheckTimeUtc[0])
+                    > REVIT_PROGRESS_CHECK_INTERVAL_IN_SECONDS
+                ):
                     progressRecordCheckTimeUtc[0] = time_util.GetDateTimeUtcNow()
-                    progressRecordNumber = ScriptDataUtil.GetProgressNumber(progressRecordFilePath)
+                    progressRecordNumber = ScriptDataUtil.GetProgressNumber(
+                        progressRecordFilePath
+                    )
                     if progressRecordNumber is not None:
                         if currentProgressRecordNumber[0] != progressRecordNumber:
                             # Progress update detected.
                             currentProgressRecordNumber[0] = progressRecordNumber
-                            progressRecordChangedTimeUtc[0] = time_util.GetDateTimeUtcNow()
+                            progressRecordChangedTimeUtc[0] = (
+                                time_util.GetDateTimeUtcNow()
+                            )
 
                 if processingTimeOutInMinutes > 0:
                     if currentProgressRecordNumber[0] != 0:
-                        if time_util.GetSecondsElapsedSinceUtc(progressRecordChangedTimeUtc[0]) > (processingTimeOutInMinutes * SECONDS_PER_MINUTE):
+                        if time_util.GetSecondsElapsedSinceUtc(
+                            progressRecordChangedTimeUtc[0]
+                        ) > (processingTimeOutInMinutes * SECONDS_PER_MINUTE):
                             output()
-                            output("WARNING: Timed-out waiting for Revit task / file to be processed. Forcibly terminating the Revit process...")
+                            output(
+                                "WARNING: Timed-out waiting for Revit task / file to be processed. Forcibly terminating the Revit process..."
+                            )
                             TerminateHostRevitProcess(hostRevitProcess, output)
 
                 if currentProgressRecordNumber[0] == 0:
-                    if time_util.GetSecondsElapsedSinceUtc(progressRecordChangedTimeUtc[0]) > REVIT_PROCESS_BEGIN_PROCESSING_TIMEOUT_IN_SECONDS:
+                    if (
+                        time_util.GetSecondsElapsedSinceUtc(
+                            progressRecordChangedTimeUtc[0]
+                        )
+                        > REVIT_PROCESS_BEGIN_PROCESSING_TIMEOUT_IN_SECONDS
+                    ):
                         output()
-                        output("WARNING: Timed-out waiting for Revit script host to begin task / file processing. Forcibly terminating the Revit process...")
+                        output(
+                            "WARNING: Timed-out waiting for Revit script host to begin task / file processing. Forcibly terminating the Revit process..."
+                        )
                         TerminateHostRevitProcess(hostRevitProcess, output)
 
                 if snapshotDataFilesExistTimestamp[0] is not None:
-                    if time_util.GetSecondsElapsedSinceUtc(snapshotDataFilesExistTimestamp[0]) > REVIT_PROCESS_EXIT_TIMEOUT_IN_SECONDS:
+                    if (
+                        time_util.GetSecondsElapsedSinceUtc(
+                            snapshotDataFilesExistTimestamp[0]
+                        )
+                        > REVIT_PROCESS_EXIT_TIMEOUT_IN_SECONDS
+                    ):
                         output()
-                        output("WARNING: Timed-out waiting for the Revit process to exit. Forcibly terminating the Revit process...")
+                        output(
+                            "WARNING: Timed-out waiting for the Revit process to exit. Forcibly terminating the Revit process..."
+                        )
                         TerminateHostRevitProcess(hostRevitProcess, output)
-                elif snapshotDataFilePaths.All(lambda snapshotDataFilePath: File.Exists(snapshotDataFilePath)):
+                elif snapshotDataFilePaths.All(
+                    lambda snapshotDataFilePath: File.Exists(snapshotDataFilePath)
+                ):
                     output()
-                    output("Detected snapshot data files. Waiting for Revit process to exit...")
+                    output(
+                        "Detected snapshot data files. Waiting for Revit process to exit..."
+                    )
                     snapshotDataFilesExistTimestamp[0] = time_util.GetDateTimeUtcNow()
 
                 try:
-                    revit_dialog_detection.DismissCheekyRevitDialogBoxes(hostRevitProcessId, output)
-                except Exception, e:
+                    revit_dialog_detection.DismissCheekyRevitDialogBoxes(
+                        hostRevitProcessId, output
+                    )
+                except Exception as e:
                     output()
-                    output("WARNING: an error occurred in the cheeky Revit dialog box dismisser!")
+                    output(
+                        "WARNING: an error occurred in the cheeky Revit dialog box dismisser!"
+                    )
                     exception_util.LogOutputErrorDetails(e, output)
-                
+
                 return
 
-            monitor_revit_process.MonitorHostRevitProcess(hostRevitProcess, monitoringAction, output)
+            monitor_revit_process.MonitorHostRevitProcess(
+                hostRevitProcess, monitoringAction, output
+            )
             return
-        
+
         stream_io_util.UsingStream(scriptOutputStreamReader, streamReaderAction)
         return
-    
+
     stream_io_util.UsingStream(serverStream, serverStreamAction)
 
     lastProgressNumber = ScriptDataUtil.GetProgressNumber(progressRecordFilePath)
-    nextProgressNumber = (lastProgressNumber + 1) if lastProgressNumber is not None else None
+    nextProgressNumber = (
+        (lastProgressNumber + 1) if lastProgressNumber is not None else None
+    )
 
     return nextProgressNumber

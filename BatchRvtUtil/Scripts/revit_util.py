@@ -24,16 +24,18 @@ import System
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 
+
 def PurgeReleasedAPIObjects(app):
     app.PurgeReleasedAPIObjects()
     return
+
 
 def InTransaction(transaction, action):
     result = None
     transaction.Start()
     try:
         result = action()
-    except Exception, e:
+    except Exception as e:
         transaction.RollBack()
         transaction.Dispose()
         raise

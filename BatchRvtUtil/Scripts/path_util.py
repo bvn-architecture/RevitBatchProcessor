@@ -66,7 +66,7 @@ def GetFileSize(filePath):
     fileSize = None
     try:
         fileSize = FileInfo(filePath).Length
-    except Exception, e:
+    except Exception as e:
         pass
     return fileSize
 
@@ -74,7 +74,7 @@ def GetLastWriteTimeUtc(filePath):
     lastWriteTime = None
     try:
         lastWriteTime = File.GetLastWriteTimeUtc(filePath)
-    except Exception, e:
+    except Exception as e:
         pass
     return lastWriteTime
 

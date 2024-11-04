@@ -55,7 +55,7 @@ def WithLoadedXmlDocument(xmlDocumentFilePath, action):
         result = action(doc)
     except XmlException, e:
         result = None
-    except Exception, e:
+    except Exception as e:
         result = None
     return result
 
@@ -71,7 +71,7 @@ def WithTextFileJsonObject(textFilePath, action):
             result = None
     except IOException, e:
         result = None
-    except Exception, e:
+    except Exception as e:
         result = None
     return result
 
