@@ -50,8 +50,8 @@ public static class RevitBatchProcessor
         Revit2021 = 7,
         Revit2022 = 8,
         Revit2023 = 9,
-        Revit2024 = 10
-
+        Revit2024 = 10,
+        Revit2025 = 11
     }
 
     /// <summary>

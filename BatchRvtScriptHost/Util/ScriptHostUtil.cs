@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 
 namespace BatchRvt.ScriptHost;
@@ -51,12 +50,13 @@ public static class ScriptHostUtil
             engine,
             new Dictionary<string, object>
             {
-                { "__revit__", uiApplicationObject }
+                { "__revit__", uiApplicationObject },
             });
 
         var mainModuleScope = ScriptUtil.CreateMainModule(engine);
 
         var pluginFullFolderPath = Path.GetFullPath(pluginFolderPath);
+
         var scriptHostFilePath = Path.Combine(batchRvtScriptsFolderPath, BatchScriptHostFilename);
         var batchRvtFolderPath = GetBatchRvtFolderPath(environmentVariables);
 
@@ -108,18 +108,20 @@ public static class ScriptHostUtil
 
     private static StringDictionary GetEnvironmentVariables()
     {
-        StringDictionary environmentVariables = null;
-
-        // NOTE: Have encountered (at least once) a NullReferenceException upon accessing the EnvironmentVariables property!
         try
         {
-            environmentVariables = Process.GetCurrentProcess().StartInfo.EnvironmentVariables;
-        }
-        catch (NullReferenceException e)
-        {
-            environmentVariables = null;
-        }
+            var environmentVariables = new StringDictionary();
+            var ev = Environment.GetEnvironmentVariables();
+            foreach (string key in ev.Keys)
+            {
+                environmentVariables[key] = ev[key].ToString();
+            }
 
-        return environmentVariables;
+            return environmentVariables;
+        }
+        catch (NullReferenceException)
+        {
+            return null;
+        }
     }
 }

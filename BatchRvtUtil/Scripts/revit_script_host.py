@@ -23,7 +23,10 @@ import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
-from System.Diagnostics import Process
+try:
+    clr.AddReference("System.Diagnostics.Process")
+except: pass
+
 clr.AddReference("System.Windows.Forms")
 from System.Windows.Forms import Application
 from System.IO import File
@@ -55,7 +58,7 @@ END_SESSION_DELAY_IN_SECONDS = 5
 CLOSE_MAIN_WINDOW_ATTEMPTS = 10
 
 def GetCurrentProcess():
-    return Process.GetCurrentProcess()
+    return System.Diagnostics.Process.GetCurrentProcess()
 
 def RunSingleTaskScript(scriptFilePath):
     aborted = False

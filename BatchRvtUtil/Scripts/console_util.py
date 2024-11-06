@@ -20,26 +20,29 @@
 
 import clr
 import System
-from System import Console, ConsoleKey
+
+try:
+    clr.AddReference("System.Console")
+except: pass
 
 def WaitForSpaceBarKeyPress():
     while True:
-        keyInfo = Console.ReadKey(True)
-        if keyInfo.Key == ConsoleKey.Spacebar:
+        keyInfo = System.Console.ReadKey(True)
+        if keyInfo.Key == System.ConsoleKey.Spacebar:
             break
     return
 
 def IsInputRedirected():
-    return Console.IsInputRedirected
+    return System.Console.IsInputRedirected
 
 def ReadLine():
-    return Console.ReadLine()
+    return System.Console.ReadLine()
 
 def ReadLines():
     lines = []
-    line = Console.ReadLine()
+    line = System.Console.ReadLine()
     while line is not None:
         lines.append(line)
-        line = Console.ReadLine()
+        line = System.Console.ReadLine()
     return lines
 

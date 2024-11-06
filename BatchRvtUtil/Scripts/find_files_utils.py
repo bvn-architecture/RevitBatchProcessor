@@ -21,7 +21,10 @@
 import clr
 import System
 
-from System.Diagnostics import Process, ProcessStartInfo
+try:
+    clr.AddReference("System.Diagnostics.Process")
+except: pass
+
 from System.Text import Encoding
 
 DIR_COMMAND_DIRECTORIES = "dir /ad /b /on"
@@ -54,14 +57,14 @@ def StartCmdProcess(commandLine):
     # NOTE: if redirecting both output and error streams, one should be read asynchronously to avoid a deadlock where
     #       the child process is waiting to write to one of the streams and the parent is waiting for data from the other
     #       stream. See Microsoft's documentation for more info.
-    psi = ProcessStartInfo('cmd.exe', '/U /S /C " ' + commandLine + ' "')
+    psi = System.Diagnostics.ProcessStartInfo('cmd.exe', '/U /S /C " ' + commandLine + ' "')
     psi.UseShellExecute = False
     psi.CreateNoWindow = True
     psi.RedirectStandardInput = False
     psi.RedirectStandardError = False # See notes above if enabling this alongside redirect output stream.
     psi.RedirectStandardOutput = True
     psi.StandardOutputEncoding = Encoding.Unicode
-    p = Process.Start(psi)
+    p = System.Diagnostics.Process.Start(psi)
     return p
 
 def ReadProcessOutputLines(process):

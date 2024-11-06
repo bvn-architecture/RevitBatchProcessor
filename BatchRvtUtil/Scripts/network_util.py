@@ -23,19 +23,21 @@ import System
 clr.AddReference("System.Core")
 clr.ImportExtensions(System.Linq)
 
-from System.Net import IPAddress
+try:
+    clr.AddReference("System.Net.Primitives")
+except: pass
 
 import batch_rvt_util
 from batch_rvt_util import Network
 
 def IsSpecialAddress(address):
     return (
-        address.Equals(IPAddress.Any) or
-        address.Equals(IPAddress.Broadcast) or
-        address.Equals(IPAddress.IPv6Any) or
-        address.Equals(IPAddress.IPv6Loopback) or
-        address.Equals(IPAddress.IPv6None) or
-        address.Equals(IPAddress.Loopback)
+        address.Equals(System.Net.IPAddress.Any) or
+        address.Equals(System.Net.IPAddress.Broadcast) or
+        address.Equals(System.Net.IPAddress.IPv6Any) or
+        address.Equals(System.Net.IPAddress.IPv6Loopback) or
+        address.Equals(System.Net.IPAddress.IPv6None) or
+        address.Equals(System.Net.IPAddress.Loopback)
     )
 
 def GetGatewayAddresses():
