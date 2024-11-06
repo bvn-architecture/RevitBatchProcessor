@@ -70,7 +70,7 @@ The Revit Batch Processor (GUI) application will appear in the Start menu after 
 
 Open the solution file RevitBatchProcessor.sln in Visual Studio 2017 or later and run Build Solution (F6).
 
-Revit addins will be automatically deployed to the Addins folder for each available Revit version [2015-2024]. e.g. %APPDATA%\Autodesk\Revit\Addins\2019
+Revit addins will be automatically deployed to the Addins folder for each available Revit version [2015-2025]. e.g. %APPDATA%\Autodesk\Revit\Addins\2019
 
 The BatchRvtGUI project is the GUI that drives the underlying engine (the BatchRvt project). Once built, run BatchRvtGUI.exe to start the Revit Batch Processor GUI.
 
@@ -78,9 +78,9 @@ When rebuilding, please make sure all Revit applications are closed before attem
 
 # Requirements
 
-- At least one version of Revit installed. Currently supports Revit versions 2015 through 2024.
+- At least one version of Revit installed. Currently supports Revit versions 2015 through 2025.
 - To build from source code, Visual Studio version 2017 or later.
-- If executing Dynamo scripts from the task script, Dynamo 1.3+ installed (currently supports Revit versions 2016 through 2024). NOTE: The Dynamo script MUST have been saved with the 'Automatic' Run mode. There **MUST BE EXACTLY ONE VERSION OF DYNAMO INSTALLED** for each version of Revit.
+- If executing Dynamo scripts from the task script, Dynamo 1.3+ installed (currently supports Revit versions 2016 through 2025). NOTE: The Dynamo script MUST have been saved with the 'Automatic' Run mode. There **MUST BE EXACTLY ONE VERSION OF DYNAMO INSTALLED** for each version of Revit.
 - If using an Excel file for the Revit File List, Microsoft Office / Excel installed.
 
 # License
@@ -109,7 +109,7 @@ Daniel Rumery [@DanRumery](https://github.com/DanRumery) (Original / Primary Aut
 
 - Vincent Cadoret [@vinnividivicci](https://github.com/vinnividivicci)
 - Ryan Schwartz [@RyanSchw](https://github.com/RyanSchw)
-- Dimitar Venkov [@dimven](https://github.com/dimven)
+- Dimitar Venkov [@dimven](https://github.com/dimven) (Upgraded support for Revit 2025) 
 - Nicklas Ostergaard [@NicklasOestergaard](https://github.com/NicklasOestergaard) (Upgraded support for Revit 2022)
 - Peter Smith [@punderscoresmithuk](https://github.com/punderscoresmithuk) (Upgraded support for Revit 2023)
 - Maciej Wypych [@maciejwypych](https://github.com/maciejwypych) (Upgraded support for Revit 2024 and more)
