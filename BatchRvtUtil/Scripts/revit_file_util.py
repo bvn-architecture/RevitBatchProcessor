@@ -28,6 +28,9 @@ import path_util
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 
+import cloud_region_util
+
+
 class CentralLockedCallback(ICentralLockedCallback):
     def __init__(self, shouldWaitForLockAvailabilityCallback):
         self.ShouldWaitForLockAvailabilityCallback = shouldWaitForLockAvailabilityCallback
@@ -127,14 +130,38 @@ def ToCloudPath(cloudProjectId, cloudModelId):
     cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(cloudProjectGuid, cloudModelGuid)
     return cloudPath
 
-def ToCloudPath2021(cloudProjectId, cloudModelId):
+def ToCloudPath2021(cloudProjectId, cloudModelId, region=None):
+    """
+    Convert cloud project and model GUIDs to a cloud path with region support.
+    
+    Note: Uses cloud_region_util for region handling. Revit API currently only 
+    supports US and EMEA regions. Australia uses hardcoded string.
+    
+    Args:
+        cloudProjectId: Project GUID (string or System.Guid)
+        cloudModelId: Model GUID (string or System.Guid)
+        region: Optional region code (US, EU, APAC)
+                Defaults to US if not specified
+    
+    Returns:
+        ModelPath object for the cloud model
+    """
     cloudProjectGuid = ToGuid(cloudProjectId)
     cloudModelGuid = ToGuid(cloudModelId)
+    
+    # Normalize and validate the region using the utility module
+    normalizedRegion = cloud_region_util.NormalizeRegionCode(region)
+    
+    # Get the appropriate Revit API region constant or hardcoded string
+    cloudRegion = cloud_region_util.GetRevitApiRegion(normalizedRegion)
+    
     try:
-        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(ModelPathUtils.CloudRegionUS, cloudProjectGuid, cloudModelGuid)
-    except:
+        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(cloudRegion, cloudProjectGuid, cloudModelGuid)
+        return cloudPath
+    except Exception as e:
+        # Fallback logic - use EMEA region
         cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(ModelPathUtils.CloudRegionEMEA, cloudProjectGuid, cloudModelGuid)
-    return cloudPath
+        return cloudPath
 
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
     modelPath = ToModelPath(modelPath)

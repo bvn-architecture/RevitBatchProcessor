@@ -32,6 +32,7 @@ import path_util
 import revit_file_version
 import batch_rvt_util
 from batch_rvt_util import RevitVersion
+import cloud_region_util
 
 class RevitFilePathData:
     def __init__(self, revitFilePath, associatedData):
@@ -80,30 +81,49 @@ def FromExcelFile(excelFilePath):
 def FromConsole():
     return FromLines(console_util.ReadLines())
 
+# updated to include ACC region support
 class RevitCloudModelInfo:
     def __init__(self, cloudModelDescriptor):
         self.cloudModelDescriptor = cloudModelDescriptor
         self.projectGuid = None
         self.modelGuid = None
         self.revitVersionText = None
+        self.region = None  # Add region property
         self.isValid = False
+        
         parts = self.GetCloudModelDescriptorParts(cloudModelDescriptor)
         numberOfParts = len(parts)
-        if numberOfParts > 1 :
+        
+        if numberOfParts > 1:
             revitVersionPart = str.Empty
             otherParts = parts
-            if numberOfParts > 2 :
+            
+            if numberOfParts > 2:
                 revitVersionPart = parts[0]
                 otherParts = parts[1:]
+            else:
+                # Handle case where there's no version specified (just GUIDs)
+                otherParts = parts
+                
             self.projectGuid = self.SafeParseGuidText(otherParts[0])
             self.modelGuid = self.SafeParseGuidText(otherParts[1])
+            
+            # Handle optional region parameter (3rd or 4th part depending on format)
+            if len(otherParts) > 2:
+                regionPart = otherParts[2].strip()
+                # Validate and normalize the region using the utilities module
+                if cloud_region_util.ValidateRegionCode(regionPart):
+                    self.region = cloud_region_util.NormalizeRegionCode(regionPart)
+            
+            # Set Revit version if provided and valid
             if RevitVersion.IsSupportedRevitVersionNumber(revitVersionPart):
                 self.revitVersionText = revitVersionPart
+                
             self.isValid = (
-                    self.projectGuid is not None
-                    and
-                    self.modelGuid is not None
-                )
+                self.projectGuid is not None
+                and
+                self.modelGuid is not None
+            )
         return
 
     def IsValid(self):
@@ -117,6 +137,33 @@ class RevitCloudModelInfo:
 
     def GetRevitVersionText(self):
         return self.revitVersionText
+    
+    def GetRegion(self):
+        """Get the region code, returns None if not specified"""
+        return self.region
+    
+    def GetRegionOrDefault(self, defaultRegion=None):
+        """Get the region code with fallback to default"""
+        if self.region is not None:
+            return self.region
+        
+        # Use provided default or the module's default
+        if defaultRegion is not None:
+            return defaultRegion
+        
+        return cloud_region_util.DEFAULT_REGION
+
+    def GetRegionDescription(self):
+        """Get the human-readable description for this model's region"""
+        return cloud_region_util.GetRegionDescription(self.region)
+
+    def GetRevitApiRegion(self):
+        """Get the Revit API constant for this model's region"""
+        return cloud_region_util.GetRevitApiRegion(self.region)
+
+    def IsDirectApiMapping(self):
+        """Check if this model's region has direct API support"""
+        return cloud_region_util.IsDirectApiMapping(self.region)
 
     def GetCloudModelDescriptorParts(self, cloudModelDescriptor):
         return cloudModelDescriptor.Split([" "].ToArray[str](), StringSplitOptions.RemoveEmptyEntries)
@@ -127,6 +174,22 @@ class RevitCloudModelInfo:
 
     def GetCloudModelDescriptor(self):
         return self.cloudModelDescriptor
+    
+    def __str__(self):
+        """String representation of the cloud model info"""
+        parts = []
+        if self.revitVersionText:
+            parts.append("Version: {0}".format(self.revitVersionText))
+        if self.projectGuid:
+            parts.append("Project: {0}".format(str(self.projectGuid)))
+        if self.modelGuid:
+            parts.append("Model: {0}".format(str(self.modelGuid)))
+        if self.region:
+            parts.append("Region: {0} ({1})".format(self.region, self.GetRegionDescription()))
+        else:
+            parts.append("Region: {0} (default)".format(cloud_region_util.DEFAULT_REGION))
+        
+        return "CloudModel[{0}]".format(", ".join(parts))
 
 class RevitFileInfo():
     def __init__(self, revitFilePath):
