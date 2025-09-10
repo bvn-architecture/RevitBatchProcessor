@@ -7,7 +7,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <Copyright>Copyright © 2025</Copyright>
+    <Copyright>Copyright ï¿½ 2025</Copyright>
     <Company>BVN</Company>
     <Product>BatchRvtAddin2026</Product>
     <AssemblyTitle>BatchRvtAddin2026</AssemblyTitle>
@@ -30,7 +30,7 @@
     <PackageReference Include="IronPython" Version="2.7.12" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Moq" Version="4.18.3" />
-    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2026.0.0" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2026.2.0" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2026.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
