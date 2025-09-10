@@ -54,6 +54,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9507B984
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2025", "BatchRvtAddin2025\BatchRvtAddin2025.csproj", "{F9C773C0-A288-4821-9DC0-E131745B3F39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2026", "BatchRvtAddin2026\BatchRvtAddin2026.csproj", "{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -198,6 +200,14 @@ Global
 		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Release|x64.ActiveCfg = Release|Any CPU
 		{F9C773C0-A288-4821-9DC0-E131745B3F39}.Release|x64.Build.0 = Release|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Debug|x64.Build.0 = Debug|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Release|x64.ActiveCfg = Release|Any CPU
+		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
