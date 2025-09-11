@@ -6,6 +6,11 @@
     <AssemblyName>BatchRvtAddin2025</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
+    <!-- Prevent runtimes folder creation -->
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+    <RuntimeIdentifiers />
+    <ExcludeAssets>runtime</ExcludeAssets>
 
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <Copyright>Copyright © 2024</Copyright>

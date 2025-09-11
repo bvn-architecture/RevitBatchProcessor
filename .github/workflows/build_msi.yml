@@ -42,12 +42,14 @@ jobs:
             $tag = "${{ github.event.release.tag_name }}"
             if ($tag -like "*-beta") {
                 $replaceWord = 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta'
+                $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta', $replaceWord
             } else {
                 $replaceWord = 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}'
+                $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}', $replaceWord
             }
             $content = $content -replace '#define AppVersion ".*"', '#define AppVersion "${{steps.version_num_set.outputs.version}}"'
-            $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta', $replaceWord
-            $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}', $replaceWord
+            
+            
             echo "Updated installer config is $content"
             Set-Content -Path Setup/RevitBatchProcessor.iss -Value $content
 
@@ -62,7 +64,7 @@ jobs:
 
       - name: Build solution
         run: |
-            msbuild "RevitBatchProcessor.sln" /p:Configuration=Release 
+            msbuild "RevitBatchProcessor.sln" /p:Configuration=Release /p:Platform="x64" /m
 
       - name: Create installer file
         id: create_installer_file

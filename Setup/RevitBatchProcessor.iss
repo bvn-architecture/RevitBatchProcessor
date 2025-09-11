@@ -14,6 +14,7 @@ ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 DefaultGroupName=Revit Batch Processor
 OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta
+OutputDir=Output
 
 ; TODO VERSION UPDATE - ADD FILES TO INSTALLER CONFIG
 [Files]
