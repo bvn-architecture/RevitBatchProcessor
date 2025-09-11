@@ -55,7 +55,7 @@ public static class BatchRvt
         UseSameSessionForFilesOfSameVersion = 1
     }
 
-
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<RevitVersion.SupportedRevitVersion, string> BATCHRVT_ADDIN_FILENAMES =
         new Dictionary<RevitVersion.SupportedRevitVersion, string>()
         {

@@ -28,6 +28,7 @@ namespace BatchRvtUtil;
 
 public static class RevitVersion
 {
+    // TODO VERSION UPDATE: Add new enum for Revit version
     public enum SupportedRevitVersion
     {
         Revit2015 = 0,
@@ -46,6 +47,7 @@ public static class RevitVersion
 
     private const string REVIT_EXECUTABLE_FILE_NAME = "Revit.exe";
 
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<SupportedRevitVersion, string> REVIT_ADDINS_RELATIVE_PATHS =
         new Dictionary<SupportedRevitVersion, string>()
         {
@@ -63,6 +65,7 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2026, @".\Autodesk\Revit\Addins\2026" },
         };
 
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<SupportedRevitVersion, string> SUPPORTED_REVIT_VERSION_NUMBERS =
         new Dictionary<SupportedRevitVersion, string>()
         {
@@ -115,7 +118,7 @@ public static class RevitVersion
         return $"BatchRvtAddin{GetVersionNumber(supportedRevitVersion)}.addin";
     }
 
-
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<SupportedRevitVersion, string> REVIT_LOCAL_FOLDER_PATHS =
         new Dictionary<SupportedRevitVersion, string>()
         {

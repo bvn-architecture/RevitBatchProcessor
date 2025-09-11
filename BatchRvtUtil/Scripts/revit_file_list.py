@@ -200,6 +200,7 @@ class SupportedRevitFileInfo():
                     revitVersionNumber = RevitVersion.GetSupportedRevitVersion(revitVersionText)
         else:
             revitVersionText = self.revitFileInfo.TryGetRevitVersionText()
+			# TODO VERSION UPDATE - Add conditional for new Revit version
             if not str.IsNullOrWhiteSpace(revitVersionText):
                 if any(revitVersionText.StartsWith(prefix) for prefix in revit_file_version.REVIT_VERSION_TEXT_PREFIXES_2015):
                     revitVersionNumber = RevitVersion.SupportedRevitVersion.Revit2015
