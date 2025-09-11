@@ -28,6 +28,8 @@ import path_util
 clr.AddReference("RevitAPI")
 from Autodesk.Revit.DB import *
 
+import cloud_region_util
+
 class CentralLockedCallback(ICentralLockedCallback):
     def __init__(self, shouldWaitForLockAvailabilityCallback):
         self.ShouldWaitForLockAvailabilityCallback = shouldWaitForLockAvailabilityCallback
@@ -128,13 +130,33 @@ def ToCloudPath(cloudProjectId, cloudModelId):
     return cloudPath
 
 def ToCloudPath2021(cloudProjectId, cloudModelId):
+    """
+    Convert cloud project and model GUIDs to a cloud path with region support.
+    
+    Note: Uses cloud_region_util for region handling. Revit API currently only 
+    supports US and EMEA regions. Australia uses hardcoded string.
+    
+    Args:
+        cloudProjectId: Project GUID (string or System.Guid)
+        cloudModelId: Model GUID (string or System.Guid)
+    
+    Returns:
+        ModelPath object for the cloud model
+    """
+    cloudPath = None
     cloudProjectGuid = ToGuid(cloudProjectId)
     cloudModelGuid = ToGuid(cloudModelId)
-    try:
-        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(ModelPathUtils.CloudRegionUS, cloudProjectGuid, cloudModelGuid)
-    except:
-        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(ModelPathUtils.CloudRegionEMEA, cloudProjectGuid, cloudModelGuid)
-    return cloudPath
+    
+    regionMapping = cloud_region_util.get_region_api_mapping()
+
+    for key, val in regionMapping.items():
+        try:
+            cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(val, cloudProjectGuid, cloudModelGuid)
+            return cloudPath
+        except Exception as e:
+            continue
+    
+    return cloud_region_util.get_unrecognised_region_msg()
 
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
     modelPath = ToModelPath(modelPath)
@@ -196,7 +218,10 @@ def OpenCloudDocument(application, cloudProjectId, cloudModelId, closeAllWorkset
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
     if audit:
         openOptions.Audit = True
-    return application.OpenDocumentFile(cloudPath, openOptions)
+    if isinstance(cloudPath, str) and cloudPath == cloud_region_util.get_unrecognised_region_msg():
+        return cloudPath
+    else:
+        return application.OpenDocumentFile(cloudPath, openOptions)
 
 def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, closeAllWorksets=False, worksetConfig=None, audit=False):
     if IsRvt2021_OrNewer(uiApplication.Application):
@@ -208,7 +233,10 @@ def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, cl
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
     if audit:
         openOptions.Audit = True
-    return uiApplication.OpenAndActivateDocument(cloudPath, openOptions, False)
+    if isinstance(cloudPath, str) and cloudPath == cloud_region_util.get_unrecognised_region_msg():
+        return cloudPath
+    else:        
+        return uiApplication.OpenAndActivateDocument(cloudPath, openOptions, False)
 
 def OpenDetachAndDiscardWorksets(application, modelPath, audit=False):
     modelPath = ToModelPath(modelPath)
