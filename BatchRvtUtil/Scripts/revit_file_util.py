@@ -30,7 +30,6 @@ from Autodesk.Revit.DB import *
 
 import cloud_region_util
 
-
 class CentralLockedCallback(ICentralLockedCallback):
     def __init__(self, shouldWaitForLockAvailabilityCallback):
         self.ShouldWaitForLockAvailabilityCallback = shouldWaitForLockAvailabilityCallback
@@ -130,7 +129,7 @@ def ToCloudPath(cloudProjectId, cloudModelId):
     cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(cloudProjectGuid, cloudModelGuid)
     return cloudPath
 
-def ToCloudPath2021(cloudProjectId, cloudModelId, region=None):
+def ToCloudPath2021(cloudProjectId, cloudModelId):
     """
     Convert cloud project and model GUIDs to a cloud path with region support.
     
@@ -140,28 +139,28 @@ def ToCloudPath2021(cloudProjectId, cloudModelId, region=None):
     Args:
         cloudProjectId: Project GUID (string or System.Guid)
         cloudModelId: Model GUID (string or System.Guid)
-        region: Optional region code (US, EU, APAC)
-                Defaults to US if not specified
     
     Returns:
         ModelPath object for the cloud model
     """
+    cloudPath = None
     cloudProjectGuid = ToGuid(cloudProjectId)
     cloudModelGuid = ToGuid(cloudModelId)
     
-    # Normalize and validate the region using the utility module
-    normalizedRegion = cloud_region_util.NormalizeRegionCode(region)
+    regionMapping = cloud_region_util.get_region_api_mapping()
+
+    for key, val in regionMapping.items():
+        try:
+            cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(val, cloudProjectGuid, cloudModelGuid)
+            return cloudPath
+        except Exception as e:
+            continue
     
-    # Get the appropriate Revit API region constant or hardcoded string
-    cloudRegion = cloud_region_util.GetRevitApiRegion(normalizedRegion)
-    
-    try:
-        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(cloudRegion, cloudProjectGuid, cloudModelGuid)
-        return cloudPath
-    except Exception as e:
-        # Fallback logic - use EMEA region
-        cloudPath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(ModelPathUtils.CloudRegionEMEA, cloudProjectGuid, cloudModelGuid)
-        return cloudPath
+
+    #TODO: error messaging about no region working
+    print("Could not determine region. Was not in {}".format(", ".join(regionMapping.keys())))
+
+    return cloudPath
 
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
     modelPath = ToModelPath(modelPath)
@@ -223,7 +222,8 @@ def OpenCloudDocument(application, cloudProjectId, cloudModelId, closeAllWorkset
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
     if audit:
         openOptions.Audit = True
-    return application.OpenDocumentFile(cloudPath, openOptions)
+    if cloudPath:
+        return application.OpenDocumentFile(cloudPath, openOptions)
 
 def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, closeAllWorksets=False, worksetConfig=None, audit=False):
     if IsRvt2021_OrNewer(uiApplication.Application):
@@ -235,7 +235,8 @@ def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, cl
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
     if audit:
         openOptions.Audit = True
-    return uiApplication.OpenAndActivateDocument(cloudPath, openOptions, False)
+    if cloudPath:
+        return uiApplication.OpenAndActivateDocument(cloudPath, openOptions, False)
 
 def OpenDetachAndDiscardWorksets(application, modelPath, audit=False):
     modelPath = ToModelPath(modelPath)

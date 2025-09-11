@@ -286,6 +286,7 @@ def WithOpenedCloudDocument(uiapp, openInUI, cloudProjectId, cloudModelId, works
         SafeCloseWithoutSave(doc, openInUI, "Closed cloud model.", output)
     return result
 
+
 def WithOpenedDocument(uiapp, openInUI, revitFilePath, audit, documentAction, output):
     app = uiapp.Application
     result = None
