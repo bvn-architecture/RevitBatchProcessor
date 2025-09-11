@@ -277,13 +277,19 @@ def WithOpenedCloudDocument(uiapp, openInUI, cloudProjectId, cloudModelId, works
         doc = uidoc.Document
     else:
         doc = revit_file_util.OpenCloudDocument(app, cloudProjectId, cloudModelId, closeAllWorksets, worksetConfig, audit)
-    try:
-        cloudModelPathText = ModelPathUtils.ConvertModelPathToUserVisiblePath(doc.GetCloudModelPath())
+    
+    if isinstance(doc, str):
         output()
-        output("Cloud model path is: " + cloudModelPathText)
-        result = documentAction(doc)
-    finally:
-        SafeCloseWithoutSave(doc, openInUI, "Closed cloud model.", output)
+        output(doc)
+        return result
+    else:
+        try:
+            cloudModelPathText = ModelPathUtils.ConvertModelPathToUserVisiblePath(doc.GetCloudModelPath())
+            output()
+            output("Cloud model path is: " + cloudModelPathText)
+            result = documentAction(doc)
+        finally:
+            SafeCloseWithoutSave(doc, openInUI, "Closed cloud model.", output)
     return result
 
 

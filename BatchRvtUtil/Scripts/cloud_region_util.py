@@ -79,6 +79,12 @@ def get_region_api_mapping():
     }
 
 
+def get_unrecognised_region_msg():
+    region_mapping = get_region_api_mapping()
+    msg = "ERROR: Could not establish a valid Cloud Model Path using the region values {}."
+    return msg.format(", ".join(region_mapping.keys()))
+
+
 def GetSupportedRegions():
     """
     Returns a dictionary of all supported region codes with their descriptions.

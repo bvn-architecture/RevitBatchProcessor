@@ -156,11 +156,7 @@ def ToCloudPath2021(cloudProjectId, cloudModelId):
         except Exception as e:
             continue
     
-
-    #TODO: error messaging about no region working
-    print("Could not determine region. Was not in {}".format(", ".join(regionMapping.keys())))
-
-    return cloudPath
+    return cloud_region_util.get_unrecognised_region_msg()
 
 def OpenNewLocal(application, modelPath, localModelPath, closeAllWorksets=False, worksetConfig=None, audit=False):
     modelPath = ToModelPath(modelPath)
@@ -222,7 +218,9 @@ def OpenCloudDocument(application, cloudProjectId, cloudModelId, closeAllWorkset
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
     if audit:
         openOptions.Audit = True
-    if cloudPath:
+    if isinstance(cloudPath, str) and cloudPath == cloud_region_util.get_unrecognised_region_msg():
+        return cloudPath
+    else:
         return application.OpenDocumentFile(cloudPath, openOptions)
 
 def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, closeAllWorksets=False, worksetConfig=None, audit=False):
@@ -235,7 +233,9 @@ def OpenAndActivateCloudDocument(uiApplication, cloudProjectId, cloudModelId, cl
     openOptions.SetOpenWorksetsConfiguration(worksetConfig)
     if audit:
         openOptions.Audit = True
-    if cloudPath:
+    if isinstance(cloudPath, str) and cloudPath == cloud_region_util.get_unrecognised_region_msg():
+        return cloudPath
+    else:        
         return uiApplication.OpenAndActivateDocument(cloudPath, openOptions, False)
 
 def OpenDetachAndDiscardWorksets(application, modelPath, audit=False):
