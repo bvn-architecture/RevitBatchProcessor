@@ -24,11 +24,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
-          
-      - name: Build solution
-        run: |
-            msbuild "RevitBatchProcessor.sln" /p:Configuration=Release 
-          
+                    
       - name: Get version number
         id: version_num_set
         run: |
@@ -54,7 +50,20 @@ jobs:
             $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}', $replaceWord
             echo "Updated installer config is $content"
             Set-Content -Path Setup/RevitBatchProcessor.iss -Value $content
-          
+
+      - name: Update version number - GlobalAssemblyInfo.cs
+        run: |
+          $assemblyInfoFile = "Common/GlobalAssemblyInfo.cs"
+          $fileContent = Get-Content -Path $assemblyInfoFile -Raw
+          echo "Input version number is $fileContent"
+          $fileContent = $fileContent -replace '\("\d+\.\d+\.\d+"\)', "(`"${{steps.version_num_set.outputs.version}}`")" 
+          echo "Updated version number is $fileContent"
+          Set-Content -Path $assemblyInfoFile -Value $fileContent            
+
+      - name: Build solution
+        run: |
+            msbuild "RevitBatchProcessor.sln" /p:Configuration=Release 
+
       - name: Create installer file
         id: create_installer_file
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2

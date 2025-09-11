@@ -160,6 +160,9 @@
     <Content Include="Scripts\batch_rvt_util.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\cloud_region_util.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\revit_dynamo.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

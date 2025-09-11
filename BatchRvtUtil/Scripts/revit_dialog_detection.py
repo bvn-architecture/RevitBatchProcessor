@@ -204,6 +204,10 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
                 output()
                 output("'" + enabledDialog.WindowText + "' dialog box detected.")
                 DismissRevitDialogBox(enabledDialog.WindowText, buttons, DO_NOT_SAVE_THE_PROJECT_TEXT, output)
+            elif enabledDialog.WindowText == CHANGES_NOT_SAVED_TITLE and len(buttons) == 3:
+                output()
+                output("'" + enabledDialog.WindowText + "' dialog box detected.")
+                DismissRevitDialogBox(enabledDialog.WindowText, buttons, DO_NOT_SAVE_THE_PROJECT_TEXT, output)
             elif enabledDialog.WindowText == CLOSE_PROJECT_WITHOUT_SAVING_TITLE and len(buttons) == 3:
                 output()
                 output("'" + enabledDialog.WindowText + "' dialog box detected.")
