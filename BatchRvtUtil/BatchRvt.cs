@@ -55,7 +55,7 @@ public static class BatchRvt
         UseSameSessionForFilesOfSameVersion = 1
     }
 
-
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<RevitVersion.SupportedRevitVersion, string> BATCHRVT_ADDIN_FILENAMES =
         new Dictionary<RevitVersion.SupportedRevitVersion, string>()
         {
@@ -70,6 +70,7 @@ public static class BatchRvt
             { RevitVersion.SupportedRevitVersion.Revit2023, "BatchRvtAddin2023.addin" },
             { RevitVersion.SupportedRevitVersion.Revit2024, "BatchRvtAddin2024.addin" },
             { RevitVersion.SupportedRevitVersion.Revit2025, "BatchRvtAddin2025.addin" },
+            { RevitVersion.SupportedRevitVersion.Revit2026, "BatchRvtAddin2026.addin" },
         };
 
 

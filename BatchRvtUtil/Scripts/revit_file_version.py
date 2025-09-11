@@ -192,6 +192,7 @@ def GenerateRevitVersionTextPrefixes(revitVersionNumberText, includeDisciplineVe
             ])
     return [str.Join(" ", prefix, revitVersionNumberText) for prefix in REVIT_VERSION_TEXT_PREFIXES]
 
+# TODO VERSION UPDATE: Add new version prefixes here as needed.
 REVIT_VERSION_TEXT_PREFIXES_2010 = GenerateRevitVersionTextPrefixes("2010", includeDisciplineVersions=True)
 REVIT_VERSION_TEXT_PREFIXES_2011 = GenerateRevitVersionTextPrefixes("2011", includeDisciplineVersions=True)
 REVIT_VERSION_TEXT_PREFIXES_2012 = GenerateRevitVersionTextPrefixes("2012", includeDisciplineVersions=True)
@@ -208,7 +209,9 @@ REVIT_VERSION_TEXT_PREFIXES_2022 = GenerateRevitVersionTextPrefixes("2022")
 REVIT_VERSION_TEXT_PREFIXES_2023 = GenerateRevitVersionTextPrefixes("2023")
 REVIT_VERSION_TEXT_PREFIXES_2024 = GenerateRevitVersionTextPrefixes("2024")
 REVIT_VERSION_TEXT_PREFIXES_2025 = GenerateRevitVersionTextPrefixes("2025")
+REVIT_VERSION_TEXT_PREFIXES_2026 = GenerateRevitVersionTextPrefixes("2026")
 
+# TODO VERSION UPDATE: Add new version checks here as needed.
 def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
     revitVersionNumberText = None
     if not str.IsNullOrWhiteSpace(revitVersionText):
@@ -246,5 +249,7 @@ def GetRevitVersionNumberTextFromRevitVersionText(revitVersionText):
             revitVersionNumberText = "2024"
         elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2025):
             revitVersionNumberText = "2025"
+        elif StartsWithOneOfPrefixes(revitVersionText, REVIT_VERSION_TEXT_PREFIXES_2026):
+            revitVersionNumberText = "2026"
     return revitVersionNumberText
 

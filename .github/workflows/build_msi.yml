@@ -24,11 +24,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
-          
-      - name: Build solution
-        run: |
-            msbuild "RevitBatchProcessor.sln" /p:Configuration=Release 
-          
+                    
       - name: Get version number
         id: version_num_set
         run: |
@@ -63,6 +59,10 @@ jobs:
           $fileContent = $fileContent -replace '\("\d+\.\d+\.\d+"\)', "(`"${{steps.version_num_set.outputs.version}}`")" 
           echo "Updated version number is $fileContent"
           Set-Content -Path $assemblyInfoFile -Value $fileContent            
+
+      - name: Build solution
+        run: |
+            msbuild "RevitBatchProcessor.sln" /p:Configuration=Release 
 
       - name: Create installer file
         id: create_installer_file

@@ -28,6 +28,7 @@ namespace BatchRvtUtil;
 
 public static class RevitVersion
 {
+    // TODO VERSION UPDATE: Add new enum for Revit version
     public enum SupportedRevitVersion
     {
         Revit2015 = 0,
@@ -41,10 +42,12 @@ public static class RevitVersion
         Revit2023 = 8,
         Revit2024 = 9,
         Revit2025 = 10,
+        Revit2026 = 11,
     }
 
     private const string REVIT_EXECUTABLE_FILE_NAME = "Revit.exe";
 
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<SupportedRevitVersion, string> REVIT_ADDINS_RELATIVE_PATHS =
         new Dictionary<SupportedRevitVersion, string>()
         {
@@ -58,9 +61,11 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2022, @".\Autodesk\Revit\Addins\2022" },
             { SupportedRevitVersion.Revit2023, @".\Autodesk\Revit\Addins\2023" },
             { SupportedRevitVersion.Revit2024, @".\Autodesk\Revit\Addins\2024" },
-            { SupportedRevitVersion.Revit2025, @".\Autodesk\Revit\Addins\2025" }
+            { SupportedRevitVersion.Revit2025, @".\Autodesk\Revit\Addins\2025" },
+            { SupportedRevitVersion.Revit2026, @".\Autodesk\Revit\Addins\2026" },
         };
 
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<SupportedRevitVersion, string> SUPPORTED_REVIT_VERSION_NUMBERS =
         new Dictionary<SupportedRevitVersion, string>()
         {
@@ -74,7 +79,8 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2022, "2022" },
             { SupportedRevitVersion.Revit2023, "2023" },
             { SupportedRevitVersion.Revit2024, "2024" },
-            { SupportedRevitVersion.Revit2025, "2025" }
+            { SupportedRevitVersion.Revit2025, "2025" },
+            { SupportedRevitVersion.Revit2026, "2026" },
         };
 
     private static Dictionary<SupportedRevitVersion, string> REVIT_EXECUTABLE_FOLDER_PATHS()
@@ -112,7 +118,7 @@ public static class RevitVersion
         return $"BatchRvtAddin{GetVersionNumber(supportedRevitVersion)}.addin";
     }
 
-
+    // TODO VERSION UPDATE: Add new key, value for Revit version
     private static readonly Dictionary<SupportedRevitVersion, string> REVIT_LOCAL_FOLDER_PATHS =
         new Dictionary<SupportedRevitVersion, string>()
         {
@@ -127,6 +133,7 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2023, @"C:\REVIT_LOCAL2023" },
             { SupportedRevitVersion.Revit2024, @"C:\REVIT_LOCAL2024" },
             { SupportedRevitVersion.Revit2025, @"C:\REVIT_LOCAL2025" },
+            { SupportedRevitVersion.Revit2026, @"C:\REVIT_LOCAL2026" },
         };
 
 

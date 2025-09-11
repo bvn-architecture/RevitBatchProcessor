@@ -38,6 +38,8 @@ public static class RevitBatchProcessor
     }
 
     // NOTE: Dynamo scripts are not supported in Revit versions earlier than 2016.
+
+    // TODO VERSION UPDATE: Add new enum for Revit version
     public enum UseRevitVersion
     {
         RevitFileVersion = 0,
@@ -51,7 +53,8 @@ public static class RevitBatchProcessor
         Revit2022 = 8,
         Revit2023 = 9,
         Revit2024 = 10,
-        Revit2025 = 11
+        Revit2025 = 11,
+        Revit2026 = 12
     }
 
     /// <summary>
