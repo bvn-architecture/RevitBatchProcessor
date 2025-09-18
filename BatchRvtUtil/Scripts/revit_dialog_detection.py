@@ -251,7 +251,7 @@ def DismissCheekyRevitDialogBoxes(revitProcessId, output_):
             elif enabledDialog.WindowText == ELEMENTS_LOST_ON_IMPORT_TITLE and len(buttons) == 1:
                 output()
                 output("'" + enabledDialog.WindowText + "' dialog box detected.")
-                DismissRevitDialogBox(enabledDialog.WindowText, buttons, CERRAR_BUTTON_TEXT, output)
+                DismissRevitDialogBox(enabledDialog.WindowText, buttons, CLOSE_BUTTON_TEXT, output)
                 #######
             elif enabledDialog.WindowText in ["Revit", str.Empty] and len(buttons) == 0 and len(win32Buttons) > 0:
                 output()
