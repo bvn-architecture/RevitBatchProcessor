@@ -36,6 +36,7 @@ def StartRevitProcess(revitVersion, initEnvironmentVariables):
     psi.RedirectStandardOutput = True
     psi.WorkingDirectory = RevitVersion.GetRevitExecutableFolderPath(revitVersion)
     initEnvironmentVariables(psi.EnvironmentVariables)
+    psi.EnvironmentVariables["RVT_ORIGIN"] = "RBP"
     revitProcess = System.Diagnostics.Process.Start(psi)
     return revitProcess
 
