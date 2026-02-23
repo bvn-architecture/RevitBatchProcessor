@@ -40,12 +40,11 @@ jobs:
             $content = Get-Content -Path Setup/RevitBatchProcessor.iss -Raw
             echo "Input installer config is $content"
             $tag = "${{ github.event.release.tag_name }}"
+            # Replace the entire OutputBaseFilename line based on tag
             if ($tag -like "*-beta") {
-                $replaceWord = 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta'
-                $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta', $replaceWord
+                $content = $content -replace 'OutputBaseFilename=.*', 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta'
             } else {
-                $replaceWord = 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}'
-                $content = $content -replace 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}', $replaceWord
+                $content = $content -replace 'OutputBaseFilename=.*', 'OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}'
             }
             $content = $content -replace '#define AppVersion ".*"', '#define AppVersion "${{steps.version_num_set.outputs.version}}"'
             

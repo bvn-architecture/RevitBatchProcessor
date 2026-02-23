@@ -36,7 +36,15 @@ import exception_util
 REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX = "[ REVIT WARNINGS HANDLER ]"
 
 def ElementIdsToSemicolonDelimitedText(elementIds):
-    return str.Join("; ", [str(elementId.IntegerValue) for elementId in elementIds])
+    values = []
+    for elementId in elementIds:
+        # Revit 2024+ deprecated IntegerValue in favour of Value (a long).
+        # Use hasattr so the code remains backwards-compatible with older Revit.
+        if hasattr(elementId, "Value"):
+            values.append(str(elementId.Value))
+        else:
+            values.append(str(elementId.IntegerValue))
+    return "; ".join(values)
 
 def ReportFailureWarning(failure, failureDefinition, output):
     failureSeverity = failure.GetSeverity()
@@ -177,4 +185,3 @@ def WithFailuresProcessingHandler(app, action, output_):
     finally:
         app.FailuresProcessing -= failuresProcessingEventHandler
     return result
-
