@@ -32,11 +32,12 @@ from Autodesk.Revit.DB.Events import FailuresProcessingEventArgs
 
 import global_test_mode
 import exception_util
+import revit_element_id_util 
 
 REVIT_WARNINGS_MESSAGE_HANDLER_PREFIX = "[ REVIT WARNINGS HANDLER ]"
 
 def ElementIdsToSemicolonDelimitedText(elementIds):
-    return str.Join("; ", [str(elementId.IntegerValue) for elementId in elementIds])
+    return str.Join("; ", [str(revit_element_id_util.get_element_id_as_int(elementId)) for elementId in elementIds])
 
 def ReportFailureWarning(failure, failureDefinition, output):
     failureSeverity = failure.GetSeverity()
