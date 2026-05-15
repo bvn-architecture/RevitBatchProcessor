@@ -56,6 +56,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2025", "BatchR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2026", "BatchRvtAddin2026\BatchRvtAddin2026.csproj", "{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchRvtAddin2027", "BatchRvtAddin2027\BatchRvtAddin2027.csproj", "{A63A6707-C82B-4645-BCF8-DFD1053C5B07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -208,6 +210,14 @@ Global
 		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Release|x64.ActiveCfg = Release|Any CPU
 		{8CBCE56A-F60F-BE0A-0BC5-9B05F49CF33B}.Release|x64.Build.0 = Release|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Debug|x64.Build.0 = Debug|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Release|x64.ActiveCfg = Release|Any CPU
+		{A63A6707-C82B-4645-BCF8-DFD1053C5B07}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
