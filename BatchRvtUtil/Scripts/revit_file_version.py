@@ -124,9 +124,9 @@ def TryGetRevitFileVersionInfoText(revitFilePath):
     revitVersionInfoText = str.Empty
     try:
         revitVersionInfoText = GetRevitFileVersionInfoText(revitFilePath)
-    except TargetInvocationException, e:
+    except TargetInvocationException as e:
         revitVersionInfoText = str.Empty
-    except IOException, e:
+    except IOException as e:
         revitVersionInfoText = str.Empty
     return revitVersionInfoText
 

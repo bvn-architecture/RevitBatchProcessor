@@ -197,11 +197,11 @@ class RevitFileInfo():
         pathException = None
         try:
             revitFilePath = path_util.GetFullPath(revitFilePath)
-        except ArgumentException, e: # Catch exceptions such as 'Illegal characters in path.'
+        except ArgumentException as e: # Catch exceptions such as 'Illegal characters in path.'
             pathException = e
-        except NotSupportedException, e: # Catch exceptions such as 'The given path's format is not supported.'
+        except NotSupportedException as e: # Catch exceptions such as 'The given path's format is not supported.'
             pathException = e
-        except PathTooLongException, e: # Catch exceptions such as 'The specified path, file name, or both are too long.'
+        except PathTooLongException as e: # Catch exceptions such as 'The specified path, file name, or both are too long.'
             pathException = e
         self.revitFilePath = revitFilePath
         self.pathException = pathException
@@ -233,7 +233,7 @@ class RevitFileInfo():
         revitVersionText = None
         try:
             revitVersionText = revit_file_version.GetRevitVersionText(self.revitFilePath)
-        except Exception, e:
+        except Exception as e:
             pass
         return revitVersionText
 

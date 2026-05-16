@@ -40,11 +40,11 @@ def Base64ToInts(base64):
     return [int(b) for b in System.Convert.FromBase64String(base64)]
 
 def Pack(values, t, n):
-    return IntsToBase64(Transform(values, ord(t[i]), n + i) for i in xrange(0, len(t)))
+    return IntsToBase64(Transform(values, ord(t[i]), n + i) for i in range(0, len(t)))
 
 def Unpack(values, t, n):
     ints = Base64ToInts(t)
-    return ''.join(chr(Transform(values, ints[i], n + i)) for i in xrange(0, len(ints)))
+    return ''.join(chr(Transform(values, ints[i], n + i)) for i in range(0, len(ints)))
 
 def GetPacker(n):
     i = [n]

@@ -31,7 +31,7 @@ def GetSessionUIApplication():
     uiapp = None
     try:
         uiapp = __revit__
-    except NameError, e:
+    except NameError as e:
         pass
     return uiapp
 

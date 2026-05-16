@@ -23,7 +23,6 @@ import System
 from System.Text import StringBuilder
 
 import global_test_mode
-import exceptions
 
 EXCEPTION_MESSAGE_HANDLER_PREFIX = "[ EXCEPTION MESSAGE ]"
 
@@ -42,7 +41,7 @@ def GetInterpretedFrameInfo(clsExceptionData):
 
 def GetClrException(exception):
     return (
-            exception.clsException if isinstance(exception, exceptions.Exception)
+            exception.clsException if isinstance(exception, Exception)
             else
             exception if isinstance(exception, System.Exception)
             else
@@ -52,7 +51,7 @@ def GetClrException(exception):
 def LogOutputErrorDetails(exception, output_, verbose=True):
     output = global_test_mode.PrefixedOutputForGlobalTestMode(output_, EXCEPTION_MESSAGE_HANDLER_PREFIX)
     exceptionMessage = (
-            str(exception.message) if isinstance(exception, exceptions.Exception)
+            str(str(exception)) if isinstance(exception, Exception)
             else
             str(exception.Message) if isinstance(exception, System.Exception)
             else

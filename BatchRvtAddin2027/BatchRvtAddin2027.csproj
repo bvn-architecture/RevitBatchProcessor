@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>BatchRvtAddin2027</RootNamespace>
     <AssemblyName>BatchRvtAddin2027</AssemblyName>
@@ -33,21 +33,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.8.0" />
-    <PackageReference Include="IronPython" Version="2.7.12" />
+    <PackageReference Include="IronPython" Version="3.4.2" />
+    <PackageReference Include="IronPython.StdLib" Version="3.4.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Moq" Version="4.18.3" />
-    <!-- Direct refs against the installed Revit 2027 binaries.
-         Nice3point's 2027 NuGet packages target .NET 10 only, which doesn't yet match
-         net8.0-windows. When Nice3point releases a net8.0-windows-compatible 2027
-         package, this can switch back to PackageReference. -->
-    <Reference Include="RevitAPI">
-      <HintPath>C:\Program Files\Autodesk\Revit 2027\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI">
-      <HintPath>C:\Program Files\Autodesk\Revit 2027\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2027.0.0-preview.1.20260110" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2027.0.10" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
   </ItemGroup>
