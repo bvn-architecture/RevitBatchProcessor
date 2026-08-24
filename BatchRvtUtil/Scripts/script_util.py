@@ -79,5 +79,7 @@ def GetRevitFileListFilePath():
 def ExecuteScript(scriptFilePath):
     path_util.AddSearchPath(Path.GetDirectoryName(scriptFilePath))
     scriptGlobals = {}
-    execfile(scriptFilePath, scriptGlobals)
+    # Use .NET I/O to bypass Python codec lookups (IronPython 3.4 lacks an encodings package).
+    source = System.IO.File.ReadAllText(scriptFilePath, System.Text.Encoding.UTF8)
+    exec(compile(source, scriptFilePath, 'exec'), scriptGlobals)
     return

@@ -64,10 +64,14 @@ public static class ScriptHostUtil
         {
             batchRvtScriptsFolderPath,
             pluginFullFolderPath,
+            Path.Combine(pluginFullFolderPath, "lib"),  // IronPython 3 stdlib (from IronPython.StdLib NuGet)
             batchRvtFolderPath
         });
 
-        ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
+        // ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
+        // ^ Skipped: python_27_lib.zip is the Python 2.7 stdlib, which IronPython 3 can't parse.
+        //   IronPython 3 has built-in support for the stdlib modules RBP's bootstrap actually uses
+        //   (os, sys, re, json, datetime, etc.) so the zip-backed meta_path importer isn't needed.
 
         var scriptSource = ScriptUtil.CreateScriptSourceFromFile(engine, scriptHostFilePath);
 

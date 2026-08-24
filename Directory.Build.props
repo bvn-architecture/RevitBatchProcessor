@@ -1,0 +1,11 @@
+<Project>
+  <!--
+    Allow building .NET Framework 4.x projects without requiring a system-wide
+    .NET Framework Developer Pack install. The Microsoft.NETFramework.ReferenceAssemblies
+    package ships the targeting-pack reference assemblies inside the NuGet itself.
+    No-op for SDK-style projects that target net6.0+, so this is safe globally.
+  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

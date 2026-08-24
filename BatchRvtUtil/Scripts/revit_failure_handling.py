@@ -132,7 +132,7 @@ def ProcessFailures(failuresAccessor, output, rollBackOnWarning=False):
                     result = FailureProcessingResult.ProceedWithRollBack
         else:
             result = FailureProcessingResult.Continue
-    except Exception, e:
+    except Exception as e:
         output()
         output("ERROR: the failure handler generated an error!")
         exception_util.LogOutputErrorDetails(e, output)

@@ -106,7 +106,7 @@ def ShowRevitProcessError(processErrorStream, showRevitProcessErrorMessages, out
 def TerminateHostRevitProcess(hostRevitProcess, output):
     try:
         hostRevitProcess.Kill()
-    except Exception, e:
+    except Exception as e:
         output()
         output("ERROR: an error occurred while attempting to kill the Revit process!")
         exception_util.LogOutputErrorDetails(e, output)
@@ -210,7 +210,7 @@ def RunScriptedRevitSession(
 
                 try:
                     revit_dialog_detection.DismissCheekyRevitDialogBoxes(hostRevitProcessId, output)
-                except Exception, e:
+                except Exception as e:
                     output()
                     output("WARNING: an error occurred in the cheeky Revit dialog box dismisser!")
                     exception_util.LogOutputErrorDetails(e, output)

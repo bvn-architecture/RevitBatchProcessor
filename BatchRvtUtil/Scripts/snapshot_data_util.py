@@ -87,7 +87,7 @@ def CopySnapshotRevitJournalFile(snapshotDataFolderPath, output):
     try:
         snapshotDataFilePath = GetSnapshotDataFilePath(snapshotDataFolderPath)
         revitJournalFilePath = ReadSnapshotDataRevitJournalFilePath(snapshotDataFilePath)
-    except Exception, e:
+    except Exception as e:
         output()
         output("WARNING: failed to read journal file path from snapshot data file.")
         exception_util.LogOutputErrorDetails(e, output)
@@ -114,7 +114,7 @@ def ConsolidateSnapshotData(dataExportFolderPath, output):
             output("WARNING: could not find snapshot data file in snapshot data folder:")
             output()
             output("\t" + dataExportFolderPath)
-    except Exception, e:
+    except Exception as e:
         output()
         output("WARNING: failed to properly consolidate the snapshot data in folder:")
         output()
