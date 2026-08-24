@@ -29,7 +29,7 @@ def IsDynamoRevitModuleLoaded():
     try:
         clr.AddReference("DynamoRevitDS")
         isLoaded = True
-    except IOException, e:
+    except IOException as e:
         isLoaded = False
     return isLoaded
 

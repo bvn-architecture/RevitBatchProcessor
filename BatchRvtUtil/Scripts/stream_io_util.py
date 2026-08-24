@@ -29,7 +29,7 @@ def WithIgnoredIOException(action):
     result = None
     try:
         result = action()
-    except IOException, e:
+    except IOException as e:
         pass
     return result
 

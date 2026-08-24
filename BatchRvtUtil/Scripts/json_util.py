@@ -40,7 +40,7 @@ def ToString(jobject, prettyPrint=False):
     return (
             JObject.ToString(jobject)
             if prettyPrint else
-            JObject.ToString(jobject, Formatting.None)
+            JObject.ToString(jobject, getattr(Formatting, "None"))
         )
 
 def SerializeObject(pythonObject, prettyPrint=False):

@@ -32,7 +32,7 @@ def IsProcessResponding(process):
     isResponding = False
     try:
         isResponding = process.Responding
-    except Exception, e:
+    except Exception as e:
         pass
     return isResponding
 

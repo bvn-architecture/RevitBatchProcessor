@@ -67,7 +67,7 @@ def DialogShowingEventHandler(sender, eventArgs, output):
             msg.AppendLine("\tHelpId: " + str(helpId))
         output(msg.ToString())
         eventArgs.OverrideResult(dialogResult)
-    except Exception, e:
+    except Exception as e:
         errorMsg = StringBuilder()
         errorMsg.AppendLine()
         errorMsg.AppendLine("Caught exception in dialog event handler!")

@@ -48,7 +48,7 @@ def DumpPlainTextLogFile():
                     plainTextLogFilePath,
                     LogFile.ReadLinesAsPlainText(logFilePath)
                 )
-        except Exception, e:
+        except Exception as e:
             plainTextLogFilePath = None
     return plainTextLogFilePath
 
