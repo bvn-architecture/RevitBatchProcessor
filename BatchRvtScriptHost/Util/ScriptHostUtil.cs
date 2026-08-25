@@ -68,10 +68,10 @@ public static class ScriptHostUtil
             batchRvtFolderPath
         });
 
-        // ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
-        // ^ Skipped: python_27_lib.zip is the Python 2.7 stdlib, which IronPython 3 can't parse.
-        //   IronPython 3 has built-in support for the stdlib modules RBP's bootstrap actually uses
-        //   (os, sys, re, json, datetime, etc.) so the zip-backed meta_path importer isn't needed.
+        ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
+        // Required for IronPython 2.7 engines (2015-2026), which have no built-in stdlib.
+        // Safe for IronPython 3 engines too (e.g. Revit 2027): this only appends a fallback
+        // meta_path importer, so it never overrides an import IronPython 3 already resolves natively.
 
         var scriptSource = ScriptUtil.CreateScriptSourceFromFile(engine, scriptHostFilePath);
 
