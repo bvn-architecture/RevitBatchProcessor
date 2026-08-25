@@ -37,7 +37,7 @@ def GetExistingLoadedAssembly(assemblyName):
 def AddBatchRvtUtilAssemblyReference():
     try:
         clr.AddReference(BATCH_RVT_UTIL_ASSEMBLY_NAME)
-    except IOException, e: # Can occur if PyRevit is installed. Need to use AddReferenceToFileAndPath() in this case.
+    except IOException as e: # Can occur if PyRevit is installed. Need to use AddReferenceToFileAndPath() in this case.
         batchRvtScriptHostAssembly = GetExistingLoadedAssembly(BATCH_RVT_SCRIPT_HOST_ASSEMBLY_NAME)
         clr.AddReference(batchRvtScriptHostAssembly)
         from BatchRvt.ScriptHost import ScriptHostUtil

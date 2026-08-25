@@ -163,7 +163,7 @@ def WithExceptionLogging(action, output):
     result = None
     try:
         result = action()
-    except Exception, e:
+    except Exception as e:
         exception_util.LogOutputErrorDetails(e, output)
         raise
     return result
@@ -180,7 +180,7 @@ def GetWorksharingCentralModelPath(doc):
     centralModelPath = None
     try:
         centralModelPath = doc.GetWorksharingCentralModelPath()
-    except InvalidOperationException, e:
+    except InvalidOperationException as e:
         centralModelPath = None
     return centralModelPath
 
@@ -205,12 +205,12 @@ def SafeCloseWithoutSave(doc, isOpenedInUI, closedMessage, output):
             revit_file_util.CloseWithoutSave(doc)
             output()
             output(closedMessage)
-    except InvalidOperationException, e:
+    except InvalidOperationException as e:
         output()
         output("WARNING: Couldn't close the document!")
         output()
         output(str(e.Message))
-    except Exception, e:
+    except Exception as e:
         output()
         output("WARNING: Couldn't close the document!")
         exception_util.LogOutputErrorDetails(e, output, False)
@@ -258,7 +258,7 @@ def WithOpenedNewLocalDocument(uiapp, openInUI, centralFilePath, localFilePath, 
             result = documentAction(doc)
         finally:
             SafeCloseWithoutSave(doc, openInUI, "Closed local file: " + localFilePath, output)
-    except ArgumentException, e:
+    except ArgumentException as e:
         if e.Message == "The model is a local file.\r\nParameter name: sourcePath":
             output()
             output("ERROR: The model is a local file. Cannot create another local file from it!")
@@ -375,11 +375,11 @@ def WithErrorReportingAndHandling(uiapp, revitAction, output):
 def WithDocumentOpeningErrorReporting(documentOpeningAction, output):
     try:
         result = documentOpeningAction()
-    except OperationCanceledException, e:
+    except OperationCanceledException as e:
         output()
         output("ERROR: The operation was canceled: " + e.Message)
         raise
-    except CorruptModelException, e:
+    except CorruptModelException as e:
         output()
         output("ERROR: Model is corrupt: " + e.Message)
         raise

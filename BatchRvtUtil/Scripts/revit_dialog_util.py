@@ -56,6 +56,8 @@ def DialogShowingEventHandler(sender, eventArgs, output):
                 dialogResult = 1001 # Continue working with the file.
             elif eventArgs.DialogId == "TaskDialog_Location_Position_Changed":
                 dialogResult = 1002 # Do not save.
+            elif eventArgs.DialogId == "TaskDialog_Update_Resources":
+                dialogResult = 1001 # Continue without reloading the resource.
         elif isinstance(eventArgs, MessageBoxShowingEventArgs):
             msg.AppendLine("\tMessage: " + str(eventArgs.Message))
             msg.AppendLine("\tDialogType: " + str(eventArgs.DialogType))
@@ -67,7 +69,7 @@ def DialogShowingEventHandler(sender, eventArgs, output):
             msg.AppendLine("\tHelpId: " + str(helpId))
         output(msg.ToString())
         eventArgs.OverrideResult(dialogResult)
-    except Exception, e:
+    except Exception as e:
         errorMsg = StringBuilder()
         errorMsg.AppendLine()
         errorMsg.AppendLine("Caught exception in dialog event handler!")

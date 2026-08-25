@@ -8,22 +8,25 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: master
 
       - name: Setup MSBuild path
-        uses: microsoft/setup-msbuild@v2     
+        uses: microsoft/setup-msbuild@v3     
 
       - name: Restore NuGet packages
         run: nuget restore "RevitBatchProcessor.sln"
       
       - name: Setup Python environment
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.x'
                     
       - name: Get version number
         id: version_num_set
@@ -101,20 +104,15 @@ jobs:
 
       - name: Create installer file
         id: create_installer_file
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2.7
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.9
         with: 
           path: Setup/RevitBatchProcessor.iss
           
       - name: Upload Release Asset
         id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: Setup\Output\RevitBatchProcessorSetup_${{github.event.release.tag_name}}.exe
-          asset_name: RevitBatchProcessorSetup_${{github.event.release.tag_name}}.exe
-          asset_content_type: application/octet-stream
+          files: Setup\Output\RevitBatchProcessorSetup_${{github.event.release.tag_name}}.exe
 
       - name: Update readme with new version
         env:
@@ -124,7 +122,7 @@ jobs:
           python $env:GITHUB_WORKSPACE\.github\workflows\update_readme.py
           
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Update version to ${{github.event.release.tag_name}} in README and .iss file"

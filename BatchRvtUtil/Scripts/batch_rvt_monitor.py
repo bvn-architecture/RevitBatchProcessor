@@ -183,7 +183,7 @@ def ExecutePreProcessingScript(batchRvtConfig, output):
         script_util.ExecuteScript(batchRvtConfig.PreProcessingScriptFilePath)
         output()
         output("Pre-processing script operation completed.")
-    except Exception, e:
+    except Exception as e:
         output()
         output("ERROR: An error occurred while executing the pre-processing script! Operation aborted.")
         exception_util.LogOutputErrorDetails(e, output)
@@ -199,7 +199,7 @@ def ExecutePostProcessingScript(batchRvtConfig, output):
         script_util.ExecuteScript(batchRvtConfig.PostProcessingScriptFilePath)
         output()
         output("Post-processing script operation completed.")
-    except Exception, e:
+    except Exception as e:
         output()
         output("ERROR: An error occurred while executing the post-processing script! Operation aborted.")
         exception_util.LogOutputErrorDetails(e, output)
@@ -419,7 +419,7 @@ def ProcessRevitFiles(batchRvtConfig, supportedRevitFileList):
                         if False:
                             try:
                                 snapshot_data_util.CopySnapshotRevitJournalFile(snapshotDataExportFolderPath, Output)
-                            except Exception, e:
+                            except Exception as e:
                                 Output()
                                 Output("WARNING: failed to copy the Revit session's journal file to snapshot data folder:")
                                 Output()
@@ -482,7 +482,7 @@ def TryGetCommandSettingsData():
     commandSettingsData = None
     try:
         commandSettingsData = __command_settings_data__
-    except NameError, e:
+    except NameError as e:
         pass
     return commandSettingsData
 
@@ -513,7 +513,7 @@ def Main():
                 aborted = RunBatchRevitTasks(batchRvtConfig)
             else:
                 aborted = RunSingleRevitTask(batchRvtConfig)
-        except Exception, e:
+        except Exception as e:
             sessionError = exception_util.GetExceptionDetails(e)
             raise
         finally:
@@ -547,6 +547,6 @@ def Main():
 
 try:
     Main()
-except Exception, e:
+except Exception as e:
     exception_util.LogOutputErrorDetails(e, Output)
     raise

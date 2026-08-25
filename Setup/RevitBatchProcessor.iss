@@ -1,5 +1,5 @@
 #define AppName "Revit Batch Processor"
-#define AppVersion "1.12.1"
+#define AppVersion "1.13.0"
 
 [Setup]
 AppName={#AppName}
@@ -10,8 +10,8 @@ AppId={{B5CA57EA-7BB2-4620-916C-AE98376C1EF1}
 DisableDirPage=auto
 DefaultDirName={localappdata}\RevitBatchProcessor
 SetupLogging=True
-ArchitecturesInstallIn64BitMode=x64compatible
-ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64
+ArchitecturesAllowed=x64
 DefaultGroupName=Revit Batch Processor
 OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}
 OutputDir=Output
@@ -43,6 +43,8 @@ Source: "..\BatchRvtAddin2025\bin\x64\Release\*"; DestDir: "{userappdata}\Autode
 Source: "..\BatchRvtAddin2025\BatchRvtAddin2025.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2025"; Flags: ignoreversion
 Source: "..\BatchRvtAddin2026\bin\x64\Release\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2026\BatchRvt"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\BatchRvtAddin2026\BatchRvtAddin2026.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2026"; Flags: ignoreversion
+Source: "..\BatchRvtAddin2027\bin\x64\Release\*"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027\BatchRvt"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\BatchRvtAddin2027\BatchRvtAddin2027.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027"; Flags: ignoreversion
 [Icons]
 Name: "{group}\Revit Batch Processor (GUI)"; Filename: "{app}\BatchRvtGUI.exe"; WorkingDir: "{app}"
 

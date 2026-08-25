@@ -33,7 +33,7 @@ def InTransaction(transaction, action):
     transaction.Start()
     try:
         result = action()
-    except Exception, e:
+    except Exception as e:
         transaction.RollBack()
         transaction.Dispose()
         raise

@@ -66,7 +66,7 @@ def GetFileSize(filePath):
     fileSize = None
     try:
         fileSize = FileInfo(filePath).Length
-    except Exception, e:
+    except Exception as e:
         pass
     return fileSize
 
@@ -74,7 +74,7 @@ def GetLastWriteTimeUtc(filePath):
     lastWriteTime = None
     try:
         lastWriteTime = File.GetLastWriteTimeUtc(filePath)
-    except Exception, e:
+    except Exception as e:
         pass
     return lastWriteTime
 
@@ -99,7 +99,7 @@ def GetFullNetworkPath(path):
         if driveRemoteName is not None:
             pathWithoutRoot = path.Substring(pathRoot.Length)
             fullNetworkPath = Path.Combine(driveRemoteName, pathWithoutRoot)
-    except PathTooLongException, e:
+    except PathTooLongException as e:
         fullNetworkPath = None
     return fullNetworkPath
 

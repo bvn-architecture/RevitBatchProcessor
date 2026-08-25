@@ -32,7 +32,7 @@ import json_util
 
 try:
     clr.AddReference("DynamoRevitDS")
-except IOException, e:
+except IOException as e:
     raise Exception(revit_dynamo_error.DYNAMO_REVIT_MODULE_NOT_FOUND_ERROR_MESSAGE)
 
 from Dynamo.Applications import DynamoRevit, DynamoRevitCommandData
@@ -53,9 +53,9 @@ def WithLoadedXmlDocument(xmlDocumentFilePath, action):
     try:
         doc.Load(xmlDocumentFilePath)
         result = action(doc)
-    except XmlException, e:
+    except XmlException as e:
         result = None
-    except Exception, e:
+    except Exception as e:
         result = None
     return result
 
@@ -67,11 +67,11 @@ def WithTextFileJsonObject(textFilePath, action):
         try:
             jobject = json_util.DeserializeToJObject(textFileContents)
             result = action(jobject)
-        except json_util.JSON.JsonReaderException, e:
+        except json_util.JSON.JsonReaderException as e:
             result = None
-    except IOException, e:
+    except IOException as e:
         result = None
-    except Exception, e:
+    except Exception as e:
         result = None
     return result
 

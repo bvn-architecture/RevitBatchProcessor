@@ -55,7 +55,7 @@ def CreateNamedPipeServer(pipeName):
         )
 
 def CreateAnonymousPipeServer(pipeDirection, handleInheritability=None):
-    handleInheritability = handleInheritability if handleInheritability is not None else HandleInheritability.None
+    handleInheritability = handleInheritability if handleInheritability is not None else getattr(HandleInheritability, "None")
     outputPipeServer = Pipes.AnonymousPipeServerStream(
             pipeDirection,
             handleInheritability,

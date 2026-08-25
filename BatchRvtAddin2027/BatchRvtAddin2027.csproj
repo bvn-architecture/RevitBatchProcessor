@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <RootNamespace>BatchRvtAddin2026</RootNamespace>
-    <AssemblyName>BatchRvtAddin2026</AssemblyName>
+    <RootNamespace>BatchRvtAddin2027</RootNamespace>
+    <AssemblyName>BatchRvtAddin2027</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <!-- Prevent runtimes folder creation -->
@@ -13,10 +13,10 @@
     <ExcludeAssets>runtime</ExcludeAssets>
 
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <Copyright>Copyright � 2025</Copyright>
+    <Copyright>Copyright © 2026</Copyright>
     <Company>BVN</Company>
-    <Product>BatchRvtAddin2026</Product>
-    <AssemblyTitle>BatchRvtAddin2026</AssemblyTitle>
+    <Product>BatchRvtAddin2027</Product>
+    <AssemblyTitle>BatchRvtAddin2027</AssemblyTitle>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <UseWindowsForms>true</UseWindowsForms>
@@ -33,11 +33,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.8.0" />
-    <PackageReference Include="IronPython" Version="2.7.12" />
+    <PackageReference Include="IronPython" Version="3.4.2" />
+    <PackageReference Include="IronPython.StdLib" Version="3.4.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Moq" Version="4.18.3" />
-    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2026.2.0" />
-    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2026.0.0" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2027.0.0-preview.1.20260110" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2027.0.10" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +46,6 @@
     <ProjectReference Include="..\BatchRvtUtil\BatchRvtUtil.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="call &quot;$(ProjectDir)..\AddinDeployment\DeployAddin.bat&quot; &quot;$(ProjectDir)&quot; &quot;$(TargetDir)&quot; &quot;2026&quot;" />
+    <Exec Command="call &quot;$(ProjectDir)..\AddinDeployment\DeployAddin.bat&quot; &quot;$(ProjectDir)&quot; &quot;$(TargetDir)&quot; &quot;2027&quot;" />
   </Target>
 </Project>

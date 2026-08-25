@@ -43,6 +43,7 @@ public static class RevitVersion
         Revit2024 = 9,
         Revit2025 = 10,
         Revit2026 = 11,
+        Revit2027 = 12,
     }
 
     private const string REVIT_EXECUTABLE_FILE_NAME = "Revit.exe";
@@ -63,6 +64,7 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2024, @".\Autodesk\Revit\Addins\2024" },
             { SupportedRevitVersion.Revit2025, @".\Autodesk\Revit\Addins\2025" },
             { SupportedRevitVersion.Revit2026, @".\Autodesk\Revit\Addins\2026" },
+            { SupportedRevitVersion.Revit2027, @".\Autodesk\Revit\Addins\2027" },
         };
 
     // TODO VERSION UPDATE: Add new key, value for Revit version
@@ -81,6 +83,7 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2024, "2024" },
             { SupportedRevitVersion.Revit2025, "2025" },
             { SupportedRevitVersion.Revit2026, "2026" },
+            { SupportedRevitVersion.Revit2027, "2027" },
         };
 
     private static Dictionary<SupportedRevitVersion, string> REVIT_EXECUTABLE_FOLDER_PATHS()
@@ -134,6 +137,7 @@ public static class RevitVersion
             { SupportedRevitVersion.Revit2024, @"C:\REVIT_LOCAL2024" },
             { SupportedRevitVersion.Revit2025, @"C:\REVIT_LOCAL2025" },
             { SupportedRevitVersion.Revit2026, @"C:\REVIT_LOCAL2026" },
+            { SupportedRevitVersion.Revit2027, @"C:\REVIT_LOCAL2027" },
         };
 
 

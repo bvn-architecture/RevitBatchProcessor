@@ -64,10 +64,14 @@ public static class ScriptHostUtil
         {
             batchRvtScriptsFolderPath,
             pluginFullFolderPath,
+            Path.Combine(pluginFullFolderPath, "lib"),  // IronPython 3 stdlib (from IronPython.StdLib NuGet)
             batchRvtFolderPath
         });
 
         ScriptUtil.AddPythonStandardLibrary(mainModuleScope);
+        // Required for IronPython 2.7 engines (2015-2026), which have no built-in stdlib.
+        // Safe for IronPython 3 engines too (e.g. Revit 2027): this only appends a fallback
+        // meta_path importer, so it never overrides an import IronPython 3 already resolves natively.
 
         var scriptSource = ScriptUtil.CreateScriptSourceFromFile(engine, scriptHostFilePath);
 

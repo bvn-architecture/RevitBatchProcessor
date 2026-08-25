@@ -48,7 +48,7 @@ def WithErrorHandling(action, errorMessage, output=None, showErrorMessageBox=Fal
     try:
         result = action()
 
-    except Exception, e:
+    except Exception as e:
 
         if output is not None:
             output()
