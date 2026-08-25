@@ -13,7 +13,7 @@ SetupLogging=True
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
 DefaultGroupName=Revit Batch Processor
-OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}
+OutputBaseFilename=RevitBatchProcessorSetup_v{#AppVersion}-beta
 OutputDir=Output
 
 ; TODO VERSION UPDATE - ADD FILES TO INSTALLER CONFIG
@@ -47,6 +47,7 @@ Source: "..\BatchRvtAddin2027\bin\x64\Release\*"; DestDir: "{userappdata}\Autode
 Source: "..\BatchRvtAddin2027\BatchRvtAddin2027.addin"; DestDir: "{userappdata}\Autodesk\Revit\Addins\2027"; Flags: ignoreversion
 [Icons]
 Name: "{group}\Revit Batch Processor (GUI)"; Filename: "{app}\BatchRvtGUI.exe"; WorkingDir: "{app}"
+
 
 
 
