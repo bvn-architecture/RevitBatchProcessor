@@ -40,7 +40,6 @@
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2027.0.0-preview.1.20260110" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2027.0.10" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="xunit" Version="2.4.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BatchRvtScriptHost\BatchRvtScriptHost.csproj" />
