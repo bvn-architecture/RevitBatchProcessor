@@ -9,9 +9,9 @@ Fully automated batch processing of Revit files with your own Python or Dynamo t
 
 ## Latest version (NEW)
 
-Version 1.13.0 beta release is available, which includes support for Revit 2026. [Installer is here](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.13.0/RevitBatchProcessorSetup_v1.13.0.exe)
+Version 1.13.0 beta release is available, which includes support for Revit 2027. [Installer is here](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.13.0-beta/RevitBatchProcessorSetup_v1.13.0-beta.exe)
 
-See the [Releases](https://github.com/bvn-architecture/RevitBatchProcessor/releases) page for [v1.13.0 release notes](https://github.com/bvn-architecture/RevitBatchProcessor/releases/tag/v1.13.0).
+See the [Releases](https://github.com/bvn-architecture/RevitBatchProcessor/releases) page for [v1.13.0 release notes](https://github.com/bvn-architecture/RevitBatchProcessor/releases/tag/v1.13.0-beta).
 
 ## RBP Sample Scripts
 
@@ -41,7 +41,7 @@ This tool doesn't _do_ any of these things, but it _allows_ you to do them:
 
 ## Features
 
-- Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2026. (Of course the required version of Revit must be installed!)
+- Batch processing of Revit files (.rvt and .rfa files) using either a specific version of Revit or a version that matches the version of Revit the file was saved in. Currently supports processing files in Revit versions 2015 through 2027. (Of course the required version of Revit must be installed!)
 - Custom task scripts written in Python or Dynamo! Python scripts have full access to the Revit API. Dynamo scripts can of course do whatever Dynamo can do :)
 - Option to create a new Python task script at the click of a button that contains the minimal amount of code required for the custom task script to operate on an opened Revit file. The new task script can then easily be extended to do some useful work. It can even load and execute your existing functions in a C# DLL (see [Executing functions in a C# DLL](#executing-functions-in-a-c-dll)).
 - Option for custom pre- and post-processing task scripts. Useful if the overall batch processing task requires some additional setup / tear down work to be done.
@@ -62,7 +62,7 @@ This tool enables you to do things with Revit files on a very large scale. Becau
 
 ## Installer
 
-[Installer for Revit Batch Processor v1.13.0 beta](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.13.0/RevitBatchProcessorSetup_v1.13.0.exe)
+[Installer for Revit Batch Processor v1.13.0 beta](https://github.com/bvn-architecture/RevitBatchProcessor/releases/download/v1.13.0-beta/RevitBatchProcessorSetup_v1.13.0-beta.exe)
 
 The Revit Batch Processor (GUI) application will appear in the Start menu after the installation.
 
@@ -113,6 +113,7 @@ Daniel Rumery [@DanRumery](https://github.com/DanRumery) (Original / Primary Aut
 - Nicklas Ostergaard [@NicklasOestergaard](https://github.com/NicklasOestergaard) (Upgraded support for Revit 2022)
 - Peter Smith [@punderscoresmithuk](https://github.com/punderscoresmithuk) (Upgraded support for Revit 2023)
 - Maciej Wypych [@maciejwypych](https://github.com/maciejwypych) (Upgraded support for Revit 2024 and more)
+- Rob Mintzes [@rgdt-bert](https://github.com/rgdt-bert) (Upgraded support for Revit 2027)
 
 # Usage
 
