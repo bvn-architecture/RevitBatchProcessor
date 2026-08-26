@@ -1,4 +1,4 @@
-#define AppName "Revit Batch Processor_BVN"
+#define AppName "Revit Batch Processor"
 #define AppVersion "1.12.0"
 
 [Setup]
@@ -8,12 +8,12 @@ AppVerName={#AppName} {#AppVersion}
 PrivilegesRequired=admin
 AppId={{B5CA57EA-7BB2-4620-916C-AE98376C1EF1}
 DisableDirPage=auto
-DefaultDirName="C:\Program Files\BVN\RevitBatchProcessor"
+DefaultDirName="C:\Program Files\RevitBatchProcessor"
 SetupLogging=True
 ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 DefaultGroupName=Revit Batch Processor
-OutputBaseFilename=RevitBatchProcessorSetup_BVN_v{#AppVersion}
+OutputBaseFilename=RevitBatchProcessorSetup_admin_v{#AppVersion}
 
 ; TODO VERSION UPDATE - ADD FILES TO INSTALLER CONFIG
 

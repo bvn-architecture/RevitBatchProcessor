@@ -220,8 +220,10 @@ public static class BatchRvt
 
     public static bool IsBatchRvtAddinInstalled(RevitVersion.SupportedRevitVersion revitVersion)
     {
+        // Revit 2027+ deploys manifests to Program Files\Autodesk\Revit\Addins\<year>, in
+        // addition to the per-machine (ProgramData) and per-user (AppData) locations.
         var revitAddinsBaseFolders = new[]
-            { Environment.SpecialFolder.CommonApplicationData, Environment.SpecialFolder.ApplicationData };
+            { Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.CommonApplicationData, Environment.SpecialFolder.ApplicationData };
 
         var revitAddinsFolderPaths = revitAddinsBaseFolders
             .Select(f => RevitVersion.GetRevitAddinsFolderPath(revitVersion, f)).ToList();

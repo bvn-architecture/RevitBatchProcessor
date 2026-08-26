@@ -148,19 +148,18 @@ public static class RevitVersion
         using var sk = Registry.LocalMachine.OpenSubKey(appPath);
         if (sk is null) return null;
 
-        string revitSubkey = null;
+        // Newer Revit versions (e.g. 2027) expose multiple "REVIT-*" subkeys, only one of
+        // which holds InstallationLocation. Pick the first subkey that actually has the value.
         foreach (var revitKey in sk.GetSubKeyNames())
         {
             if (!revitKey.Contains("REVIT-")) continue;
 
-            revitSubkey = revitKey;
+            using var rk = sk.OpenSubKey(revitKey);
+            var installLocation = rk?.GetValue("InstallationLocation");
+            if (installLocation != null) return installLocation.ToString();
         }
 
-        if (revitSubkey == null) return null;
-
-        using var rk = sk.OpenSubKey(revitSubkey);
-        var installLocation = rk?.GetValue("InstallationLocation");
-        return installLocation?.ToString();
+        return null;
     }
 
     public static string GetRevitExecutableFolderPath(SupportedRevitVersion revitVersion)

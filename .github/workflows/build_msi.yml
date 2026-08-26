@@ -38,7 +38,7 @@ jobs:
             echo "Numeric only from that is $version_number"
             echo "version=$version_number" >> $env:GITHUB_OUTPUT
           
-      - name: Update installer config
+      - name: Update user installer config
         run: |
             $content = Get-Content -Path Setup/RevitBatchProcessor.iss -Raw
             echo "Input installer config is $content"
@@ -54,6 +54,23 @@ jobs:
             
             echo "Updated installer config is $content"
             Set-Content -Path Setup/RevitBatchProcessor.iss -Value $content
+
+      - name: Update admin installer config
+        run: |
+            $content = Get-Content -Path Setup/RevitBatchProcessor_admin.iss -Raw
+            echo "Input installer config is $content"
+            $tag = "${{ github.event.release.tag_name }}"
+            # Replace the entire OutputBaseFilename line based on tag
+            if ($tag -like "*-beta") {
+                $content = $content -replace 'OutputBaseFilename=.*', 'OutputBaseFilename=RevitBatchProcessorSetup_admin_v{#AppVersion}-beta'
+            } else {
+                $content = $content -replace 'OutputBaseFilename=.*', 'OutputBaseFilename=RevitBatchProcessorSetup_admin_v{#AppVersion}'
+            }
+            $content = $content -replace '#define AppVersion ".*"', '#define AppVersion "${{steps.version_num_set.outputs.version}}"'
+            
+            
+            echo "Updated installer config is $content"
+            Set-Content -Path Setup/RevitBatchProcessor_admin.iss -Value $content
 
       - name: Update version number - GlobalAssemblyInfo.cs
         run: |
@@ -87,11 +104,15 @@ jobs:
             $guiOut = "BatchRvtGUI/bin/x64/Release"
             $res = Test-DirWithFiles $guiOut; if ($res) { $missing += $res }
 
-            # 3. Addin years 2015-2026 (directories + .addin files)
-            foreach ($year in 2015..2026) {
+            # 3. Addin years 2015-2027 (directories + .addin files)
+            foreach ($year in 2015..2027) {
               $addinDir = "BatchRvtAddin$year/bin/x64/Release"
               $res = Test-DirWithFiles $addinDir; if ($res) { $missing += $res }
-              $addinFile = "BatchRvtAddin$year/BatchRvtAddin$year.addin"
+              if ($year -eq 2027) {
+                $addinFile = "BatchRvtAddin$year/BatchRvtAddin${year}_admin.addin"
+              } else {
+                $addinFile = "BatchRvtAddin$year/BatchRvtAddin$year.addin"
+              }
               if (-not (Test-Path -Path $addinFile -PathType Leaf)) { $missing += "Missing file: $addinFile" }
             }
 
@@ -102,17 +123,29 @@ jobs:
               $missing | ForEach-Object { Write-Host $_ }
             }
 
-      - name: Create installer file
-        id: create_installer_file
+      - name: Create user installer file
+        id: create_installer_file_user
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.9
         with: 
           path: Setup/RevitBatchProcessor.iss
           
-      - name: Upload Release Asset
-        id: upload-release-asset 
+      - name: Upload Release Asset - user install msi
+        id: upload-release-asset_user 
         uses: softprops/action-gh-release@v2
         with:
           files: Setup\Output\RevitBatchProcessorSetup_${{github.event.release.tag_name}}.exe
+
+      - name: Create admin installer file
+        id: create_installer_file_admin
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.9
+        with: 
+          path: Setup/RevitBatchProcessor_admin.iss
+          
+      - name: Upload Release Asset - admin install msi
+        id: upload-release-asset_admin
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Setup\Output\RevitBatchProcessorSetup_admin_${{github.event.release.tag_name}}.exe
 
       - name: Update readme with new version
         env:
