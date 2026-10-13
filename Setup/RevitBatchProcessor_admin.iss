@@ -1,5 +1,5 @@
 #define AppName "Revit Batch Processor"
-#define AppVersion "1.13.1-beta"
+#define AppVersion "1.13.1"
 
 [Setup]
 AppName={#AppName}
@@ -13,7 +13,7 @@ SetupLogging=True
 ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 DefaultGroupName=Revit Batch Processor
-OutputBaseFilename=RevitBatchProcessorSetup_admin_v{#AppVersion}
+OutputBaseFilename=RevitBatchProcessorSetup_admin_v{#AppVersion}-beta
 
 ; TODO VERSION UPDATE - ADD FILES TO INSTALLER CONFIG
 
@@ -48,3 +48,4 @@ Source: "..\BatchRvtAddin2027\BatchRvtAddin2027_admin.addin"; DestDir: "C:\Progr
 
 [Icons]
 Name: "{group}\Revit Batch Processor (GUI)"; Filename: "{app}\BatchRvtGUI.exe"; WorkingDir: "{app}"
+
